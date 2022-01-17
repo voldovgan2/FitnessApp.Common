@@ -13,7 +13,20 @@ namespace FitnessApp.Common.Abstractions.Db.DbContext
         public DbContext(IOptions<CosmosDbSettings> settings)
         {
             _cosmosClient = new CosmosClient(settings.Value.EndpointUri, settings.Value.PrimaryKey);
-            Container = _cosmosClient.GetContainer(settings.Value.DatabaseId, settings.Value.ContainerId);
+            var database = _cosmosClient.GetDatabase(settings.Value.DatabaseId);
+            var containerProperties = new ContainerProperties 
+            {
+                Id = settings.Value.ContainerId,
+                IndexingPolicy = new IndexingPolicy()
+                {
+                    Automatic = true,
+                    IndexingMode = IndexingMode.Consistent,
+                }
+            };
+            database
+                .CreateContainerIfNotExistsAsync(containerProperties)
+                .ContinueWith(result => Container = result.Result)
+                .Wait();
         }
 
         public Container Container { get; private set; }

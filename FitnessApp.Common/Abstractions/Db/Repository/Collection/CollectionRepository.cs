@@ -80,7 +80,7 @@ namespace FitnessApp.Common.Abstractions.Db.Repository.Collection
                 entity = _mapper.Convert<Entity>(model);
                 try
                 {
-                    entity = (await _dbContext.Container.CreateItemAsync(entity, new PartitionKey(entity.UserId))).Resource;
+                    entity = (await _dbContext.Container.CreateItemAsync(entity)).Resource;
                 }
                 catch (Exception ex)
                 {
@@ -148,7 +148,7 @@ namespace FitnessApp.Common.Abstractions.Db.Repository.Collection
                         break;
                 }
 
-                Entity replaced = (await _dbContext.Container.UpsertItemAsync(entity, new PartitionKey(model.UserId))).Resource;
+                Entity replaced = (await _dbContext.Container.UpsertItemAsync(entity)).Resource;
                 if (replaced != null)
                 {
                     result = _mapper.Convert<CollectionItemModel>(replaced);
@@ -172,7 +172,7 @@ namespace FitnessApp.Common.Abstractions.Db.Repository.Collection
             string result = null;
             try
             {
-                var deleted = (await _dbContext.Container.DeleteItemAsync<Entity>(userId, new PartitionKey(userId))).Resource;
+                var deleted = (await _dbContext.Container.DeleteItemAsync<Entity>(userId, PartitionKey.None)).Resource;
                 if (deleted != null)
                 {
                     result = userId;
