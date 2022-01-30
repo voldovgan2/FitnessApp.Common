@@ -1,9 +1,9 @@
-﻿using FitnessApp.Common.Abstractions.Db.Entities.Collection;
+﻿using AutoMapper;
+using FitnessApp.Common.Abstractions.Db.Entities.Collection;
 using FitnessApp.Common.Abstractions.Db.Repository.Collection;
 using FitnessApp.Common.Abstractions.Models.Collection;
 using FitnessApp.Common.Paged.Extensions;
 using FitnessApp.Common.Paged.Models.Output;
-using FitnessApp.Common.Serializer.JsonMapper;
 using Microsoft.Extensions.Logging;
 using System.Collections.Generic;
 using System.Linq;
@@ -21,12 +21,12 @@ namespace FitnessApp.Common.Abstractions.Services.Collection
         where UpdateModel : IUpdateCollectionModel
     {
         private readonly ICollectionRepository<Entity, CollectionItemEntity, Model, CollectionItemModel, CreateModel, UpdateModel> _repository;
-        private readonly IJsonMapper _mapper;
+        private readonly IMapper _mapper;
 
         public CollectionService
         (
             ICollectionRepository<Entity, CollectionItemEntity, Model, CollectionItemModel, CreateModel, UpdateModel> repository,
-            IJsonMapper mapper,
+            IMapper mapper,
             ILogger<CollectionService<Entity, CollectionItemEntity, Model, CollectionItemModel, CreateModel, UpdateModel>> log
         )
         {
@@ -48,7 +48,7 @@ namespace FitnessApp.Common.Abstractions.Services.Collection
             var item = await GetItemByUserIdAsync(model.UserId);
             if (item != null)
             {
-                var allItems = _mapper.Convert<IEnumerable<CollectionItemModel>>(item.Collection[model.CollectionName]);
+                var allItems = _mapper.Map<IEnumerable<CollectionItemModel>>(item.Collection[model.CollectionName]);
                 if (allItems != null)
                 {
                     allItems = allItems.Where(p => p.Matches(model.Search));
