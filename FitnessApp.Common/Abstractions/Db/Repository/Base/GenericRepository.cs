@@ -1,9 +1,9 @@
-﻿using FitnessApp.Common.Abstractions.Db.Configuration;
+﻿using AutoMapper;
+using FitnessApp.Common.Abstractions.Db.Configuration;
 using FitnessApp.Common.Abstractions.Db.DbContext;
 using FitnessApp.Common.Abstractions.Db.Entities.Base;
 using FitnessApp.Common.Abstractions.Models.Base;
 using FitnessApp.Common.Logger;
-using FitnessApp.Common.Serializer.JsonMapper;
 using Microsoft.Azure.Cosmos;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
@@ -22,13 +22,13 @@ namespace FitnessApp.Common.Abstractions.Db.Repository.Base
         where UpdateModel : IUpdateModel
     {
         private readonly DbContext<Entity> _dbContext;
-        private readonly IJsonMapper _mapper;
+        private readonly IMapper _mapper;
         private readonly ILogger<GenericRepository<Entity, Model, CreateModel, UpdateModel>> _log;
 
         public GenericRepository
         (
             IOptions<CosmosDbSettings> settings, 
-            IJsonMapper mapper, 
+            IMapper mapper,
             ILogger<GenericRepository<Entity, Model, CreateModel, UpdateModel>> log
         )
         {
@@ -42,22 +42,22 @@ namespace FitnessApp.Common.Abstractions.Db.Repository.Base
             IEnumerable<Entity> items = null;
             try
             {
-                items = _dbContext.Container.GetItemLinqQueryable<Entity>().ToList();
+                items = _dbContext.GetAllItems();
             }
             catch (Exception ex)
             {
                 _log.WriteException(ex);
             }
-            var result = items?.Select(entity => _mapper.Convert<Model>(entity));
+            var result = items?.Select(entity => _mapper.Map<Model>(entity));
             return Task.FromResult(result);
         }
 
         public virtual Task<Model> GetItemByUserIdAsync(string userId)
         {
-            Entity entity = default;
+            IEntity entity = default;
             try
             {
-                entity = _dbContext.Container.GetItemLinqQueryable<Entity>().Where(i => i.UserId == userId).Single();
+                entity = _dbContext.GetItemById(userId);
             }
             catch (Exception ex)
             {
@@ -66,22 +66,22 @@ namespace FitnessApp.Common.Abstractions.Db.Repository.Base
             Model result = default;
             if (entity != null)
             {
-                result = _mapper.Convert<Model>(entity);
+                result = _mapper.Map<Model>(entity);
             }
             return Task.FromResult(result);
         }
 
         public virtual async Task<Model> CreateItemAsync(CreateModel model)
         {
-            var itemExists = _dbContext.Container.GetItemLinqQueryable<Entity>().Where(i => i.UserId == model.UserId).Any();
+            var itemExists = _dbContext.TryGetItemById(model.UserId)!= null;
             Model result = default;
             if (!itemExists)
             {
-                var entity = _mapper.Convert<Entity>(model);
+                var entity = _mapper.Map<Entity>(model);
                 Entity created = default;
                 try
                 {
-                    created = (await _dbContext.Container.CreateItemAsync(entity)).Resource;
+                    created = await _dbContext.CreateItem(entity);
                 }
                 catch (Exception ex)
                 {
@@ -89,7 +89,7 @@ namespace FitnessApp.Common.Abstractions.Db.Repository.Base
                 }
                 if (created != null)
                 {
-                    result = _mapper.Convert<Model>(created);
+                    result = _mapper.Map<Model>(created);
                 }
             }
             else
@@ -104,9 +104,12 @@ namespace FitnessApp.Common.Abstractions.Db.Repository.Base
             Entity replaced = default;
             try
             {
-                var entity = _dbContext.Container.GetItemLinqQueryable<Entity>().Where(i => i.UserId == model.UserId).Single();
-                var propertiesToUpdate = model.GetType().GetProperties()
-                    .Where(p => p.GetValue(model, null) != null);
+                var entity = _dbContext.GetItemById(model.UserId);
+                var propertiesToUpdate = model
+                    .GetType()
+                    .GetProperties()
+                    .Where(p => p.GetValue(model, null) != null)
+                    .Where(p => p.Name != nameof(model.UserId));
                 var entityProperties = entity.GetType().GetProperties();
                 foreach (var propertyToUpdate in propertiesToUpdate)
                 {
@@ -121,7 +124,7 @@ namespace FitnessApp.Common.Abstractions.Db.Repository.Base
                         throw ex;
                     }
                 }
-                replaced = (await _dbContext.Container.UpsertItemAsync(entity)).Resource;                
+                replaced = await _dbContext.UpdateItem(entity);                
             }
             catch (Exception ex)
             {
@@ -130,7 +133,7 @@ namespace FitnessApp.Common.Abstractions.Db.Repository.Base
             Model result = default;
             if (replaced != null)
             {
-                result = _mapper.Convert<Model>(replaced);
+                result = _mapper.Map<Model>(replaced);
             }
             return result;
         }
@@ -140,8 +143,8 @@ namespace FitnessApp.Common.Abstractions.Db.Repository.Base
             string result = null;
             try
             {
-                var deleted = (await _dbContext.Container.DeleteItemAsync<Entity>(userId, PartitionKey.None)).Resource;
-                if (deleted != null)
+                var deleted = await _dbContext.DeleteItem(userId);
+                if (deleted)
                 {
                     result = userId;
                 }

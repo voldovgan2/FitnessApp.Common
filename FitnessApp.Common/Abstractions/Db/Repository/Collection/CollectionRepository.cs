@@ -1,15 +1,14 @@
-﻿using FitnessApp.Common.Abstractions.Db.Configuration;
+﻿using AutoMapper;
+using FitnessApp.Common.Abstractions.Db.Configuration;
 using FitnessApp.Common.Abstractions.Db.DbContext;
 using FitnessApp.Common.Abstractions.Db.Entities.Collection;
 using FitnessApp.Common.Abstractions.Db.Enums.Collection;
 using FitnessApp.Common.Abstractions.Models.Collection;
 using FitnessApp.Common.Logger;
-using FitnessApp.Common.Serializer.JsonMapper;
-using Microsoft.Azure.Cosmos;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
+using Newtonsoft.Json;
 using System;
-using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 
@@ -25,18 +24,18 @@ namespace FitnessApp.Common.Abstractions.Db.Repository.Collection
         where UpdateModel : IUpdateCollectionModel
     {
         private readonly DbContext<Entity> _dbContext;
-        private readonly IJsonMapper _mapper;
-        private const string _idPropertyName = "Id";
+        private readonly IMapper _mapper;
         private readonly ILogger<CollectionRepository<Entity, CollectionItemEntity, Model, CollectionItemModel, CreateModel, UpdateModel>> _log;
 
         public CollectionRepository
         (
             IOptions<CosmosDbSettings> settings,
-            IJsonMapper mapper,
-            ILogger<CollectionRepository<Entity, CollectionItemEntity, Model, CollectionItemModel, CreateModel, UpdateModel>> log
+            IMapper mapper,
+            ILogger<CollectionRepository<Entity, CollectionItemEntity, Model, CollectionItemModel, CreateModel, UpdateModel>> log,
+            JsonConverter[] converters
         )
         {
-            _dbContext = new DbContext<Entity>(settings);
+            _dbContext = new DbContext<Entity>(settings, converters);
             _mapper = mapper;
             _log = log;
         }
@@ -46,7 +45,7 @@ namespace FitnessApp.Common.Abstractions.Db.Repository.Collection
             Entity entity = default;
             try
             {
-                entity = _dbContext.Container.GetItemLinqQueryable<Entity>().Where(i => i.UserId == userId).Single();
+                entity = _dbContext.GetItemById(userId);
             }
             catch (Exception ex)
             {
@@ -55,32 +54,21 @@ namespace FitnessApp.Common.Abstractions.Db.Repository.Collection
             Model result = default;
             if (entity != null)
             {  
-                result = _mapper.Convert<Model>(entity, new string[] { nameof(entity.Collection) });
-                result.Collection = new Dictionary<string, IEnumerable<ICollectionItemModel>>();
-                foreach(var kvp in entity.Collection)
-                {
-                    var items = _mapper.Convert<IEnumerable<CollectionItemModel>>(kvp.Value);
-                    var collectionItems = new List<ICollectionItemModel>();
-                    foreach (var item in items)
-                    {
-                        collectionItems.Add(item);
-                    }
-                    result.Collection.Add(kvp.Key, collectionItems);
-                }
+                result = _mapper.Map<Model>(entity);
             }
             return Task.FromResult(result);
         }
 
         public virtual async Task<string> CreateItemAsync(CreateModel model)
         {
-            var itemExists = _dbContext.Container.GetItemLinqQueryable<Entity>().Where(i => i.UserId == model.UserId).Any();
+            var itemExists = _dbContext.TryGetItemById(model.UserId) != null;
             Entity entity = default;
             if (!itemExists)
             {
-                entity = _mapper.Convert<Entity>(model);
+                entity = _mapper.Map<Entity>(model);
                 try
                 {
-                    entity = (await _dbContext.Container.CreateItemAsync(entity)).Resource;
+                    entity = await _dbContext.CreateItem(entity);
                 }
                 catch (Exception ex)
                 {
@@ -100,14 +88,14 @@ namespace FitnessApp.Common.Abstractions.Db.Repository.Collection
             CollectionItemModel result = default;
             try
             {
-                var entity = _dbContext.Container.GetItemLinqQueryable<Entity>().Where(i => i.UserId == model.UserId).Single();
+                var entity = _dbContext.GetItemById(model.UserId);
                 var collection = entity.Collection[model.CollectionName];
                 CollectionItemEntity itemEntity = default;
                 switch (model.Action)
                 {
                     case UpdateCollectionAction.Add:
                         {
-                            var added = _mapper.Convert<CollectionItemEntity>(model.Model);
+                            var added = _mapper.Map<CollectionItemEntity>(model.Model);
                             if (added.Id == null)
                             {
                                 added.Id = Guid.NewGuid().ToString();
@@ -121,7 +109,7 @@ namespace FitnessApp.Common.Abstractions.Db.Repository.Collection
                             var updated = collection.Single(i => i.Id == model.Model.Id);
                             var propertiesToUpdate = model.Model.GetType().GetProperties()
                                 .Where(p => p.GetValue(model.Model, null) != null)
-                                .Where(p => p.Name.ToUpper() != _idPropertyName.ToUpper());
+                                .Where(p => p.Name != nameof(model.Model.Id));
                             var entityProperties = typeof(CollectionItemEntity).GetProperties();
                             foreach (var propertyToUpdate in propertiesToUpdate)
                             {
@@ -136,22 +124,22 @@ namespace FitnessApp.Common.Abstractions.Db.Repository.Collection
                                     throw ex;
                                 }
                             }
-                            itemEntity = _mapper.Convert<CollectionItemEntity>(updated);
+                            itemEntity = _mapper.Map<CollectionItemEntity>(updated);
                         }
                         break;
                     case UpdateCollectionAction.Remove:
                         {
                             var removed = collection.Single(i => i.Id == model.Model.Id);
                             collection.Remove(removed);
-                            itemEntity = _mapper.Convert<CollectionItemEntity>(removed);
+                            itemEntity = _mapper.Map<CollectionItemEntity>(removed);
                         }
                         break;
                 }
 
-                Entity replaced = (await _dbContext.Container.UpsertItemAsync(entity)).Resource;
+                Entity replaced = await _dbContext.UpdateItem(entity);
                 if (replaced != null)
                 {
-                    result = _mapper.Convert<CollectionItemModel>(replaced);
+                    result = _mapper.Map<CollectionItemModel>(itemEntity);
                 }
                 else
                 {
@@ -172,8 +160,8 @@ namespace FitnessApp.Common.Abstractions.Db.Repository.Collection
             string result = null;
             try
             {
-                var deleted = (await _dbContext.Container.DeleteItemAsync<Entity>(userId, PartitionKey.None)).Resource;
-                if (deleted != null)
+                var deleted = await _dbContext.DeleteItem(userId);
+                if (deleted)
                 {
                     result = userId;
                 }

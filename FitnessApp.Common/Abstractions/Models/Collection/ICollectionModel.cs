@@ -6,6 +6,6 @@ namespace FitnessApp.Common.Abstractions.Models.Collection
     public interface ICollectionModel : IModel
     {
         string UserId { get; set; }
-        Dictionary<string, IEnumerable<ICollectionItemModel>> Collection { get; set; }
+        Dictionary<string, List<ICollectionItemModel>> Collection { get; set; }
     }
 }
