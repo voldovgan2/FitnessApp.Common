@@ -1,0 +1,88 @@
+# ASP.NET Core (.NET Framework)
+# Build and test ASP.NET Core projects targeting the full .NET Framework.
+# Add steps that publish symbols, save build artifacts, and more:
+# https://docs.microsoft.com/azure/devops/pipelines/languages/dotnet-core
+
+trigger:
+- master
+
+pool:
+  vmImage: 'windows-latest'
+
+name: 1.0.$(Rev:r)
+
+variables:
+  solution: '**/*.sln'
+  buildPlatform: 'Any CPU'
+  buildConfiguration: 'Release'
+  nupkgVersion: '$(Build.BuildNumber)'
+
+steps:
+- checkout: self
+  fetchDepth: 0
+  
+- task: NuGetToolInstaller@1
+  displayName: Install nuget tools
+
+- task: NuGetCommand@2
+  displayName: NuGet restore
+  inputs:
+    command: 'restore'
+    restoreSolution: '**/*.sln'
+    feedsToUse: 'select'
+    vstsFeed: 'd4b2f77e-b5c6-4527-9536-edcd13c21ed4/127819fe-d4da-4c0d-a38a-7ddf2d084207'
+
+- task: SonarCloudPrepare@1
+  displayName: Prepare Sonar cloud
+  inputs:
+    SonarCloud: 'SonarCloud'
+    organization: 'volodimirdovgan'
+    scannerMode: 'MSBuild'
+    projectKey: 'volodimirdovgan_FitnessApp.Common'
+    projectName: 'FitnessApp.Common'
+
+- task: DotNetCoreCLI@2
+  displayName: Build solution
+  inputs:
+    command: 'build'
+
+- task: SonarCloudAnalyze@1
+  displayName: Sonar cloud analyze
+  inputs:
+    jdkversion: 'JAVA_HOME_17_X64'
+
+- task: SonarCloudPublish@1
+  displayName: Sonar cloud publis results
+  inputs:
+    pollingTimeoutSec: '300'
+
+- task: DotNetCoreCLI@2
+  displayName: Run tests
+  inputs:
+    command: test
+    projects: '**/*Tests/*.csproj'
+    arguments: '--configuration $(buildConfiguration)'
+
+- task: DotNetCoreCLI@2
+  displayName: NuGet pack
+  inputs:
+    command: pack
+    versioningScheme: byEnvVar
+    versionEnvVar: nupkgVersion
+    packagesToPack: '**/*.csproj;!**/*Tests/*.csproj'
+    
+- task: NuGetCommand@2
+  displayName: NuGet push
+  inputs:
+    command: 'push'
+    packagesToPush: '$(Build.ArtifactStagingDirectory)/**/*.nupkg;!$(Build.ArtifactStagingDirectory)/**/*.symbols.nupkg'
+    nuGetFeedType: 'internal'
+    publishVstsFeed: 'd4b2f77e-b5c6-4527-9536-edcd13c21ed4/127819fe-d4da-4c0d-a38a-7ddf2d084207'
+
+- task: PublishBuildArtifacts@1
+  displayName: Publish Artifact
+  condition: succeededOrFailed()
+  inputs:
+    PathtoPublish: $(build.artifactstagingdirectory)
+    ArtifactName: $(BuildParameters.ArtifactName)
+    TargetPath: '\\my\share\$(Build.DefinitionName)\$(Build.BuildNumber)'
