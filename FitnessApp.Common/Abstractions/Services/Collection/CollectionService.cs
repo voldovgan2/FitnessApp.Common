@@ -5,7 +5,6 @@ using FitnessApp.Common.Abstractions.Db.Repository.Collection;
 using FitnessApp.Common.Abstractions.Extensions;
 using FitnessApp.Common.Abstractions.Models.Collection;
 using FitnessApp.Common.Abstractions.Models.Validation;
-using FitnessApp.Common.Abstractions.Services.Search;
 using FitnessApp.Common.Abstractions.Services.Validation;
 using FitnessApp.Common.Paged.Extensions;
 using FitnessApp.Common.Paged.Models.Output;
@@ -20,15 +19,12 @@ namespace FitnessApp.Common.Abstractions.Services.Collection
         where TUpdateCollectionModel : IUpdateCollectionModel
     {
         private readonly ICollectionRepository<TCollectionModel, TCollectionItemModel, TCreateCollectionModel, TUpdateCollectionModel> _repository;
-        private readonly ISearchService _searchService;
 
         protected CollectionService(
-            ICollectionRepository<TCollectionModel, TCollectionItemModel, TCreateCollectionModel, TUpdateCollectionModel> repository,
-            ISearchService searchService
+            ICollectionRepository<TCollectionModel, TCollectionItemModel, TCreateCollectionModel, TUpdateCollectionModel> repository
         )
         {
             _repository = repository;
-            _searchService = searchService;
         }
 
         public virtual async Task<TCollectionModel> GetItemByUserId(string userId)
@@ -63,9 +59,7 @@ namespace FitnessApp.Common.Abstractions.Services.Collection
             var allItems = await _repository.GetCollectionByUserId(model.UserId, model.CollectionName);
             if (allItems != null)
             {
-                var itemsBySearch = await _searchService.Search(search);
-                allItems = allItems.Where(model.Predicate)
-                .Where(i => itemsBySearch.Contains(i.Id));
+                allItems = allItems.Where(model.Predicate);
                 result = allItems.ToPaged(model);
             }
 

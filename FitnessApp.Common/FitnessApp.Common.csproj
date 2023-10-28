@@ -12,22 +12,27 @@
     <Description>FitnessApp.Common</Description>    
   </PropertyGroup>
 
+  <PropertyGroup>
+    <RepositoryUrl>https://github.com/voldovgan2/FitnessApp.Common</RepositoryUrl>
+  </PropertyGroup>
+
   <ItemGroup>	
-    <PackageReference Include="Azure.Search.Documents" Version="11.4.0" />	
-    <PackageReference Include="Microsoft.ApplicationInsights" Version="2.21.0" />	
-    <PackageReference Include="Microsoft.Extensions.Azure" Version="1.7.0" />	
     <PackageReference Include="Microsoft.Extensions.Caching.Abstractions" Version="6.0.0" />
     <PackageReference Include="Microsoft.Extensions.Hosting.Abstractions" Version="6.0.0" />
     <PackageReference Include="Microsoft.Extensions.Logging.Abstractions" Version="6.0.0" />
     <PackageReference Include="Microsoft.Extensions.Options" Version="6.0.0" />
-	<PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="6.0.0" />
+	  <PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="6.0.0" />
     <PackageReference Include="Microsoft.Azure.AppConfiguration.AspNetCore" Version="6.0.0" />
-    <PackageReference Include="MongoDB.Driver" Version="2.18.0" />    
-	<PackageReference Include="Swashbuckle.AspNetCore" Version="6.0.4" />
-	<PackageReference Include="Swashbuckle.AspNetCore.Filters" Version="6.0.1" />
-	<PackageReference Include="AutoMapper" Version="11.0.0" />	
-	<PackageReference Include="Azure.Storage.Blobs" Version="12.14.0" />
-	<PackageReference Include="FitnessApp.ServiceBus" Version="1.0.19" />
+    <PackageReference Include="MongoDB.Driver" Version="2.18.0" />
+    <PackageReference Include="Serilog.AspNetCore" Version="6.0.0" />
+    <PackageReference Include="Serilog.Enrichers.Environment" Version="2.3.0" />
+    <PackageReference Include="Serilog.Exceptions" Version="8.4.0" />
+    <PackageReference Include="Serilog.Sinks.Debug" Version="2.0.0" />
+    <PackageReference Include="Serilog.Sinks.Elasticsearch" Version="9.0.3" />    
+	  <PackageReference Include="Swashbuckle.AspNetCore" Version="6.0.4" />
+	  <PackageReference Include="Swashbuckle.AspNetCore.Filters" Version="6.0.1" />
+	  <PackageReference Include="AutoMapper" Version="11.0.0" />	
+    <PackageReference Include="NATS.Client" Version="1.1.0" />
   </ItemGroup>
 
 </Project>

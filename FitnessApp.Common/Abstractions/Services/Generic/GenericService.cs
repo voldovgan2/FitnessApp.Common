@@ -9,7 +9,6 @@ using FitnessApp.Common.Abstractions.Db.Repository.Generic;
 using FitnessApp.Common.Abstractions.Extensions;
 using FitnessApp.Common.Abstractions.Models.Generic;
 using FitnessApp.Common.Abstractions.Models.Validation;
-using FitnessApp.Common.Abstractions.Services.Search;
 using FitnessApp.Common.Abstractions.Services.Validation;
 
 namespace FitnessApp.Common.Abstractions.Services.Generic
@@ -22,17 +21,14 @@ namespace FitnessApp.Common.Abstractions.Services.Generic
         where TUpdateGenericModel : IUpdateGenericModel
     {
         private readonly IGenericRepository<TGenericEntity, TGenericModel, TCreateGenericModel, TUpdateGenericModel> _repository;
-        private readonly ISearchService _searchService;
         private readonly IMapper _mapper;
 
         protected GenericService(
             IGenericRepository<TGenericEntity, TGenericModel, TCreateGenericModel, TUpdateGenericModel> repository,
-            ISearchService searchService,
             IMapper mapper
         )
         {
             _repository = repository;
-            _searchService = searchService;
             _mapper = mapper;
         }
 
@@ -46,9 +42,7 @@ namespace FitnessApp.Common.Abstractions.Services.Generic
 
         public async Task<IEnumerable<TGenericModel>> GetItems(string search, Expression<Func<TGenericEntity, bool>> predicate)
         {
-            var itemsBySearch = await _searchService.Search(search);
             var data = (await _repository.GetAllItems())
-                .Where(i => itemsBySearch.Contains(i.UserId))
                 .Where(predicate)
                 .ToList();
             var result = _mapper.Map<List<TGenericModel>>(data);

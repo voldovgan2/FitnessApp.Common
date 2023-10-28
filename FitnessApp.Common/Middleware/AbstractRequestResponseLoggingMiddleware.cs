@@ -2,21 +2,19 @@
 using System.IO;
 using System.Text;
 using System.Threading.Tasks;
-using Microsoft.ApplicationInsights.DataContracts;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Http.Features;
+using Serilog;
 
 namespace FitnessApp.Common.Middleware
 {
     public abstract class AbstractRequestResponseLoggingMiddleware
     {
         private readonly RequestDelegate _next;
-        private readonly string _telemetryName;
 
-        protected AbstractRequestResponseLoggingMiddleware(RequestDelegate next, string telemetryName)
+        protected AbstractRequestResponseLoggingMiddleware(RequestDelegate next)
         {
             _next = next;
-            _telemetryName = telemetryName;
         }
 
         public async Task Invoke(HttpContext context)
@@ -30,7 +28,7 @@ namespace FitnessApp.Common.Middleware
             await AppendResponseBody(context.Response.StatusCode, copyBodyStream, context.Request.Path, stringBuilder);
 
             context.Response.Body = copyBodyStream;
-            context.Features.Get<RequestTelemetry>().Properties.Add(_telemetryName, stringBuilder.ToString());
+            context.Features.Get<ILogger>().Information(stringBuilder.ToString());
         }
 
         private async Task AppendRequestData(HttpRequest request, StringBuilder stringBuilder)

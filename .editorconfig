@@ -107,6 +107,7 @@ dotnet_diagnostic.SA1124.severity = silent
 dotnet_diagnostic.S4035.severity = silent
 dotnet_diagnostic.SA1123.severity = silent
 csharp_space_around_binary_operators = before_and_after
+dotnet_diagnostic.SA1310.severity = silent
 [*.{cs,vb}]
 #### Naming styles ####
 

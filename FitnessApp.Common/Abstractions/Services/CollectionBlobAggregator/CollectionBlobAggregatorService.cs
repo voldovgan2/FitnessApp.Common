@@ -13,7 +13,7 @@ using FitnessApp.Common.Abstractions.Models.Validation;
 using FitnessApp.Common.Abstractions.Services.Collection;
 using FitnessApp.Common.Abstractions.Services.Configuration;
 using FitnessApp.Common.Abstractions.Services.Validation;
-using FitnessApp.Common.Blob;
+using FitnessApp.Common.Files;
 using FitnessApp.Common.Paged.Extensions;
 using FitnessApp.Common.Paged.Models.Output;
 
@@ -31,13 +31,13 @@ namespace FitnessApp.Common.Abstractions.Services.CollectionBlobAggregator
         where TUpdateCollectionModel : IUpdateCollectionModel
     {
         private readonly ICollectionService<TCollectionModel, TCollectionItemModel, TCreateCollectionModel, TUpdateCollectionModel> _collectionService;
-        protected readonly IBlobService _blobService;
+        protected readonly IFilesService _blobService;
         protected readonly IMapper _mapper;
         private readonly CollectionBlobAggregatorSettings _collectionBlobAggregatorSettings;
 
         protected CollectionBlobAggregatorService(
             ICollectionService<TCollectionModel, TCollectionItemModel, TCreateCollectionModel, TUpdateCollectionModel> collectionService,
-            IBlobService blobService,
+            IFilesService blobService,
             IMapper mapper,
             CollectionBlobAggregatorSettings collectionBlobAggregatorSettings
         )
@@ -151,7 +151,7 @@ namespace FitnessApp.Common.Abstractions.Services.CollectionBlobAggregator
                 if (blobField.Value != null)
                 {
                     var blobContent = Encoding.Default.GetBytes(blobField.Value);
-                    await _blobService.UploadFile(_collectionBlobAggregatorSettings.ContainerName, BlobService.CreateBlobName(blobField.FieldName, result.Model.Id), new MemoryStream(blobContent));
+                    await _blobService.UploadFile(_collectionBlobAggregatorSettings.ContainerName, FilesService.CreateBlobName(blobField.FieldName, result.Model.Id), new MemoryStream(blobContent));
                     result.Images.Add(blobField);
                 }
             }
@@ -186,7 +186,7 @@ namespace FitnessApp.Common.Abstractions.Services.CollectionBlobAggregator
                 var collectionBlobFields = _collectionBlobAggregatorSettings.CollectionsBlobFields[collectionName];
                 foreach (var blobField in collectionBlobFields)
                 {
-                    var blobContent = await _blobService.DownloadFile(_collectionBlobAggregatorSettings.ContainerName, BlobService.CreateBlobName(blobField, collectionItemModel.Id));
+                    var blobContent = await _blobService.DownloadFile(_collectionBlobAggregatorSettings.ContainerName, FilesService.CreateBlobName(blobField, collectionItemModel.Id));
                     if (blobContent != null)
                     {
                         collectionBlobAggregatorItemModel.Images.Add(new BlobImageModel
@@ -219,7 +219,7 @@ namespace FitnessApp.Common.Abstractions.Services.CollectionBlobAggregator
         {
             foreach (var blobField in blobFields)
             {
-                await _blobService.DeleteFile(_collectionBlobAggregatorSettings.ContainerName, BlobService.CreateBlobName(blobField, itemId));
+                await _blobService.DeleteFile(_collectionBlobAggregatorSettings.ContainerName, FilesService.CreateBlobName(blobField, itemId));
             }
         }
     }

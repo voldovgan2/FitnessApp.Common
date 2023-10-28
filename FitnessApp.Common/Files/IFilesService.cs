@@ -1,9 +1,9 @@
 ﻿using System.IO;
 using System.Threading.Tasks;
 
-namespace FitnessApp.Common.Blob
+namespace FitnessApp.Common.Files
 {
-    public interface IBlobService
+    public interface IFilesService
     {
         Task UploadFile(string path, string name, Stream stream);
         Task<byte[]> DownloadFile(string path, string name);

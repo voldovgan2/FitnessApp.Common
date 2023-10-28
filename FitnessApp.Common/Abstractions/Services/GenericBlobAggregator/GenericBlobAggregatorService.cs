@@ -12,7 +12,7 @@ using FitnessApp.Common.Abstractions.Models.GenericBlobAggregator;
 using FitnessApp.Common.Abstractions.Services.Configuration;
 using FitnessApp.Common.Abstractions.Services.Generic;
 using FitnessApp.Common.Abstractions.Services.Validation;
-using FitnessApp.Common.Blob;
+using FitnessApp.Common.Files;
 
 namespace FitnessApp.Common.Abstractions.Services.GenericBlobAggregator
 {
@@ -27,13 +27,13 @@ namespace FitnessApp.Common.Abstractions.Services.GenericBlobAggregator
         where TUpdateGenericModel : IUpdateGenericModel
     {
         protected readonly IGenericService<TGenericEntity, TGenericModel, TCreateGenericModel, TUpdateGenericModel> _genericService;
-        protected readonly IBlobService _blobService;
+        protected readonly IFilesService _blobService;
         protected readonly IMapper _mapper;
         protected readonly GenericBlobAggregatorSettings _genericBlobAggregatorSettings;
 
         protected GenericBlobAggregatorService(
             IGenericService<TGenericEntity, TGenericModel, TCreateGenericModel, TUpdateGenericModel> genericService,
-            IBlobService blobService,
+            IFilesService blobService,
             IMapper mapper,
             GenericBlobAggregatorSettings genericBlobAggregatorSettings
         )
@@ -104,7 +104,7 @@ namespace FitnessApp.Common.Abstractions.Services.GenericBlobAggregator
                 if (blobField.Value != null)
                 {
                     var blobContent = Encoding.Default.GetBytes(blobField.Value);
-                    await _blobService.UploadFile(_genericBlobAggregatorSettings.ContainerName, BlobService.CreateBlobName(blobField.FieldName, result.Model.UserId), new MemoryStream(blobContent));
+                    await _blobService.UploadFile(_genericBlobAggregatorSettings.ContainerName, FilesService.CreateBlobName(blobField.FieldName, result.Model.UserId), new MemoryStream(blobContent));
                     result.Images.Add(blobField);
                 }
             }
@@ -120,7 +120,7 @@ namespace FitnessApp.Common.Abstractions.Services.GenericBlobAggregator
 
             foreach (var blobField in _genericBlobAggregatorSettings.BlobFields)
             {
-                var blobContent = await _blobService.DownloadFile(_genericBlobAggregatorSettings.ContainerName, BlobService.CreateBlobName(blobField, dataModel.UserId));
+                var blobContent = await _blobService.DownloadFile(_genericBlobAggregatorSettings.ContainerName, FilesService.CreateBlobName(blobField, dataModel.UserId));
                 if (blobContent != null)
                 {
                     result.Images.Add(new BlobImageModel
@@ -149,7 +149,7 @@ namespace FitnessApp.Common.Abstractions.Services.GenericBlobAggregator
         {
             foreach (var blobField in _genericBlobAggregatorSettings.BlobFields)
             {
-                await _blobService.DeleteFile(_genericBlobAggregatorSettings.ContainerName, BlobService.CreateBlobName(blobField, userId));
+                await _blobService.DeleteFile(_genericBlobAggregatorSettings.ContainerName, FilesService.CreateBlobName(blobField, userId));
             }
         }
     }

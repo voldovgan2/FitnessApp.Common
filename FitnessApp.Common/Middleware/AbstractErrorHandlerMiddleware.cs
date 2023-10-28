@@ -3,6 +3,7 @@ using System.Net;
 using System.Threading.Tasks;
 using FitnessApp.Common.Serializer.JsonSerializer;
 using Microsoft.AspNetCore.Http;
+using Serilog;
 
 namespace FitnessApp.Common.Middleware
 {
@@ -11,7 +12,9 @@ namespace FitnessApp.Common.Middleware
         private readonly RequestDelegate _next;
         private readonly IJsonSerializer _serializer;
 
-        protected AbstractErrorHandlerMiddleware(RequestDelegate next, IJsonSerializer serializer)
+        protected AbstractErrorHandlerMiddleware(
+            RequestDelegate next,
+            IJsonSerializer serializer)
         {
             _next = next;
             _serializer = serializer;
@@ -26,6 +29,7 @@ namespace FitnessApp.Common.Middleware
             catch (Exception error)
             {
                 await HandleGlobalError(context, error);
+                Log.Error(error, "");
                 var response = context.Response;
                 response.ContentType = "application/json";
                 response.StatusCode = (int)GetStatusCodeByError(error);

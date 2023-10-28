@@ -1,8 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
 using FitnessApp.Common.Abstractions.Models.Validation;
-using Microsoft.Azure.Amqp.Framing;
 
 namespace FitnessApp.Common.Exceptions
 {

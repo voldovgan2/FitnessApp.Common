@@ -6,19 +6,20 @@ namespace FitnessApp.Common.Configuration.Identity
 {
     public static class AzureAdExtensions
     {
-        public static IServiceCollection ConfigureAzureAdAuthentication(this IServiceCollection services, IConfiguration configuration)
+        public static IServiceCollection ConfigureAuthentication(this IServiceCollection services, IConfiguration configuration)
         {
-            services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
-                .AddJwtBearer(options =>
-                 {
-                     options.Audience = configuration["AzureAd:Audience"];
-                     options.Authority = configuration["AzureAd:Authority"];
-                     options.TokenValidationParameters = new Microsoft.IdentityModel.Tokens.TokenValidationParameters
-                     {
-                         ValidAudience = configuration["AzureAd:ValidAudience"],
-                         ValidIssuer = configuration["AzureAd:ValidIssuer"]
-                     };
-                 });
+            services.AddAuthentication(opts =>
+            {
+                opts.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
+                opts.DefaultScheme = JwtBearerDefaults.AuthenticationScheme;
+                opts.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
+            })
+                .AddJwtBearer(cfg =>
+                {
+                    cfg.RequireHttpsMetadata = false;
+                    cfg.Authority = configuration["OpenIdConnect:Issuer"];
+                    cfg.Audience = configuration["OpenIdConnect:Audience"];
+                });
             return services;
         }
     }
