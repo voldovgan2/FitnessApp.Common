@@ -12,7 +12,8 @@ jobs:
       CommitsSinceVersionSource: ${{ steps.gitversion.outputs.CommitsSinceVersionSource }} 
 
     steps:
-    - uses: actions/checkout@v2
+    - name: Check out Code 
+      uses: actions/checkout@v2
       with:
         fetch-depth: 0 #fetch-depth is needed for GitVersion
         
@@ -21,9 +22,14 @@ jobs:
       uses: gittools/actions/gitversion/setup@v0.9.7
       with:
         versionSpec: 5.x
+        
     - name: Determine Version
       uses: gittools/actions/gitversion/execute@v0.9.7
       id: gitversion # step id used as reference for output values
+      with:
+          useConfigFile: true
+          configFilePath: ./.github/gitversion.yml 
+      
     - name: Display GitVersion outputs
       run: |
         echo "Version: ${{ steps.gitversion.outputs.SemVer }}"
@@ -34,8 +40,16 @@ jobs:
       uses: actions/setup-dotnet@v1
       with:
         dotnet-version: 6.0.x
-    - name: Build and Pack NuGet package
-      run: dotnet pack src/services/Florage.Shared/Florage.Shared.csproj -p:Version='${{ steps.gitversion.outputs.SemVer }}' -c Release
+        
+    -- name: Restore dependencies
+      run: dotnet restore
+      
+    - name: Build dotnet 
+      run: dotnet build FitnessApp.Common.sln --configuration release /p:Version=${{ steps.gitversion.outputs.AssemblySemVer }} /p:AssemblyVersion=${{ steps.gitversion.outputs.AssemblySemVer }} /p:InformationalVersion=${{ steps.gitversion.outputs.InformationalVersion }} --no-restore
+      
+    - name: Run Tests
+      run: dotnet test --configuration Release /p:Version=${{ steps.gitversion.outputs.AssemblySemVer }} --no-build --verbosity normal
+    
     - name: Upload NuGet package to GitHub
       uses: actions/upload-artifact@v2
       with:
@@ -53,8 +67,10 @@ jobs:
       uses: actions/download-artifact@v1.0.0
       with:
         name: nugetPackage
+        
     - name: Prep packages
       run: dotnet nuget add source --username voldovgan2 --password ${{ secrets.NUGET_PACKAGE_TOKEN }} --store-password-in-clear-text --name github "https://nuget.pkg.github.com/yourusername/index.json"
+    
     - name: Push package to GitHub packages 
       if: needs.build.outputs.CommitsSinceVersionSource > 0 #Only release if there has been a commit/version change  
       run: dotnet nuget push nugetPackage/*.nupkg --api-key ${{ secrets.NUGET_PACKAGE_TOKEN }}  --source "github"
