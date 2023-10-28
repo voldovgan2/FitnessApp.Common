@@ -13,7 +13,7 @@ jobs:
 
     steps:
     - name: Check out Code 
-      uses: actions/checkout@v2
+      uses: actions/checkout@v3
       with:
         fetch-depth: 0 #fetch-depth is needed for GitVersion
         
@@ -51,7 +51,7 @@ jobs:
       run: dotnet test --configuration Release /p:Version=${{ steps.gitversion.outputs.AssemblySemVer }} --no-build --verbosity normal
     
     - name: Upload NuGet package to GitHub
-      uses: actions/upload-artifact@v2
+      uses: actions/upload-artifact@v3
       with:
         name: nugetPackage
         path: bin/Release/ 
