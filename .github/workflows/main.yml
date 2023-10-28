@@ -63,7 +63,7 @@ jobs:
     steps:  
     #Push NuGet package to GitHub packages
     - name: Download nuget package artifact
-      uses: actions/download-artifact@v1.0.0
+      uses: actions/download-artifact@v3
       with:
         name: nugetPackage
         
@@ -76,7 +76,7 @@ jobs:
     
     #Create release
     - name: Create Release
-      uses: actions/create-release@v1
+      uses: actions/create-release@v3
       env:
         GITHUB_TOKEN: ${{ secrets.NUGET_PACKAGE_TOKEN }} 
       with:
