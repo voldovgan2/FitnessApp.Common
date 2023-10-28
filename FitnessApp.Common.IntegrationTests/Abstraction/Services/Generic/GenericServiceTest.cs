@@ -19,7 +19,7 @@ namespace FitnessApp.Common.IntegrationTests.Abstraction.Services.Generic
 
         public GenericServiceTest(GenericServiceFixture fixture)
         {
-            _service = new GenericServiceMock(new GenericRepositoryMock(fixture.DbContext, fixture.Mapper), fixture.SearchService, fixture.Mapper);
+            _service = new GenericServiceMock(new GenericRepositoryMock(fixture.DbContext, fixture.Mapper), fixture.Mapper);
         }
 
         [Fact]

@@ -27,7 +27,7 @@ namespace FitnessApp.Common.Files
             return Task.CompletedTask;
         }
 
-        public static string CreateBlobName(string propertyName, string userId)
+        public static string CreateFileName(string propertyName, string userId)
         {
             return $"{propertyName}_{userId}";
         }

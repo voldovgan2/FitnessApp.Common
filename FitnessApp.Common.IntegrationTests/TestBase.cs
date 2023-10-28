@@ -1,7 +1,6 @@
 ﻿using System.IO;
 using AutoMapper;
 using Azure.Data.AppConfiguration;
-using FitnessApp.Common.Abstractions.Services.Search;
 using FitnessApp.Comon.Tests.Shared;
 using Microsoft.Extensions.Configuration;
 
@@ -9,7 +8,6 @@ namespace FitnessApp.Common.IntegrationTests
 {
     public class TestBase
     {
-        public ISearchService SearchService { get; }
         public IMapper Mapper { get; }
         public IConfiguration Configuration { get; }
 

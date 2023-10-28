@@ -9,7 +9,6 @@ using FitnessApp.Comon.Tests.Shared;
 using FitnessApp.Comon.Tests.Shared.Abstraction.Db.Repository.Collection;
 using FitnessApp.Comon.Tests.Shared.Abstraction.Models.Collection;
 using FitnessApp.Comon.Tests.Shared.Abstraction.Services.Collection;
-using FitnessApp.Comon.Tests.Shared.Abstraction.Services.Search;
 using Xunit;
 
 namespace FitnessApp.Common.IntegrationTests.Abstraction.Services.Collection
@@ -21,7 +20,7 @@ namespace FitnessApp.Common.IntegrationTests.Abstraction.Services.Collection
 
         public CollectionServiceTests(CollectionServiceFixture fixture)
         {
-            _service = new CollectionServiceMock(new CollectionRepositoryMock(fixture.DbContext, fixture.Mapper), new SearchServiceMock());
+            _service = new CollectionServiceMock(new CollectionRepositoryMock(fixture.DbContext, fixture.Mapper));
         }
 
         [Fact]

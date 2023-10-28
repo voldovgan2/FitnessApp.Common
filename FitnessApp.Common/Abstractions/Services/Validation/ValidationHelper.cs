@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using FitnessApp.Common.Abstractions.Models.BlobImage;
+using FitnessApp.Common.Abstractions.Models.FileImage;
 using FitnessApp.Common.Abstractions.Models.Validation;
 using FitnessApp.Common.Exceptions;
 
@@ -27,15 +27,15 @@ namespace FitnessApp.Common.Abstractions.Services.Validation
                 throw new ValidationException(error);
         }
 
-        public static void ThrowExceptionIfNotValidBlobs(List<BlobImageModel> images)
+        public static void ThrowExceptionIfNotValidFiles(List<FileImageModel> images)
         {
             var errors = images.Select(image =>
             {
-                BlobValidationException exception = null;
-                ValidationError blobFieldNameError = ValidateEmptyStringField(nameof(image.FieldName), image.FieldName);
-                ValidationError blobFieldValueError = ValidateEmptyStringField(nameof(image.Value), image.Value);
-                if (blobFieldNameError != null || blobFieldValueError != null)
-                    exception = new BlobValidationException(blobFieldNameError, blobFieldValueError);
+                FileValidationException exception = null;
+                ValidationError fileFieldNameError = ValidateEmptyStringField(nameof(image.FieldName), image.FieldName);
+                ValidationError fileFieldValueError = ValidateEmptyStringField(nameof(image.Value), image.Value);
+                if (fileFieldNameError != null || fileFieldValueError != null)
+                    exception = new FileValidationException(fileFieldNameError, fileFieldValueError);
 
                 return exception;
             }).Where(e => e != null);
