@@ -45,7 +45,7 @@ jobs:
       run: dotnet restore
       
     - name: Build dotnet 
-      run: dotnet build FitnessApp.Common.sln --configuration release /p:Version=${{ steps.gitversion.outputs.AssemblySemVer }} /p:AssemblyVersion=${{ steps.gitversion.outputs.AssemblySemVer }} /p:InformationalVersion=${{ steps.gitversion.outputs.InformationalVersion }} --no-restore
+      run: dotnet build FitnessApp.Common.sln -c Release /p:Version=${{ steps.gitversion.outputs.AssemblySemVer }} /p:AssemblyVersion=${{ steps.gitversion.outputs.AssemblySemVer }} /p:InformationalVersion=${{ steps.gitversion.outputs.InformationalVersion }} --no-restore
       
     - name: Run Tests
       run: dotnet test --configuration Release /p:Version=${{ steps.gitversion.outputs.AssemblySemVer }} --no-build --verbosity normal
@@ -57,7 +57,7 @@ jobs:
       uses: actions/upload-artifact@v2
       with:
         name: nugetPackage
-        path: bin/Release/ 
+        path: FitnessApp.Common/bin/Release/ 
         
   release:
     runs-on: ubuntu-latest    
