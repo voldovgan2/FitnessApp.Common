@@ -72,7 +72,7 @@ jobs:
         name: nugetPackage
         
     - name: Prep packages
-      run: dotnet nuget add source --username voldovgan2 --password ${{ secrets.NUGET_PACKAGE_TOKEN }} --store-password-in-clear-text --name github "https://nuget.pkg.github.com/yourusername/index.json"
+      run: dotnet nuget add source --username voldovgan2 --password ${{ secrets.NUGET_PACKAGE_TOKEN }} --store-password-in-clear-text --name github "https://nuget.pkg.github.com/voldovgan2/index.json"
     
     - name: Push package to GitHub packages 
       #if: needs.build.outputs.CommitsSinceVersionSource > 0 #Only release if there has been a commit/version change  
