@@ -4,7 +4,7 @@ using Microsoft.Extensions.DependencyInjection;
 
 namespace FitnessApp.Common.Configuration.Identity
 {
-    public static class AzureAdExtensions
+    public static class IdentityExtensions
     {
         public static IServiceCollection ConfigureAuthentication(this IServiceCollection services, IConfiguration configuration)
         {
