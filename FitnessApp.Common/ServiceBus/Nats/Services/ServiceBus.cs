@@ -13,14 +13,7 @@ namespace FitnessApp.Common.ServiceBus.Nats.Services
             IConnectionFactory connectionFactory,
             IOptions<ServiceBusSettings> settings)
         {
-            try
-            {
-                _connection = connectionFactory.CreateConnection(settings.Value.Url);
-            }
-            catch (Exception ex)
-            {
-                Console.WriteLine(ex.ToString());
-            }
+            _connection = connectionFactory.CreateConnection(settings.Value.Url);
         }
 
         public void PublishEvent(string subject, byte[] data)
