@@ -1,6 +1,5 @@
 ﻿using System.IO;
 using AutoMapper;
-using Azure.Data.AppConfiguration;
 using FitnessApp.Comon.Tests.Shared;
 using Microsoft.Extensions.Configuration;
 
