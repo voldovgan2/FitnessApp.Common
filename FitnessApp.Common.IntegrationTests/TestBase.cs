@@ -17,17 +17,9 @@ namespace FitnessApp.Common.IntegrationTests
             configurationBuilder
                 .SetBasePath(Directory.GetCurrentDirectory())
                 .AddJsonFile("appsettings.json");
-            var configuration = configurationBuilder.Build();
 
             Configuration = configurationBuilder
               .Build();
-
-            var _client = new ConfigurationClient(configuration.GetConnectionString("AppConfig"));
-            var settings = _client.GetConfigurationSettings(new SettingSelector());
-            foreach (var setting in settings)
-            {
-                Configuration[setting.Key] = setting.Value;
-            }
 
             Mapper = new MapperConfiguration(cfg =>
                 {

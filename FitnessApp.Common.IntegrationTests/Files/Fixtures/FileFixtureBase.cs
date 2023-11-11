@@ -1,5 +1,7 @@
 ﻿using System;
 using FitnessApp.Common.Files;
+using Microsoft.Extensions.Configuration;
+using Minio;
 
 namespace FitnessApp.Common.IntegrationTests.File.Fixtures
 {
@@ -11,7 +13,16 @@ namespace FitnessApp.Common.IntegrationTests.File.Fixtures
         public FileFixtureBase()
         {
             Path = typeof(T).Name.ToLower();
-            FileService = new FilesService();
+            var endpoint = Configuration.GetValue<string>("Minio:Endpoint");
+            var accessKey = Configuration.GetValue<string>("Minio:AccessKey");
+            var secretKey = Configuration.GetValue<string>("Minio:SecretKey");
+            var secure = Configuration.GetValue<bool>("Minio:Secure");
+            var minIoClient = new MinioClient()
+                .WithEndpoint(endpoint)
+                .WithCredentials(accessKey, secretKey)
+                .WithSSL(secure)
+                .Build();
+            FileService = new FilesService(minIoClient);
         }
 
         public void Dispose()
