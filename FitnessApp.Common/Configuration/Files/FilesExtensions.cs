@@ -1,4 +1,5 @@
 ﻿using System;
+using FitnessApp.Common.Vault;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Minio;
@@ -15,9 +16,10 @@ namespace FitnessApp.Common.Configuration.Files
             services.AddTransient<IMinioClient, MinioClient>(
                 sp =>
                 {
+                    var vaultService = sp.GetRequiredService<IVaultService>();
                     var endpoint = configuration.GetValue<string>("Minio:Endpoint");
                     var accessKey = configuration.GetValue<string>("Minio:AccessKey");
-                    var secretKey = configuration.GetValue<string>("Minio:SecretKey");
+                    var secretKey = vaultService.GetSecret("Minio:SecretKey").GetAwaiter().GetResult();
                     var secure = configuration.GetValue<bool>("Minio:Secure");
                     return new MinioClient()
                         .WithEndpoint(endpoint)
