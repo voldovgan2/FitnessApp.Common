@@ -19,7 +19,9 @@ namespace FitnessApp.Common.Configuration.Swagger
                 });
                 var xmlFile = $"{apiName}.XML";
                 var xmlPath = Path.Combine(AppContext.BaseDirectory, xmlFile);
-                c.IncludeXmlComments(xmlPath);
+                if (File.Exists(xmlPath))
+                    c.IncludeXmlComments(xmlPath);
+
                 c.AddSecurityDefinition("oauth2", new OpenApiSecurityScheme
                 {
                     Description = "Standard Authorization header using the Bearer scheme. Example: \"bearer {token}\"",

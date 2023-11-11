@@ -1,35 +1,74 @@
 ﻿using System.IO;
-using System.Text;
 using System.Threading.Tasks;
+using Minio;
 
 namespace FitnessApp.Common.Files
 {
     public class FilesService : IFilesService
     {
-        public FilesService()
+        private readonly IMinioClient _minioClient;
+        public FilesService(IMinioClient minioClient)
         {
+            _minioClient = minioClient;
         }
 
-        public Task UploadFile(string path, string name, Stream stream)
+        public async Task UploadFile(string bucketName, string objectName, Stream stream)
         {
-            return Task.CompletedTask;
+            await EnsureBucket(objectName);
+            var args = new PutObjectArgs()
+                .WithBucket(bucketName)
+                .WithObject(objectName)
+                .WithStreamData(stream)
+                .WithObjectSize(stream.Length);
+            await _minioClient.PutObjectAsync(args).ConfigureAwait(false);
         }
 
-        public Task<byte[]> DownloadFile(string path, string name)
+        public async Task<byte[]> DownloadFile(string bucketName, string objectName)
         {
-            byte[] result = Encoding.Default.GetBytes($"{path}_{name}");
+            await EnsureBucket(objectName);
+            var memoryStream = new MemoryStream();
+            var completed = false;
+            var args = new GetObjectArgs()
+                .WithBucket(bucketName)
+                .WithObject(objectName)
+                .WithCallbackStream(x =>
+                {
+                    x.CopyTo(memoryStream);
+                    memoryStream.Seek(0, SeekOrigin.Begin);
+                    completed = true;
+                });
+            await _minioClient.GetObjectAsync(args);
+            var timeoutCounter = 5;
+            while (!completed)
+            {
+                await Task.Delay(100);
+                if (timeoutCounter > 0)
+                    timeoutCounter--;
+                else
+                    break;
+            }
 
-            return Task.FromResult(result);
+            return memoryStream.ToArray();
         }
 
-        public Task DeleteFile(string path, string name)
+        public async Task DeleteFile(string bucketName, string objectName)
         {
-            return Task.CompletedTask;
+            await EnsureBucket(objectName);
+            var args = new RemoveObjectArgs()
+                .WithBucket(bucketName)
+                .WithObject(objectName);
+            await _minioClient.RemoveObjectAsync(args);
         }
 
         public static string CreateFileName(string propertyName, string userId)
         {
             return $"{propertyName}_{userId}";
+        }
+
+        private async Task EnsureBucket(string bucketName)
+        {
+            if (!await _minioClient.BucketExistsAsync(new BucketExistsArgs().WithBucket(bucketName)))
+                await _minioClient.MakeBucketAsync(new MakeBucketArgs().WithBucket(bucketName)).ConfigureAwait(false);
         }
     }
 }

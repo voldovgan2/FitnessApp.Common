@@ -3,7 +3,7 @@ using Microsoft.Extensions.Hosting;
 
 namespace FitnessApp.Common.Configuration.AppConfiguration
 {
-    public static class AzureAppConfigurationExtensions
+    public static class AppConfigurationExtensions
     {
         public static IHostBuilder ConfigureAppConfiguration(this IHostBuilder host)
         {
