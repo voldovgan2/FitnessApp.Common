@@ -57,9 +57,6 @@ jobs:
     - name: Run Tests
       run: dotnet test --configuration Release /p:Version=${{ steps.gitversion.outputs.AssemblySemVer }} --no-build --verbosity normal
     
-    - name: Package nuget
-      run: dotnet pack ApiResponse.sln --configuration release -o:package /p:PackageVersion=${{ steps.gitversion.outputs.AssemblySemVer }}
-      
     - name: Build and Pack NuGet package
       run: dotnet pack FitnessApp.Common/FitnessApp.Common.csproj -o:package /p:PackageVersion=='${{ steps.gitversion.outputs.SemVer }}' -c Release
         
