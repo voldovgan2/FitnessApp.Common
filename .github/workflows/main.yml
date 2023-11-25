@@ -58,7 +58,7 @@ jobs:
       run: dotnet test --configuration Release /p:Version=${{ steps.gitversion.outputs.AssemblySemVer }} --no-build --verbosity normal
     
     - name: Build and Pack NuGet package
-      run: dotnet pack FitnessApp.Common/FitnessApp.Common.csproj -p:Version='${{ steps.gitversion.outputs.SemVer }}' -c Release
+      run: dotnet pack FitnessApp.Common/FitnessApp.Common.csproj -p:Version='${{ steps.gitversion.outputs.SemVer }}' -c Release --output ./nuget
     
     - name: Prepare packages
       run: dotnet nuget add source --username voldovgan2 --password ${{ secrets.NUGET_PACKAGE_TOKEN }} --store-password-in-clear-text --name github "https://nuget.pkg.github.com/voldovgan2/index.json"
