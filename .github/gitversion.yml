@@ -1,7 +1,11 @@
-mode: Mainline
+mode: Mainline 
+next-version: 2.0.0 
 branches:
-  feature:
-    tag: beta
-  main: {}
+ feature:
+   tag: feature-{BranchName}-alpha
+ hotfix:
+   tag: fix-{BranchName}-alpha
+ master:
+    tag: '' 
 ignore:
-  sha: []
+ sha: []
