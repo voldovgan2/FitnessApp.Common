@@ -3,8 +3,7 @@
   <PropertyGroup>
     <TargetFramework>net6.0</TargetFramework>
 	<PackageId>FitnessApp.Common</PackageId>
-	<Version>1.0.1</Version>
-    <Authors>FitnessApp</Authors>
+  <Authors>FitnessApp</Authors>
 	<IsPackable>true</IsPackable>
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>    
     <Product>FitnessApp.Common</Product>
