@@ -2,7 +2,15 @@ name: Publish FitnessApp.Common
 
 on:
   push:
-    branches: [develop]
+    branches:
+    - master
+    - feature*
+    - hotfix*
+  pull_request:
+    branches:
+    - master
+    - feature*
+    - hotfix*
       
 jobs:
   build:
