@@ -2,15 +2,7 @@ name: Publish FitnessApp.Common
 
 on:
   push:
-    branches:
-    - master
-    - feature*
-    - hotfix*
-  pull_request:
-    branches:
-    - master
-    - feature*
-    - hotfix*
+    branches: [develop]
       
 jobs:
   build:
@@ -57,9 +49,12 @@ jobs:
     - name: Run Tests
       run: dotnet test --configuration Release /p:Version=${{ steps.gitversion.outputs.AssemblySemVer }} --no-build --verbosity normal
     
+    - name: Package nuget
+      run: dotnet pack ApiResponse.sln --configuration release -o:package /p:PackageVersion=${{ steps.gitversion.outputs.AssemblySemVer }}
+      
     - name: Build and Pack NuGet package
-      run: dotnet pack FitnessApp.Common/FitnessApp.Common.csproj -p:Version='${{ steps.gitversion.outputs.SemVer }}' -c Release --output ./nuget
-    
+      run: dotnet pack FitnessApp.Common/FitnessApp.Common.csproj -o:package /p:PackageVersion=='${{ steps.gitversion.outputs.SemVer }}' -c Release
+        
     - name: Prepare packages
       run: dotnet nuget add source --username voldovgan2 --password ${{ secrets.NUGET_PACKAGE_TOKEN }} --store-password-in-clear-text --name github "https://nuget.pkg.github.com/voldovgan2/index.json"
     
