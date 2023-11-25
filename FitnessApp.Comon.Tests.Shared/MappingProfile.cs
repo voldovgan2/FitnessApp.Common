@@ -4,9 +4,9 @@ using FitnessApp.Common.Abstractions.Db.Entities.Collection;
 using FitnessApp.Comon.Tests.Shared.Abstraction.Db.Entities.Collection;
 using FitnessApp.Comon.Tests.Shared.Abstraction.Db.Entities.Generic;
 using FitnessApp.Comon.Tests.Shared.Abstraction.Models.Collection;
-using FitnessApp.Comon.Tests.Shared.Abstraction.Models.CollectionBlobAggregator;
+using FitnessApp.Comon.Tests.Shared.Abstraction.Models.CollectionFileAggregator;
 using FitnessApp.Comon.Tests.Shared.Abstraction.Models.Generic;
-using FitnessApp.Comon.Tests.Shared.Abstraction.Models.GenericBlobAggregator;
+using FitnessApp.Comon.Tests.Shared.Abstraction.Models.GenericFileAggregator;
 
 namespace FitnessApp.Comon.Tests.Shared
 {
@@ -41,14 +41,14 @@ namespace FitnessApp.Comon.Tests.Shared
                 .ForMember(e => e.Collection, m => m.MapFrom(o => CollectionEntitiesToCollectionModels(o.Collection)));
             #endregion
 
-            #region GenericBlobAggregatorModel 2 GenericModel
-            CreateMap<CreateTestGenericBlobAggregatorModel, CreateTestGenericModel>();
-            CreateMap<UpdateTestGenericBlobAggregatorModel, UpdateTestGenericModel>();
+            #region GenericFileAggregatorModel 2 GenericModel
+            CreateMap<CreateTestGenericFileAggregatorModel, CreateTestGenericModel>();
+            CreateMap<UpdateTestGenericFileAggregatorModel, UpdateTestGenericModel>();
             #endregion
 
-            #region CollectionBlobAggregatorModel 2 CollectionModel
-            CreateMap<CreateTestCollectionBlobAggregatorModel, CreateTestCollectionModel>();
-            CreateMap<UpdateTestCollectionBlobAggregatorModel, UpdateTestCollectionModel>()
+            #region CollectionFileAggregatorModel 2 CollectionModel
+            CreateMap<CreateTestCollectionFileAggregatorModel, CreateTestCollectionModel>();
+            CreateMap<UpdateTestCollectionFileAggregatorModel, UpdateTestCollectionModel>()
                 .ForMember(m1 => m1.Model, m2 => m2.MapFrom(m2 => m2.Model.Model));
 
             #endregion

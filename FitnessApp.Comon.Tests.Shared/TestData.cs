@@ -4,16 +4,16 @@ using System.IO;
 using System.Text;
 using FitnessApp.Common.Abstractions.Db.Entities.Collection;
 using FitnessApp.Common.Abstractions.Db.Enums.Collection;
-using FitnessApp.Common.Abstractions.Models.BlobImage;
 using FitnessApp.Common.Abstractions.Models.Collection;
-using FitnessApp.Common.Abstractions.Models.CollectionBlobAggregator;
+using FitnessApp.Common.Abstractions.Models.CollectionFileAggregator;
+using FitnessApp.Common.Abstractions.Models.FileImage;
 using FitnessApp.Common.Abstractions.Services.Configuration;
 using FitnessApp.Comon.Tests.Shared.Abstraction.Db.Entities.Collection;
 using FitnessApp.Comon.Tests.Shared.Abstraction.Db.Entities.Generic;
 using FitnessApp.Comon.Tests.Shared.Abstraction.Models.Collection;
-using FitnessApp.Comon.Tests.Shared.Abstraction.Models.CollectionBlobAggregator;
+using FitnessApp.Comon.Tests.Shared.Abstraction.Models.CollectionFileAggregator;
 using FitnessApp.Comon.Tests.Shared.Abstraction.Models.Generic;
-using FitnessApp.Comon.Tests.Shared.Abstraction.Models.GenericBlobAggregator;
+using FitnessApp.Comon.Tests.Shared.Abstraction.Models.GenericFileAggregator;
 
 namespace FitnessApp.Comon.Tests.Shared
 {
@@ -24,16 +24,16 @@ namespace FitnessApp.Comon.Tests.Shared
         public static string EntityIdToUpdate { get; } = "EntityIdToUpdate";
         public static string EntityIdToDelete { get; } = "EntityIdToDelete";
 
-        public static string BlobToDownload { get; } = "BlobToDownload";
-        public static string BlobToUpload { get; } = "BlobToUpload";
-        public static string BlobToDelete { get; } = "BlobToDelete";
+        public static string FileToDownload { get; } = "FileToDownload";
+        public static string FileToUpload { get; } = "FileToUpload";
+        public static string FileToDelete { get; } = "FileToDelete";
 
         public static string Id { get; } = "1";
         public static string[] Ids { get; } = new string[] { Id };
         public static string CollectionName { get; } = "Collection";
         public static string ContainerName { get; } = "ContainerName";
-        public static string BlobFieldName { get; } = "BlobField";
-        public static string BlobFieldContent { get; } = "BlobFieldContent";
+        public static string FileFieldName { get; } = "FileField";
+        public static string FileFieldContent { get; } = "FileFieldContent";
 
         private static string _propertyPrefix = "TestProperty";
 
@@ -185,7 +185,7 @@ namespace FitnessApp.Comon.Tests.Shared
 
         #endregion
 
-        #region BLOB
+        #region File
 
         public static Stream GetStream(string content)
         {
@@ -194,112 +194,112 @@ namespace FitnessApp.Comon.Tests.Shared
 
         #endregion
 
-        #region BLOB aggregator initialization
+        #region File aggregator initialization
 
-        public static byte[] CreateBlobResult()
+        public static byte[] CreateFileResult()
         {
-            var bytes = Encoding.Default.GetBytes(BlobFieldContent);
+            var bytes = Encoding.Default.GetBytes(FileFieldContent);
             return bytes;
         }
 
-        public static List<BlobImageModel> CreateBlobAggregatorImages()
+        public static List<FileImageModel> CreateFileAggregatorImages()
         {
-            return new List<BlobImageModel>
+            return new List<FileImageModel>
             {
-                new BlobImageModel
+                new FileImageModel
                 {
-                    FieldName = BlobFieldName,
-                    Value = BlobFieldContent
+                    FieldName = FileFieldName,
+                    Value = FileFieldContent
                 }
             };
         }
 
         #endregion
 
-        #region Generic BLOB aggregator initialization
+        #region Generic File aggregator initialization
 
-        public static CreateTestGenericBlobAggregatorModel CreateCreateTestGenericBlobAggregatorModel(Dictionary<string, object> args)
+        public static CreateTestGenericFileAggregatorModel CreateCreateTestGenericFileAggregatorModel(Dictionary<string, object> args)
         {
             var id = args["Id"];
-            return new CreateTestGenericBlobAggregatorModel
+            return new CreateTestGenericFileAggregatorModel
             {
                 UserId = id.ToString(),
                 TestProperty = $"{_propertyPrefix}{id}",
-                Images = (List<BlobImageModel>)args["Images"]
+                Images = (List<FileImageModel>)args["Images"]
             };
         }
 
-        public static UpdateTestGenericBlobAggregatorModel CreateUpdateTestGenericBlobAggregatorModel(Dictionary<string, object> args)
+        public static UpdateTestGenericFileAggregatorModel CreateUpdateTestGenericFileAggregatorModel(Dictionary<string, object> args)
         {
             var id = args["Id"];
-            return new UpdateTestGenericBlobAggregatorModel
+            return new UpdateTestGenericFileAggregatorModel
             {
                 UserId = id.ToString(),
                 TestProperty = $"{_propertyPrefix}{id}",
-                Images = (List<BlobImageModel>)args["Images"]
+                Images = (List<FileImageModel>)args["Images"]
             };
         }
 
-        public static GenericBlobAggregatorSettings CreateGenericBlobAggregatorSettings()
+        public static GenericFileAggregatorSettings CreateGenericFileAggregatorSettings()
         {
-            return new GenericBlobAggregatorSettings
+            return new GenericFileAggregatorSettings
             {
                 ContainerName = ContainerName,
-                BlobFields = new string[]
+                FileFields = new string[]
                 {
-                    BlobFieldName
+                    FileFieldName
                 }
             };
         }
 
         #endregion
 
-        #region Collection BLOB aggregator initialization
+        #region Collection File aggregator initialization
 
-        public static CreateTestCollectionBlobAggregatorModel CreateCreateTestCollectionBlobAggregatorModel(Dictionary<string, object> args)
+        public static CreateTestCollectionFileAggregatorModel CreateCreateTestCollectionFileAggregatorModel(Dictionary<string, object> args)
         {
-            return new CreateTestCollectionBlobAggregatorModel
+            return new CreateTestCollectionFileAggregatorModel
             {
                 UserId = args["Id"].ToString(),
                 Collection = new Dictionary<string, IEnumerable<ICollectionItemModel>>()
             };
         }
 
-        public static TestCollectionBlobAggregatorItemModel CreateTestCollectionBlobAggregatorItemModel(Dictionary<string, object> args)
+        public static TestCollectionFileAggregatorItemModel CreateTestCollectionFileAggregatorItemModel(Dictionary<string, object> args)
         {
             args.TryGetValue("Id", out var index);
             index ??= 1;
 
-            return new TestCollectionBlobAggregatorItemModel
+            return new TestCollectionFileAggregatorItemModel
             {
                 Model = CreateCollectionItemModel(index),
-                Images = CreateBlobAggregatorImages()
+                Images = CreateFileAggregatorImages()
             };
         }
 
-        public static UpdateTestCollectionBlobAggregatorModel CreateUpdateTestCollectionBlobAggregatorModel(Dictionary<string, object> args)
+        public static UpdateTestCollectionFileAggregatorModel CreateUpdateTestCollectionFileAggregatorModel(Dictionary<string, object> args)
         {
-            return new UpdateTestCollectionBlobAggregatorModel
+            return new UpdateTestCollectionFileAggregatorModel
             {
                 UserId = args["Id"].ToString(),
                 CollectionName = args["CollectionName"].ToString(),
                 Action = (UpdateCollectionAction)args["Action"],
-                Model = (ICollectionBlobAggregatorItemModel<ICollectionItemModel>)args["Model"],
+                Model = (ICollectionFileAggregatorItemModel<ICollectionItemModel>)args["Model"],
             };
         }
 
-        public static CollectionBlobAggregatorSettings CreateCollectionBlobAggregatorSettings()
+        public static CollectionFileAggregatorSettings CreateCollectionFileAggregatorSettings()
         {
-            return new CollectionBlobAggregatorSettings
+            return new CollectionFileAggregatorSettings
             {
                 ContainerName = ContainerName,
-                CollectionsBlobFields = new Dictionary<string, string[]>
+                CollectionsFileFields = new Dictionary<string, string[]>
                 {
                     {
                         CollectionName,
                         new string[]
                         {
-                            BlobFieldName
+                            FileFieldName
                         }
                     }
                 }

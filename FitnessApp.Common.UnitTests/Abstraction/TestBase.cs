@@ -1,7 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
 using AutoMapper;
-using FitnessApp.Common.Abstractions.Services.Search;
 using FitnessApp.Comon.Tests.Shared;
 using FitnessApp.Comon.Tests.Shared.Abstraction.Db.Entities.Collection;
 using FitnessApp.Comon.Tests.Shared.Abstraction.Db.Entities.Generic;

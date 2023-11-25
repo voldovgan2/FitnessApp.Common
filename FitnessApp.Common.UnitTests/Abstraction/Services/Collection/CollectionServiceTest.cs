@@ -3,7 +3,6 @@ using System.Linq;
 using System.Threading.Tasks;
 using FitnessApp.Common.Abstractions.Db.Enums.Collection;
 using FitnessApp.Common.Abstractions.Db.Repository.Collection;
-using FitnessApp.Common.Abstractions.Services.Search;
 using FitnessApp.Comon.Tests.Shared;
 using FitnessApp.Comon.Tests.Shared.Abstraction.Models.Collection;
 using FitnessApp.Comon.Tests.Shared.Abstraction.Services.Collection;
@@ -19,7 +18,6 @@ namespace FitnessApp.Common.UnitTests.Abstraction.Services.Collection
         {
             // Arrange
             var repositoryMock = new Mock<ICollectionRepository<TestCollectionModel, TestCollectionItemModel, CreateTestCollectionModel, UpdateTestCollectionModel>>();
-            var searchMock = new Mock<ISearchService>();
             var queryableGenericModelsMock = GetQueryableMock(
                 TestData.GetAll(
                     TestData.CreateCollectionModel,
@@ -35,7 +33,7 @@ namespace FitnessApp.Common.UnitTests.Abstraction.Services.Collection
                .Setup(s => s.GetItemByUserId(It.IsAny<string>()))
                .ReturnsAsync(queryableGenericModelsMock.Object.Single(i => i.UserId == TestData.Id));
 
-            var service = new CollectionServiceMock(repositoryMock.Object, searchMock.Object);
+            var service = new CollectionServiceMock(repositoryMock.Object);
 
             // Act
             var entity = await service.GetItemByUserId(TestData.Id);
@@ -49,7 +47,6 @@ namespace FitnessApp.Common.UnitTests.Abstraction.Services.Collection
         {
             // Arrange
             var repositoryMock = new Mock<ICollectionRepository<TestCollectionModel, TestCollectionItemModel, CreateTestCollectionModel, UpdateTestCollectionModel>>();
-            var searchMock = new Mock<ISearchService>();
             var collectionItems = new List<TestCollectionItemModel>
             {
                 TestData.CreateCollectionItemModel(1),
@@ -59,7 +56,7 @@ namespace FitnessApp.Common.UnitTests.Abstraction.Services.Collection
                .Setup(s => s.GetCollectionByUserId(It.IsAny<string>(), It.IsAny<string>()))
                .ReturnsAsync(collectionItems);
 
-            var service = new CollectionServiceMock(repositoryMock.Object, searchMock.Object);
+            var service = new CollectionServiceMock(repositoryMock.Object);
 
             // Act
             var collection = await service.GetCollectionByUserId(TestData.Id, TestData.CollectionName);
@@ -74,7 +71,6 @@ namespace FitnessApp.Common.UnitTests.Abstraction.Services.Collection
         {
             // Arrange
             var repositoryMock = new Mock<ICollectionRepository<TestCollectionModel, TestCollectionItemModel, CreateTestCollectionModel, UpdateTestCollectionModel>>();
-            var searchMock = new Mock<ISearchService>();
             var collectionItems = new List<TestCollectionItemModel>
             {
                 TestData.CreateCollectionItemModel(1),
@@ -83,9 +79,7 @@ namespace FitnessApp.Common.UnitTests.Abstraction.Services.Collection
                 TestData.CreateCollectionItemModel(4)
             };
             var filteredBySearchItems = collectionItems.Take(2).Select(i => i.Id);
-            searchMock
-                .Setup(s => s.Search(It.IsAny<string>()))
-                .ReturnsAsync(filteredBySearchItems);
+
             var testProperty = "TestProperty1";
 
             var getModel = new GetTestFilteredCollectionItemsModel
@@ -101,7 +95,7 @@ namespace FitnessApp.Common.UnitTests.Abstraction.Services.Collection
                .Setup(s => s.GetCollectionByUserId(It.IsAny<string>(), It.IsAny<string>()))
                .ReturnsAsync(collectionItems);
 
-            var service = new CollectionServiceMock(repositoryMock.Object, searchMock.Object);
+            var service = new CollectionServiceMock(repositoryMock.Object);
 
             // Act
             var items = await service.GetFilteredCollectionItems("", getModel);
@@ -115,7 +109,6 @@ namespace FitnessApp.Common.UnitTests.Abstraction.Services.Collection
         {
             // Arrange
             var repositoryMock = new Mock<ICollectionRepository<TestCollectionModel, TestCollectionItemModel, CreateTestCollectionModel, UpdateTestCollectionModel>>();
-            var searchMock = new Mock<ISearchService>();
             var createModel = TestData.CreateCreateTestCollectionModel(new Dictionary<string, object>
             {
                 {
@@ -127,7 +120,7 @@ namespace FitnessApp.Common.UnitTests.Abstraction.Services.Collection
                .Setup(s => s.CreateItem(It.IsAny<CreateTestCollectionModel>()))
                .ReturnsAsync(createModel.UserId);
 
-            var service = new CollectionServiceMock(repositoryMock.Object, searchMock.Object);
+            var service = new CollectionServiceMock(repositoryMock.Object);
 
             // Act
             var id = await service.CreateItem(createModel);
@@ -141,14 +134,13 @@ namespace FitnessApp.Common.UnitTests.Abstraction.Services.Collection
         {
             // Arrange
             var repositoryMock = new Mock<ICollectionRepository<TestCollectionModel, TestCollectionItemModel, CreateTestCollectionModel, UpdateTestCollectionModel>>();
-            var searchMock = new Mock<ISearchService>();
             var addItemModel = TestData.CreateCollectionItemModel(1);
 
             repositoryMock
                .Setup(s => s.UpdateItem(It.IsAny<UpdateTestCollectionModel>()))
                .ReturnsAsync(addItemModel);
 
-            var service = new CollectionServiceMock(repositoryMock.Object, searchMock.Object);
+            var service = new CollectionServiceMock(repositoryMock.Object);
 
             // Act
             var createdItemModel = await service.UpdateItem(TestData.CreateUpdateTestCollectionModel(new Dictionary<string, object>
@@ -177,14 +169,13 @@ namespace FitnessApp.Common.UnitTests.Abstraction.Services.Collection
         {
             // Arrange
             var repositoryMock = new Mock<ICollectionRepository<TestCollectionModel, TestCollectionItemModel, CreateTestCollectionModel, UpdateTestCollectionModel>>();
-            var searchMock = new Mock<ISearchService>();
             var updateItemModel = TestData.CreateCollectionItemModel(1, "Updated");
 
             repositoryMock
                .Setup(s => s.UpdateItem(It.IsAny<UpdateTestCollectionModel>()))
                .ReturnsAsync(updateItemModel);
 
-            var service = new CollectionServiceMock(repositoryMock.Object, searchMock.Object);
+            var service = new CollectionServiceMock(repositoryMock.Object);
 
             // Act
             var createdItemModel = await service.UpdateItem(TestData.CreateUpdateTestCollectionModel(new Dictionary<string, object>
@@ -213,14 +204,13 @@ namespace FitnessApp.Common.UnitTests.Abstraction.Services.Collection
         {
             // Arrange
             var repositoryMock = new Mock<ICollectionRepository<TestCollectionModel, TestCollectionItemModel, CreateTestCollectionModel, UpdateTestCollectionModel>>();
-            var searchMock = new Mock<ISearchService>();
             var updateItemModel = TestData.CreateCollectionItemModel(1);
 
             repositoryMock
                .Setup(s => s.UpdateItem(It.IsAny<UpdateTestCollectionModel>()))
                .ReturnsAsync(updateItemModel);
 
-            var service = new CollectionServiceMock(repositoryMock.Object, searchMock.Object);
+            var service = new CollectionServiceMock(repositoryMock.Object);
 
             // Act
             var deletedItemModel = await service.UpdateItem(TestData.CreateUpdateTestCollectionModel(new Dictionary<string, object>
@@ -249,7 +239,6 @@ namespace FitnessApp.Common.UnitTests.Abstraction.Services.Collection
         {
             // Arrange
             var repositoryMock = new Mock<ICollectionRepository<TestCollectionModel, TestCollectionItemModel, CreateTestCollectionModel, UpdateTestCollectionModel>>();
-            var searchMock = new Mock<ISearchService>();
 
             var deletedModel = TestData.CreateCollectionModel(
                 new Dictionary<string, object>
@@ -267,7 +256,7 @@ namespace FitnessApp.Common.UnitTests.Abstraction.Services.Collection
                .Setup(s => s.DeleteItem(It.IsAny<string>()))
                .ReturnsAsync(deletedModel);
 
-            var service = new CollectionServiceMock(repositoryMock.Object, searchMock.Object);
+            var service = new CollectionServiceMock(repositoryMock.Object);
 
             // Act
             var deletedItemModel = await service.DeleteItem(TestData.Id);

@@ -1,5 +1,5 @@
 ﻿using System;
-using Microsoft.Extensions.Configuration;
+using FitnessApp.Common.Vault;
 using Microsoft.Extensions.DependencyInjection;
 using MongoDB.Driver;
 
@@ -7,7 +7,7 @@ namespace FitnessApp.Common.Configuration.Mongo
 {
     public static class MongoClientExtensions
     {
-        public static IServiceCollection ConfigureMongoClient(this IServiceCollection services, IConfiguration configuration)
+        public static IServiceCollection ConfigureMongoClient(this IServiceCollection services)
         {
             if (services is null)
                 throw new ArgumentNullException(nameof(services));
@@ -15,7 +15,8 @@ namespace FitnessApp.Common.Configuration.Mongo
             services.AddTransient<IMongoClient, MongoClient>(
                 sp =>
                 {
-                    var connectionString = configuration.GetValue<string>("MongoConnection:ConnectionString");
+                    var vaultService = sp.GetRequiredService<IVaultService>();
+                    var connectionString = vaultService.GetSecret("MongoConnection:ConnectionString").GetAwaiter().GetResult();
                     return new MongoClient(connectionString);
                 }
             );
