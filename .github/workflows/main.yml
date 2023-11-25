@@ -52,12 +52,6 @@ jobs:
     - name: Build and Pack NuGet package
       run: dotnet pack FitnessApp.Common/FitnessApp.Common.csproj -p:Version='${{ steps.gitversion.outputs.SemVer }}' -c Release
     
-    - name: Upload NuGet package to GitHub
-      uses: actions/upload-artifact@v2
-      with:
-        name: nugetPackage
-        path: FitnessApp.Common/bin/Release/ 
-        
     - name: Prepare packages
       run: dotnet nuget add source --username voldovgan2 --password ${{ secrets.NUGET_PACKAGE_TOKEN }} --store-password-in-clear-text --name github "https://nuget.pkg.github.com/voldovgan2/index.json"
     
