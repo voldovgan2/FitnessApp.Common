@@ -2,9 +2,9 @@
 
   <PropertyGroup>
     <TargetFramework>net6.0</TargetFramework>
-	<PackageId>FitnessApp.Common</PackageId>
-  <Authors>FitnessApp</Authors>
-	<IsPackable>true</IsPackable>
+	  <PackageId>FitnessApp.Common</PackageId>
+    <Authors>FitnessApp</Authors>
+	  <IsPackable>true</IsPackable>
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>    
     <Product>FitnessApp.Common</Product>
     <Company>FitnessApp</Company>
