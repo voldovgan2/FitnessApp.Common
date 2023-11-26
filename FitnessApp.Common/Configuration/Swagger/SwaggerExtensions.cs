@@ -17,8 +17,7 @@ namespace FitnessApp.Common.Configuration.Swagger
                     Title = apiName,
                     Version = version
                 });
-                var xmlFile = $"{apiName}.XML";
-                var xmlPath = Path.Combine(AppContext.BaseDirectory, xmlFile);
+                var xmlPath = Path.Combine(AppContext.BaseDirectory, $"{apiName}.XML");
                 if (File.Exists(xmlPath))
                     c.IncludeXmlComments(xmlPath);
 
