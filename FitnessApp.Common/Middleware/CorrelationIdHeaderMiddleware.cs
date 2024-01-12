@@ -4,15 +4,8 @@ using Microsoft.AspNetCore.Http;
 
 namespace FitnessApp.Common.Middleware
 {
-    public class CorrelationIdHeaderMiddleware
+    public class CorrelationIdHeaderMiddleware(RequestDelegate next)
     {
-        private readonly RequestDelegate _next;
-
-        public CorrelationIdHeaderMiddleware(RequestDelegate next)
-        {
-            _next = next;
-        }
-
         public async Task Invoke(HttpContext context)
         {
             if (!context.Request.Headers.TryGetValue(MiddlewareConstants.CorrelationIdHeaderName, out var correlationId))
@@ -20,11 +13,11 @@ namespace FitnessApp.Common.Middleware
 
             context.Response.OnStarting(() =>
             {
-                context.Response.Headers.Add(MiddlewareConstants.CorrelationIdHeaderName, new[] { correlationId.ToString() });
+                context.Response.Headers.Append(MiddlewareConstants.CorrelationIdHeaderName, new[] { correlationId.ToString() });
                 return Task.CompletedTask;
             });
 
-            await _next(context);
+            await next(context);
         }
     }
 }
