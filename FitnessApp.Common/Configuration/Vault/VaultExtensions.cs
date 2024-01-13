@@ -11,8 +11,7 @@ namespace FitnessApp.Common.Configuration.Vault
     {
         public static IServiceCollection AddVaultClient(this IServiceCollection services, IConfiguration configuration)
         {
-            if (services == null)
-                throw new ArgumentNullException(nameof(services));
+            ArgumentNullException.ThrowIfNull(services);
 
             services.AddTransient<IVaultClient, VaultClient>(
                 sp =>

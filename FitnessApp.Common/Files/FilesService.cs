@@ -1,6 +1,7 @@
 ﻿using System.IO;
 using System.Threading.Tasks;
 using Minio;
+using Minio.DataModel.Args;
 
 namespace FitnessApp.Common.Files
 {
@@ -42,10 +43,12 @@ namespace FitnessApp.Common.Files
             while (!completed)
             {
                 await Task.Delay(100);
+#pragma warning disable S2589 // Bug with sonar
                 if (timeoutCounter > 0)
                     timeoutCounter--;
                 else
                     break;
+#pragma warning restore S2589 // Bug with sonar
             }
 
             return memoryStream.ToArray();

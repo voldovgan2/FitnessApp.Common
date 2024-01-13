@@ -9,8 +9,7 @@ namespace FitnessApp.Common.Configuration.Mongo
     {
         public static IServiceCollection ConfigureMongoClient(this IServiceCollection services)
         {
-            if (services is null)
-                throw new ArgumentNullException(nameof(services));
+            ArgumentNullException.ThrowIfNull(services);
 
             services.AddTransient<IMongoClient, MongoClient>(
                 sp =>
