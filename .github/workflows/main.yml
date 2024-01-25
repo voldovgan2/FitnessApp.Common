@@ -64,6 +64,9 @@ jobs:
       with:
         dotnet-version: 8.0.x
         
+    - name: Prepare package
+      run: dotnet nuget add source --username voldovgan2 --password ${{ secrets.NUGET_PACKAGE_TOKEN }} --store-password-in-clear-text --name github "https://nuget.pkg.github.com/voldovgan2/index.json"
+            
     - name: Restore dependencies
       run: dotnet restore
       
@@ -75,9 +78,6 @@ jobs:
     
     - name: Pack package
       run: dotnet pack FitnessApp.Common/FitnessApp.Common.csproj -o:package /p:PackageVersion='${{ steps.gitversion.outputs.SemVer }}' -c Release
-        
-    - name: Prepare package
-      run: dotnet nuget add source --username voldovgan2 --password ${{ secrets.NUGET_PACKAGE_TOKEN }} --store-password-in-clear-text --name github "https://nuget.pkg.github.com/voldovgan2/index.json"
     
     - name: Push generated package to GitHub registry
       run: dotnet nuget push ./package/*.nupkg  --source https://nuget.pkg.github.com/voldovgan2/index.json   --api-key ${{ github.token }}
