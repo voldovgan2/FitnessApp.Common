@@ -24,9 +24,9 @@ jobs:
           --health-timeout 5s
           --health-retries 5
           --name mongo_container
+          
       minio:
         image: minio/minio
-        command: server /data
         ports:
           - 9000:9000
         environment:
