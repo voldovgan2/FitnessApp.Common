@@ -29,16 +29,13 @@ jobs:
         image: minio/minio
         ports:
           - 9000:9000
-        environment:
-          MINIO_ROOT_USER = minioadmin
-          MINIO_ROOT_PASSWORD = minioadmin
-        healthcheck:
-          test: [ "CMD", "mc", "ready", "local" ]
-          interval: 5s
-          timeout: 5s
-          retries: 5
+        env:
+          MINIO_ACCESS_KEY: ${{ secrets.MINIO_ACCESS_KEY }}
+          MINIO_SECRET_KEY: ${{ secrets.MINIO_SECRET_KEY }}
         volumes:
           - minio:/data
+        options: --name=minio --health-cmd "curl http://localhost:9000/minio/health/live"
+   
         
     steps:
     - name: Check out Code 
