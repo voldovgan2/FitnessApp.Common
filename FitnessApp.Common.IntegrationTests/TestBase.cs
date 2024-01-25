@@ -14,15 +14,14 @@ namespace FitnessApp.Common.IntegrationTests
         {
             var configurationBuilder = new ConfigurationBuilder();
             configurationBuilder
-                .SetBasePath(Directory.GetCurrentDirectory())
-#if RELEASE
+                .SetBasePath(Directory.GetCurrentDirectory());
+#if RELEASE1
                 .AddJsonFile("appsettings.json");
 #endif
-#if DEBUG
+#if DEBUG1
                 .AddJsonFile("appsettings.development.json");
 #endif
-            Configuration = configurationBuilder
-              .Build();
+            Configuration = configurationBuilder.Build();
 
             Mapper = new MapperConfiguration(cfg =>
                 {

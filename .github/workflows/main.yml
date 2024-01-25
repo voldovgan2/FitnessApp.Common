@@ -75,7 +75,13 @@ jobs:
       
     - name: Run tests
       run: dotnet test --configuration Release /p:Version=${{ steps.gitversion.outputs.AssemblySemVer }} --no-build --verbosity normal
-    
+      env:
+        Minio__Endpoint: minio:9000
+        Minio__AccessKey: minioadmin
+        Minio__SecretKey: minioadmin
+        Minio__Secure: False
+        MongoConnection__ConnectionString: mongodb://localhost:27017
+        
     - name: Pack package
       run: dotnet pack FitnessApp.Common/FitnessApp.Common.csproj -o:package /p:PackageVersion='${{ steps.gitversion.outputs.SemVer }}' -c Release
     
