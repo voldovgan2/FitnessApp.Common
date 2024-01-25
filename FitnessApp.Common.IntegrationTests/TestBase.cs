@@ -12,21 +12,21 @@ namespace FitnessApp.Common.IntegrationTests
 
         public TestBase()
         {
-            var configurationBuilder = new ConfigurationBuilder();
-            configurationBuilder
-                .SetBasePath(Directory.GetCurrentDirectory());
-#if RELEASE1
-                .AddJsonFile("appsettings.json");
-#endif
-#if DEBUG1
-                .AddJsonFile("appsettings.development.json");
-#endif
-            Configuration = configurationBuilder.Build();
+            Configuration = CreateConfiguration();
 
             Mapper = new MapperConfiguration(cfg =>
                 {
                     cfg.AddProfile<MappingProfile>();
                 }).CreateMapper();
+        }
+
+        private static IConfiguration CreateConfiguration()
+        {
+            var configurationBuilder = new ConfigurationBuilder();
+            configurationBuilder
+                .SetBasePath(Directory.GetCurrentDirectory())
+                .AddJsonFile("appsettings.json");
+            return configurationBuilder.Build();
         }
     }
 }
