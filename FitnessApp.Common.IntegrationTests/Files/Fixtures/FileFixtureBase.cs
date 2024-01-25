@@ -1,5 +1,11 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.IO;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
 using FitnessApp.Common.Files;
+using FitnessApp.Comon.Tests.Shared;
 using Microsoft.Extensions.Configuration;
 using Minio;
 
@@ -23,6 +29,34 @@ namespace FitnessApp.Common.IntegrationTests.File.Fixtures
                 .WithSSL(secure)
                 .Build();
             FileService = new FilesService(minIoClient);
+
+            var itemIds = new string[]
+            {
+                TestData.FileToDownload,
+                TestData.FileToDelete,
+                FilesService.CreateFileName(TestData.FileFieldName, TestData.EntityIdToGet),
+                FilesService.CreateFileName(TestData.FileFieldName, TestData.EntityIdToDelete)
+            }
+                .Concat(
+                    TestData
+                        .CreateCollectionEntity(new Dictionary<string, object>
+                        {
+                            {
+                                "Id", TestData.EntityIdToGet
+                            },
+                            {
+                                "ItemsCount", 2
+                            }
+                        })
+                        .Collection[TestData.CollectionName]
+                        .Select(item => FilesService.CreateFileName(TestData.FileFieldName, item.Id))
+                );
+            var createdItemsTasks = itemIds
+                .Select(itemId => FileService.UploadFile(
+                    Path.ToLower(),
+                    itemId,
+                    new MemoryStream(Encoding.Default.GetBytes(itemId))));
+            Task.WhenAll(createdItemsTasks).GetAwaiter().GetResult();
         }
 
         public void Dispose()
