@@ -26,16 +26,14 @@ jobs:
           --name mongo_container
           
       minio:
-        image: minio/minio
+        image: minio/minio:latest
         ports:
           - 9000:9000
         env:
-          MINIO_ACCESS_KEY: ${{ secrets.MINIO_ACCESS_KEY }}
-          MINIO_SECRET_KEY: ${{ secrets.MINIO_SECRET_KEY }}
-        volumes:
-          - minio:/data
-        options: --name=minio --health-cmd "curl http://localhost:9000/minio/health/live"
-   
+          MINIO_ROOT_USER: minioadmin
+          MINIO_ROOT_PASSWORD: minioadmin
+          MINIO_ACCESS_KEY: minioadmin
+          MINIO_SECRET_KEY: minioadmin   
         
     steps:
     - name: Check out Code 
