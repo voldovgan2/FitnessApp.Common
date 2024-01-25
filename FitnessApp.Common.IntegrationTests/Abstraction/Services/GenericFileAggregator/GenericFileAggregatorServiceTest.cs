@@ -13,6 +13,7 @@ using FitnessApp.Comon.Tests.Shared.Abstraction.Models.Generic;
 using FitnessApp.Comon.Tests.Shared.Abstraction.Models.GenericFileAggregator;
 using FitnessApp.Comon.Tests.Shared.Abstraction.Services.Generic;
 using FitnessApp.Comon.Tests.Shared.Abstraction.Services.GenericFileAggregator;
+using Minio.Exceptions;
 using Xunit;
 
 namespace FitnessApp.Common.IntegrationTests.Abstraction.Services.GenericFileAggregator
@@ -97,7 +98,7 @@ namespace FitnessApp.Common.IntegrationTests.Abstraction.Services.GenericFileAgg
             Assert.NotNull(item.Images.Single().Value);
         }
 
-        [Fact(Skip ="currently mocked")]
+        [Fact]
         public async Task DeleteItem_ReturnsDeleted()
         {
             var fileName = FilesService.CreateFileName(TestData.FileFieldName, TestData.EntityIdToDelete);
@@ -109,8 +110,7 @@ namespace FitnessApp.Common.IntegrationTests.Abstraction.Services.GenericFileAgg
 
             // Assert
             Assert.Equal(TestData.EntityIdToDelete, item);
-            var bolb = await _fileFixture.FileService.DownloadFile(_fileFixture.Path, fileName);
-            Assert.Null(bolb);
+            await Assert.ThrowsAsync<ObjectNotFoundException>(() => _fileFixture.FileService.DownloadFile(_fileFixture.Path, fileName));
         }
     }
 }

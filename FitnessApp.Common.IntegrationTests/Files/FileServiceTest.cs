@@ -1,6 +1,10 @@
 ﻿using System.Diagnostics;
+using System.IO;
+using System.Text;
 using System.Threading.Tasks;
+using FitnessApp.Common.Files;
 using FitnessApp.Common.IntegrationTests.File.Fixtures;
+using FitnessApp.Comon.Tests.Shared;
 using Xunit;
 
 namespace FitnessApp.Common.IntegrationTests.File
@@ -17,24 +21,24 @@ namespace FitnessApp.Common.IntegrationTests.File
         }
 
         [Fact]
-        public Task UploadFile_Success()
+        public async Task UploadFile_Success()
         {
+            await _fixture.FileService.UploadFile(_fixture.Path.ToLower(), TestData.FileToUpload, new MemoryStream(Encoding.Default.GetBytes(TestData.FileToUpload)));
             Assert.True(true);
-            return Task.CompletedTask;
         }
 
         [Fact]
-        public Task DownloadFile_Success()
+        public async Task DownloadFile_Success()
         {
-            Assert.False(false);
-            return Task.CompletedTask;
+            await _fixture.FileService.DownloadFile(_fixture.Path.ToLower(), TestData.FileToDownload);
+            Assert.True(true);
         }
 
         [Fact]
-        public Task DeleteFile_Success()
+        public async Task DeleteFile_Success()
         {
-            Assert.Null(null);
-            return Task.CompletedTask;
+            await _fixture.FileService.DeleteFile(_fixture.Path.ToLower(), TestData.FileToDelete);
+            Assert.True(true);
         }
     }
 }

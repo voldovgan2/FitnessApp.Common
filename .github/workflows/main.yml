@@ -24,6 +24,21 @@ jobs:
           --health-timeout 5s
           --health-retries 5
           --name mongo_container
+      minio:
+        image: minio/minio
+        command: server /data
+        ports:
+          - "9000:9000"
+        environment:
+          MINIO_ROOT_USER: minioadmin
+          MINIO_ROOT_PASSWORD: minioadmin
+        healthcheck:
+          test: [ "CMD", "mc", "ready", "local" ]
+          interval: 5s
+          timeout: 5s
+          retries: 5
+        volumes:
+          - minio:/data
         
     steps:
     - name: Check out Code 

@@ -15,7 +15,7 @@ namespace FitnessApp.Common.Files
 
         public async Task UploadFile(string bucketName, string objectName, Stream stream)
         {
-            await EnsureBucket(objectName);
+            await EnsureBucket(bucketName);
             var args = new PutObjectArgs()
                 .WithBucket(bucketName)
                 .WithObject(objectName)
@@ -26,7 +26,7 @@ namespace FitnessApp.Common.Files
 
         public async Task<byte[]> DownloadFile(string bucketName, string objectName)
         {
-            await EnsureBucket(objectName);
+            await EnsureBucket(bucketName);
             var memoryStream = new MemoryStream();
             var completed = false;
             var args = new GetObjectArgs()
@@ -56,7 +56,7 @@ namespace FitnessApp.Common.Files
 
         public async Task DeleteFile(string bucketName, string objectName)
         {
-            await EnsureBucket(objectName);
+            await EnsureBucket(bucketName);
             var args = new RemoveObjectArgs()
                 .WithBucket(bucketName)
                 .WithObject(objectName);
@@ -65,7 +65,7 @@ namespace FitnessApp.Common.Files
 
         public static string CreateFileName(string propertyName, string userId)
         {
-            return $"{propertyName}_{userId}";
+            return $"{propertyName}{userId}";
         }
 
         private async Task EnsureBucket(string bucketName)

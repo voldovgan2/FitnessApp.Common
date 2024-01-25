@@ -8,6 +8,8 @@ using FitnessApp.Common.Abstractions.Db.Entities.Generic;
 using FitnessApp.Comon.Tests.Shared;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Options;
+using MongoDB.Bson.Serialization;
+using MongoDB.Bson.Serialization.Serializers;
 using MongoDB.Driver;
 
 namespace FitnessApp.Common.IntegrationTests.Abstraction.Db.Fixtures
@@ -21,6 +23,8 @@ namespace FitnessApp.Common.IntegrationTests.Abstraction.Db.Fixtures
 
         public DbContextFixtureBase(string databaseName, Func<string, TEntity> createEntityFacotryMethod)
         {
+            var objectSerializer = new ObjectSerializer(type => true);
+            BsonSerializer.RegisterSerializer(objectSerializer);
             _mongoDbSettings = new MongoDbSettings
             {
                 ConnectionString = Configuration.GetValue<string>("MongoConnection:ConnectionString"),

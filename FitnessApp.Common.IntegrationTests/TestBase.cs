@@ -15,8 +15,12 @@ namespace FitnessApp.Common.IntegrationTests
             var configurationBuilder = new ConfigurationBuilder();
             configurationBuilder
                 .SetBasePath(Directory.GetCurrentDirectory())
+#if RELEASE
                 .AddJsonFile("appsettings.json");
-
+#endif
+#if DEBUG
+                .AddJsonFile("appsettings.development.json");
+#endif
             Configuration = configurationBuilder
               .Build();
 
