@@ -2,7 +2,6 @@
 using System.IO;
 using System.Text;
 using System.Threading.Tasks;
-using FitnessApp.Common.Files;
 using FitnessApp.Common.IntegrationTests.File.Fixtures;
 using FitnessApp.Comon.Tests.Shared;
 using Xunit;
