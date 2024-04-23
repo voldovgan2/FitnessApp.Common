@@ -13,30 +13,40 @@ namespace FitnessApp.Common.UnitTests.Abstraction.Services.Collection
 {
     public class CollectionServiceTest : TestBase
     {
+        private readonly Mock<ICollectionRepository<TestCollectionModel, TestCollectionItemModel, CreateTestCollectionModel, UpdateTestCollectionModel>> _repositoryMock;
+        private readonly CollectionServiceMock _service;
+        private readonly Dictionary<string, object> _defaultTestCollectionEntityParameters = new()
+        {
+            {
+                "Id", TestData.Id
+            },
+            {
+                "ItemsCount", 2
+            }
+        };
+
+        public CollectionServiceTest() : base()
+        {
+            _repositoryMock = new Mock<ICollectionRepository<TestCollectionModel, TestCollectionItemModel, CreateTestCollectionModel, UpdateTestCollectionModel>>();
+            _service = new CollectionServiceMock(_repositoryMock.Object);
+        }
+
         [Fact]
         public async Task GetItemByUserId_ReturnsSingleItem()
         {
             // Arrange
-            var repositoryMock = new Mock<ICollectionRepository<TestCollectionModel, TestCollectionItemModel, CreateTestCollectionModel, UpdateTestCollectionModel>>();
-            var queryableGenericModelsMock = GetQueryableMock(
-                TestData.GetAll(
-                    TestData.CreateCollectionModel,
-                    new Dictionary<string, object>
-                    {
-                        {
-                            "ItemsCount", 2
-                        }
-                    }
-                )
-            );
-            repositoryMock
+            var genericModelsMock = TestData.GetAll(TestData.CreateCollectionModel, new()
+            {
+                {
+                    "ItemsCount", 2
+                }
+            });
+            _repositoryMock
                .Setup(s => s.GetItemByUserId(It.IsAny<string>()))
-               .ReturnsAsync(queryableGenericModelsMock.Object.Single(i => i.UserId == TestData.Id));
-
-            var service = new CollectionServiceMock(repositoryMock.Object);
+               .ReturnsAsync(genericModelsMock.Single(i => i.UserId == TestData.Id));
 
             // Act
-            var entity = await service.GetItemByUserId(TestData.Id);
+            var entity = await _service.GetItemByUserId(TestData.Id);
 
             // Assert
             Assert.Equal(TestData.Id, entity.UserId);
@@ -46,20 +56,17 @@ namespace FitnessApp.Common.UnitTests.Abstraction.Services.Collection
         public async Task GetCollectionByUserId_ReturnsCollection()
         {
             // Arrange
-            var repositoryMock = new Mock<ICollectionRepository<TestCollectionModel, TestCollectionItemModel, CreateTestCollectionModel, UpdateTestCollectionModel>>();
             var collectionItems = new List<TestCollectionItemModel>
             {
                 TestData.CreateCollectionItemModel(1),
                 TestData.CreateCollectionItemModel(2)
             };
-            repositoryMock
+            _repositoryMock
                .Setup(s => s.GetCollectionByUserId(It.IsAny<string>(), It.IsAny<string>()))
                .ReturnsAsync(collectionItems);
 
-            var service = new CollectionServiceMock(repositoryMock.Object);
-
             // Act
-            var collection = await service.GetCollectionByUserId(TestData.Id, TestData.CollectionName);
+            var collection = await _service.GetCollectionByUserId(TestData.Id, TestData.CollectionName);
 
             // Assert
             Assert.All(collection, c => Assert.Contains(collectionItems, ci => ci.Id == c.Id));
@@ -70,7 +77,6 @@ namespace FitnessApp.Common.UnitTests.Abstraction.Services.Collection
         public async Task GetFilteredCollectionItems_ReturnsMatchedItems()
         {
             // Arrange
-            var repositoryMock = new Mock<ICollectionRepository<TestCollectionModel, TestCollectionItemModel, CreateTestCollectionModel, UpdateTestCollectionModel>>();
             var collectionItems = new List<TestCollectionItemModel>
             {
                 TestData.CreateCollectionItemModel(1),
@@ -91,14 +97,12 @@ namespace FitnessApp.Common.UnitTests.Abstraction.Services.Collection
                 PageSize = 10
             };
 
-            repositoryMock
+            _repositoryMock
                .Setup(s => s.GetCollectionByUserId(It.IsAny<string>(), It.IsAny<string>()))
                .ReturnsAsync(collectionItems);
 
-            var service = new CollectionServiceMock(repositoryMock.Object);
-
             // Act
-            var items = await service.GetFilteredCollectionItems("", getModel);
+            var items = await _service.GetFilteredCollectionItems("", getModel);
 
             // Assert
             Assert.All(items.Items, m => filteredBySearchItems.Contains(m.Id));
@@ -108,7 +112,6 @@ namespace FitnessApp.Common.UnitTests.Abstraction.Services.Collection
         public async Task CreateItem_ReturnsCreated()
         {
             // Arrange
-            var repositoryMock = new Mock<ICollectionRepository<TestCollectionModel, TestCollectionItemModel, CreateTestCollectionModel, UpdateTestCollectionModel>>();
             var createModel = TestData.CreateCreateTestCollectionModel(new Dictionary<string, object>
             {
                 {
@@ -116,14 +119,12 @@ namespace FitnessApp.Common.UnitTests.Abstraction.Services.Collection
                 }
             });
 
-            repositoryMock
+            _repositoryMock
                .Setup(s => s.CreateItem(It.IsAny<CreateTestCollectionModel>()))
                .ReturnsAsync(createModel.UserId);
 
-            var service = new CollectionServiceMock(repositoryMock.Object);
-
             // Act
-            var id = await service.CreateItem(createModel);
+            var id = await _service.CreateItem(createModel);
 
             // Assert
             Assert.Equal(TestData.Id, id);
@@ -133,31 +134,14 @@ namespace FitnessApp.Common.UnitTests.Abstraction.Services.Collection
         public async Task UpdateItemAddCollectionItem_ReturnsAddedItem()
         {
             // Arrange
-            var repositoryMock = new Mock<ICollectionRepository<TestCollectionModel, TestCollectionItemModel, CreateTestCollectionModel, UpdateTestCollectionModel>>();
             var addItemModel = TestData.CreateCollectionItemModel(1);
 
-            repositoryMock
+            _repositoryMock
                .Setup(s => s.UpdateItem(It.IsAny<UpdateTestCollectionModel>()))
                .ReturnsAsync(addItemModel);
 
-            var service = new CollectionServiceMock(repositoryMock.Object);
-
             // Act
-            var createdItemModel = await service.UpdateItem(TestData.CreateUpdateTestCollectionModel(new Dictionary<string, object>
-            {
-                {
-                    "Id", TestData.Id
-                },
-                {
-                    "Action", UpdateCollectionAction.Add
-                },
-                {
-                    "CollectionName", TestData.CollectionName
-                },
-                {
-                    "Model", addItemModel
-                },
-            }));
+            var createdItemModel = await _service.UpdateItem(CreateUpdateTestCollectionModel(UpdateCollectionAction.Add, addItemModel));
 
             // Assert
             Assert.Equal(addItemModel.Id, createdItemModel.Id);
@@ -168,31 +152,14 @@ namespace FitnessApp.Common.UnitTests.Abstraction.Services.Collection
         public async Task UpdateItemUpdateCollectionItem_ReturnsUpdatedItem()
         {
             // Arrange
-            var repositoryMock = new Mock<ICollectionRepository<TestCollectionModel, TestCollectionItemModel, CreateTestCollectionModel, UpdateTestCollectionModel>>();
             var updateItemModel = TestData.CreateCollectionItemModel(1, "Updated");
 
-            repositoryMock
+            _repositoryMock
                .Setup(s => s.UpdateItem(It.IsAny<UpdateTestCollectionModel>()))
                .ReturnsAsync(updateItemModel);
 
-            var service = new CollectionServiceMock(repositoryMock.Object);
-
             // Act
-            var createdItemModel = await service.UpdateItem(TestData.CreateUpdateTestCollectionModel(new Dictionary<string, object>
-            {
-                {
-                    "Id", TestData.Id
-                },
-                {
-                    "Action", UpdateCollectionAction.Update
-                },
-                {
-                    "CollectionName", TestData.CollectionName
-                },
-                {
-                    "Model", TestData.CreateCollectionItemModel(1)
-                },
-            }));
+            var createdItemModel = await _service.UpdateItem(CreateUpdateTestCollectionModel(UpdateCollectionAction.Update, TestData.CreateCollectionItemModel(1)));
 
             // Assert
             Assert.Equal(updateItemModel.Id, createdItemModel.Id);
@@ -203,31 +170,14 @@ namespace FitnessApp.Common.UnitTests.Abstraction.Services.Collection
         public async Task UpdateItemDeleteCollectionItem_ReturnsDeletedItem()
         {
             // Arrange
-            var repositoryMock = new Mock<ICollectionRepository<TestCollectionModel, TestCollectionItemModel, CreateTestCollectionModel, UpdateTestCollectionModel>>();
             var updateItemModel = TestData.CreateCollectionItemModel(1);
 
-            repositoryMock
+            _repositoryMock
                .Setup(s => s.UpdateItem(It.IsAny<UpdateTestCollectionModel>()))
                .ReturnsAsync(updateItemModel);
 
-            var service = new CollectionServiceMock(repositoryMock.Object);
-
             // Act
-            var deletedItemModel = await service.UpdateItem(TestData.CreateUpdateTestCollectionModel(new Dictionary<string, object>
-            {
-                {
-                    "Id", TestData.Id
-                },
-                {
-                    "Action", UpdateCollectionAction.Remove
-                },
-                {
-                    "CollectionName", TestData.CollectionName
-                },
-                {
-                    "Model", TestData.CreateCollectionItemModel(1)
-                },
-            }));
+            var deletedItemModel = await _service.UpdateItem(CreateUpdateTestCollectionModel(UpdateCollectionAction.Remove, TestData.CreateCollectionItemModel(1)));
 
             // Assert
             Assert.Equal(updateItemModel.Id, deletedItemModel.Id);
@@ -238,31 +188,36 @@ namespace FitnessApp.Common.UnitTests.Abstraction.Services.Collection
         public async Task DeleteItem_ReturnsDeleted()
         {
             // Arrange
-            var repositoryMock = new Mock<ICollectionRepository<TestCollectionModel, TestCollectionItemModel, CreateTestCollectionModel, UpdateTestCollectionModel>>();
+            var deletedModel = TestData.CreateCollectionModel(_defaultTestCollectionEntityParameters);
 
-            var deletedModel = TestData.CreateCollectionModel(
-                new Dictionary<string, object>
-                {
-                    {
-                        "Id", TestData.Id
-                    },
-                    {
-                        "ItemsCount", 2
-                    }
-                }
-            );
-
-            repositoryMock
+            _repositoryMock
                .Setup(s => s.DeleteItem(It.IsAny<string>()))
                .ReturnsAsync(deletedModel);
 
-            var service = new CollectionServiceMock(repositoryMock.Object);
-
             // Act
-            var deletedItemModel = await service.DeleteItem(TestData.Id);
+            var deletedItemModel = await _service.DeleteItem(TestData.Id);
 
             // Assert
             Assert.Equal(deletedModel.UserId, deletedItemModel.UserId);
+        }
+
+        private UpdateTestCollectionModel CreateUpdateTestCollectionModel(UpdateCollectionAction action, TestCollectionItemModel model)
+        {
+            return TestData.CreateUpdateTestCollectionModel(new Dictionary<string, object>
+            {
+                {
+                    "Id", TestData.Id
+                },
+                {
+                    "Action", action
+                },
+                {
+                    "CollectionName", TestData.CollectionName
+                },
+                {
+                    "Model", model
+                },
+            });
         }
     }
 }

@@ -13,46 +13,34 @@ using FitnessApp.Common.Abstractions.Services.Validation;
 
 namespace FitnessApp.Common.Abstractions.Services.Generic
 {
-    public abstract class GenericService<TGenericEntity, TGenericModel, TCreateGenericModel, TUpdateGenericModel>
+    public abstract class GenericService<TGenericEntity, TGenericModel, TCreateGenericModel, TUpdateGenericModel>(
+        IGenericRepository<TGenericEntity, TGenericModel, TCreateGenericModel, TUpdateGenericModel> repository,
+        IMapper mapper
+        )
         : IGenericService<TGenericEntity, TGenericModel, TCreateGenericModel, TUpdateGenericModel>
         where TGenericEntity : IGenericEntity
         where TGenericModel : IGenericModel
         where TCreateGenericModel : ICreateGenericModel
         where TUpdateGenericModel : IUpdateGenericModel
     {
-        private readonly IGenericRepository<TGenericEntity, TGenericModel, TCreateGenericModel, TUpdateGenericModel> _repository;
-        private readonly IMapper _mapper;
-
-        protected GenericService(
-            IGenericRepository<TGenericEntity, TGenericModel, TCreateGenericModel, TUpdateGenericModel> repository,
-            IMapper mapper
-        )
-        {
-            _repository = repository;
-            _mapper = mapper;
-        }
-
         public async Task<TGenericModel> GetItemByUserId(string userId)
         {
             ValidationHelper.ThrowExceptionIfNotValidatedEmptyStringField(nameof(userId), userId);
-
-            var result = await _repository.GetItemByUserId(userId);
+            var result = await repository.GetItemByUserId(userId);
             return result;
         }
 
         public async Task<IEnumerable<TGenericModel>> GetItems(string search, Expression<Func<TGenericEntity, bool>> predicate)
         {
-            var data = (await _repository.GetAllItems())
-                .Where(predicate)
-                .ToList();
-            var result = _mapper.Map<List<TGenericModel>>(data);
+            var data = (await repository.GetAllItems(predicate)).ToList();
+            var result = mapper.Map<List<TGenericModel>>(data);
             return result;
         }
 
         public async Task<IEnumerable<TGenericModel>> GetItems(IEnumerable<string> ids)
         {
-            var data = await _repository.GetItemsByIds(ids.Where(id => !string.IsNullOrWhiteSpace(id)));
-            var result = data.Select(entity => _mapper.Map<TGenericModel>(entity));
+            var data = await repository.GetItemsByIds(ids.Where(id => !string.IsNullOrWhiteSpace(id)));
+            var result = data.Select(entity => mapper.Map<TGenericModel>(entity));
             return result;
         }
 
@@ -61,7 +49,7 @@ namespace FitnessApp.Common.Abstractions.Services.Generic
             var validationErrors = ValidateCreateGenericModel(model);
             validationErrors.ThrowIfNotEmpty();
 
-            var result = await _repository.CreateItem(model);
+            var result = await repository.CreateItem(model);
             return result;
         }
 
@@ -70,7 +58,7 @@ namespace FitnessApp.Common.Abstractions.Services.Generic
             var validationErrors = ValidateUpdateGenericModel(model);
             validationErrors.ThrowIfNotEmpty();
 
-            var result = await _repository.UpdateItem(model);
+            var result = await repository.UpdateItem(model);
             return result;
         }
 
@@ -78,7 +66,7 @@ namespace FitnessApp.Common.Abstractions.Services.Generic
         {
             ValidationHelper.ThrowExceptionIfNotValidatedEmptyStringField(nameof(userId), userId);
 
-            var result = await _repository.DeleteItem(userId);
+            var result = await repository.DeleteItem(userId);
             return result;
         }
 

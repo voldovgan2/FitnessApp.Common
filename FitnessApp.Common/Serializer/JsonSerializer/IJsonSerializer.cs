@@ -6,9 +6,11 @@ namespace FitnessApp.Common.Serializer.JsonSerializer
     public interface IJsonSerializer
     {
         Encoding DefaultEncoding { get; }
-        byte[] SerializeToBytes(object data, IEnumerable<string> propertiesToIgnore = null);
+        byte[] SerializeToBytes(object data);
+        byte[] SerializeToBytes(object data, IEnumerable<string> propertiesToIgnore);
         T DeserializeFromBytes<T>(byte[] data);
-        string SerializeToString(object data, IEnumerable<string> propertiesToIgnore = null);
+        string SerializeToString(object data);
+        string SerializeToString(object data, IEnumerable<string> propertiesToIgnore);
         T DeserializeFromString<T>(string data);
     }
 }

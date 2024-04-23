@@ -1,5 +1,7 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
+using System.Linq.Expressions;
 using System.Threading.Tasks;
 using FitnessApp.Common.Abstractions.Db.Repository.Generic;
 using FitnessApp.Comon.Tests.Shared;
@@ -13,20 +15,32 @@ namespace FitnessApp.Common.UnitTests.Abstraction.Services.Generic
 {
     public class GenericServiceTest : TestBase
     {
+        private readonly Mock<IGenericRepository<TestGenericEntity, TestGenericModel, CreateTestGenericModel, UpdateTestGenericModel>> _repositoryMock;
+        private readonly GenericServiceMock _serviceMock;
+        private readonly Dictionary<string, object> _defaultGenericModelParameters = new()
+        {
+            {
+                "Id", TestData.Id
+            }
+        };
+
+        public GenericServiceTest() : base()
+        {
+            _repositoryMock = new Mock<IGenericRepository<TestGenericEntity, TestGenericModel, CreateTestGenericModel, UpdateTestGenericModel>>();
+            _serviceMock = new GenericServiceMock(_repositoryMock.Object, _mapper);
+        }
+
         [Fact]
         public async Task GetItemByUserId_ReturnsSingleItem()
         {
             // Arrange
-            var repositoryMock = new Mock<IGenericRepository<TestGenericEntity, TestGenericModel, CreateTestGenericModel, UpdateTestGenericModel>>();
-            var queryableGenericModelsMock = GetQueryableMock(TestData.GetAll(TestData.CreateGenericModel, new Dictionary<string, object>()));
-            repositoryMock
+            var allDataMock = TestData.GetAll(TestData.CreateGenericModel, new Dictionary<string, object>());
+            _repositoryMock
                .Setup(s => s.GetItemByUserId(It.IsAny<string>()))
-               .ReturnsAsync(queryableGenericModelsMock.Object.Single(i => i.UserId == TestData.Id));
-
-            var service = new GenericServiceMock(repositoryMock.Object, _mapper);
+               .ReturnsAsync(allDataMock.Single(i => i.UserId == TestData.Id));
 
             // Act
-            var entity = await service.GetItemByUserId(TestData.Id);
+            var entity = await _serviceMock.GetItemByUserId(TestData.Id);
 
             // Assert
             Assert.Equal(TestData.Id, entity.UserId);
@@ -36,19 +50,16 @@ namespace FitnessApp.Common.UnitTests.Abstraction.Services.Generic
         public async Task GetItems_ReturnsMatchedBySearchCriteriaItems()
         {
             // Arrange
-            var repositoryMock = new Mock<IGenericRepository<TestGenericEntity, TestGenericModel, CreateTestGenericModel, UpdateTestGenericModel>>();
-            var queryableGenericEntitiesMock = GetQueryableMock(TestData.GetAll(TestData.CreateGenericEntity, new Dictionary<string, object>()));
-            repositoryMock
-               .Setup(s => s.GetAllItems())
-               .ReturnsAsync(queryableGenericEntitiesMock.Object);
-            var filteredBySearchItems = queryableGenericEntitiesMock.Object.Take(2).Select(i => i.UserId);
-
-            var service = new GenericServiceMock(repositoryMock.Object, _mapper);
+            var allDataMock = CreateDefaultMockedData();
+            _repositoryMock
+               .Setup(s => s.GetAllItems(It.IsAny<Expression<Func<TestGenericEntity, bool>>>()))
+               .ReturnsAsync(allDataMock);
+            var filteredBySearchItems = allDataMock.Take(2).Select(i => i.UserId);
 
             var testProperty = "TestProperty1";
 
             // Act
-            var models = await service.GetItems("", e => e.TestProperty1 == testProperty);
+            var models = await _serviceMock.GetItems("", e => e.TestProperty1 == testProperty);
 
             // Assert
             Assert.All(models, m => filteredBySearchItems.Contains(m.UserId));
@@ -58,16 +69,13 @@ namespace FitnessApp.Common.UnitTests.Abstraction.Services.Generic
         public async Task GetItems_ReturnsMatchedByIdsItems()
         {
             // Arrange
-            var repositoryMock = new Mock<IGenericRepository<TestGenericEntity, TestGenericModel, CreateTestGenericModel, UpdateTestGenericModel>>();
-            var queryableGenericEntitiesMock = GetQueryableMock(TestData.GetAll(TestData.CreateGenericEntity, new Dictionary<string, object>()));
-            repositoryMock
+            var genericEntitiesMock = CreateDefaultMockedData();
+            _repositoryMock
                .Setup(s => s.GetItemsByIds(It.IsAny<IEnumerable<string>>()))
-               .ReturnsAsync(queryableGenericEntitiesMock.Object.Where(e => TestData.Ids.Contains(e.UserId)));
-
-            var service = new GenericServiceMock(repositoryMock.Object, _mapper);
+               .ReturnsAsync(genericEntitiesMock.Where(e => TestData.Ids.Contains(e.UserId)));
 
             // Act
-            var models = await service.GetItems(TestData.Ids);
+            var models = await _serviceMock.GetItems(TestData.Ids);
 
             // Assert
             Assert.All(models, m => Assert.Contains(m.UserId, TestData.Ids));
@@ -77,31 +85,13 @@ namespace FitnessApp.Common.UnitTests.Abstraction.Services.Generic
         public async Task CreateItem_ReturnsCreatedItem()
         {
             // Arrange
-            var repositoryMock = new Mock<IGenericRepository<TestGenericEntity, TestGenericModel, CreateTestGenericModel, UpdateTestGenericModel>>();
-
-            var model = TestData.CreateGenericModel(
-                new Dictionary<string, object>
-                {
-                    {
-                        "Id", TestData.Id
-                    }
-                }
-            );
-            repositoryMock
+            var model = TestData.CreateGenericModel(_defaultGenericModelParameters);
+            _repositoryMock
                 .Setup(s => s.CreateItem(It.IsAny<CreateTestGenericModel>()))
                 .ReturnsAsync(model);
 
-            var service = new GenericServiceMock(repositoryMock.Object, _mapper);
-
             // Act
-            var entity = await service.CreateItem(TestData.CreateCreateTestGenericModel(
-                new Dictionary<string, object>
-                {
-                    {
-                        "Id", TestData.Id
-                    }
-                }
-            ));
+            var entity = await _serviceMock.CreateItem(TestData.CreateCreateTestGenericModel(_defaultGenericModelParameters));
 
             // Assert
             Assert.Equal(TestData.Id, entity.UserId);
@@ -111,33 +101,17 @@ namespace FitnessApp.Common.UnitTests.Abstraction.Services.Generic
         public async Task UpdateItem_ReturnsUpdatedItem()
         {
             // Arrange
-            var repositoryMock = new Mock<IGenericRepository<TestGenericEntity, TestGenericModel, CreateTestGenericModel, UpdateTestGenericModel>>();
+            var updateModel = TestData.CreateUpdateTestGenericModel(_defaultGenericModelParameters);
 
-            var updateModel = TestData.CreateUpdateTestGenericModel(new Dictionary<string, object>
-            {
-                {
-                    "Id", TestData.Id
-                }
-            });
-
-            var model = TestData.CreateGenericModel(
-                new Dictionary<string, object>
-                {
-                    {
-                        "Id", TestData.Id
-                    }
-                }
-            );
+            var model = TestData.CreateGenericModel(_defaultGenericModelParameters);
             model.TestProperty1 = updateModel.TestProperty1;
 
-            repositoryMock
+            _repositoryMock
                 .Setup(s => s.UpdateItem(It.IsAny<UpdateTestGenericModel>()))
                 .ReturnsAsync(model);
 
-            var service = new GenericServiceMock(repositoryMock.Object, _mapper);
-
             // Act
-            var entity = await service.UpdateItem(updateModel);
+            var entity = await _serviceMock.UpdateItem(updateModel);
 
             // Assert
             Assert.Equal(model.TestProperty1, entity.TestProperty1);
@@ -147,18 +121,20 @@ namespace FitnessApp.Common.UnitTests.Abstraction.Services.Generic
         public async Task DeleteItem_ReturnsDeletedItemId()
         {
             // Arrange
-            var repositoryMock = new Mock<IGenericRepository<TestGenericEntity, TestGenericModel, CreateTestGenericModel, UpdateTestGenericModel>>();
-            repositoryMock
+            _repositoryMock
                 .Setup(s => s.DeleteItem(It.IsAny<string>()))
                 .ReturnsAsync(TestData.Id);
 
-            var service = new GenericServiceMock(repositoryMock.Object, _mapper);
-
             // Act
-            var deletedId = await service.DeleteItem(TestData.Id);
+            var deletedId = await _serviceMock.DeleteItem(TestData.Id);
 
             // Assert
             Assert.Equal(TestData.Id, deletedId);
+        }
+
+        private IEnumerable<TestGenericEntity> CreateDefaultMockedData()
+        {
+            return TestData.GetAll(TestData.CreateGenericEntity, new Dictionary<string, object>());
         }
     }
 }

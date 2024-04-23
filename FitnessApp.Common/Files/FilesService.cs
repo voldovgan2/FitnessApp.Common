@@ -5,14 +5,8 @@ using Minio.DataModel.Args;
 
 namespace FitnessApp.Common.Files
 {
-    public class FilesService : IFilesService
+    public class FilesService(IMinioClient minioClient) : IFilesService
     {
-        private readonly IMinioClient _minioClient;
-        public FilesService(IMinioClient minioClient)
-        {
-            _minioClient = minioClient;
-        }
-
         public async Task UploadFile(string bucketName, string objectName, Stream stream)
         {
             await EnsureBucket(bucketName);
@@ -21,7 +15,7 @@ namespace FitnessApp.Common.Files
                 .WithObject(objectName)
                 .WithStreamData(stream)
                 .WithObjectSize(stream.Length);
-            await _minioClient.PutObjectAsync(args).ConfigureAwait(false);
+            await minioClient.PutObjectAsync(args).ConfigureAwait(false);
         }
 
         public async Task<byte[]> DownloadFile(string bucketName, string objectName)
@@ -38,7 +32,7 @@ namespace FitnessApp.Common.Files
                     memoryStream.Seek(0, SeekOrigin.Begin);
                     completed = true;
                 });
-            await _minioClient.GetObjectAsync(args);
+            await minioClient.GetObjectAsync(args);
             var timeoutCounter = 5;
             while (!completed)
             {
@@ -60,7 +54,7 @@ namespace FitnessApp.Common.Files
             var args = new RemoveObjectArgs()
                 .WithBucket(bucketName)
                 .WithObject(objectName);
-            await _minioClient.RemoveObjectAsync(args);
+            await minioClient.RemoveObjectAsync(args);
         }
 
         public static string CreateFileName(string propertyName, string userId)
@@ -70,8 +64,8 @@ namespace FitnessApp.Common.Files
 
         private async Task EnsureBucket(string bucketName)
         {
-            if (!await _minioClient.BucketExistsAsync(new BucketExistsArgs().WithBucket(bucketName)))
-                await _minioClient.MakeBucketAsync(new MakeBucketArgs().WithBucket(bucketName)).ConfigureAwait(false);
+            if (!await minioClient.BucketExistsAsync(new BucketExistsArgs().WithBucket(bucketName)))
+                await minioClient.MakeBucketAsync(new MakeBucketArgs().WithBucket(bucketName)).ConfigureAwait(false);
         }
     }
 }

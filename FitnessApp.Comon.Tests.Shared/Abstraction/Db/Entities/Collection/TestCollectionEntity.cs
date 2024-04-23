@@ -14,8 +14,8 @@ namespace FitnessApp.Comon.Tests.Shared.Abstraction.Db.Entities.Collection
 
         public static bool operator ==(TestCollectionEntity ce1, TestCollectionEntity ce2)
         {
-            if ((object)ce1 == null)
-                return (object)ce2 == null;
+            if (ce1 is null)
+                return ce2 is null;
 
             return ce1.Equals(ce2);
         }

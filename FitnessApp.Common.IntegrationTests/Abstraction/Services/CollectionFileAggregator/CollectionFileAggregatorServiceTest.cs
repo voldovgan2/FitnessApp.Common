@@ -1,7 +1,10 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using FitnessApp.Common.Abstractions.Db.Enums.Collection;
+using FitnessApp.Common.Abstractions.Models.Collection;
+using FitnessApp.Common.Abstractions.Models.CollectionFileAggregator;
 using FitnessApp.Common.Abstractions.Services.CollectionFileAggregator;
 using FitnessApp.Common.Abstractions.Services.Configuration;
 using FitnessApp.Common.IntegrationTests.Abstraction.Services.Fixtures;
@@ -51,14 +54,7 @@ namespace FitnessApp.Common.IntegrationTests.Abstraction.Services.CollectionFile
         public async Task GetItem_ReturnsSingleItem()
         {
             // Arrange
-            var getFilteredCollectionItemsModel = new GetTestFilteredCollectionItemsModel
-            {
-                UserId = TestData.EntityIdToGet,
-                Predicate = i => i.TestProperty.Contains("Property"),
-                CollectionName = TestData.CollectionName,
-                Page = 0,
-                PageSize = 10
-            };
+            var getFilteredCollectionItemsModel = CreateGetTestFilteredCollectionItemsModel(i => i.TestProperty.Contains("Property"));
 
             // Act
             var testCollectionFileAggregatorItemModel = await _service.GetFilteredCollectionItems(getFilteredCollectionItemsModel);
@@ -75,14 +71,7 @@ namespace FitnessApp.Common.IntegrationTests.Abstraction.Services.CollectionFile
         public async Task GetFilteredCollectionItems_ReturnsItemsWithFiles()
         {
             // Arrange
-            var getFilteredCollectionItemsModel = new GetTestFilteredCollectionItemsModel
-            {
-                UserId = TestData.EntityIdToGet,
-                Predicate = i => true,
-                CollectionName = TestData.CollectionName,
-                Page = 0,
-                PageSize = 10
-            };
+            var getFilteredCollectionItemsModel = CreateGetTestFilteredCollectionItemsModel(i => true);
 
             // Act
             var testCollectionFileAggregatorItemModel = await _service.GetFilteredCollectionItems(getFilteredCollectionItemsModel);
@@ -119,26 +108,7 @@ namespace FitnessApp.Common.IntegrationTests.Abstraction.Services.CollectionFile
         public async Task UpdateItemAddCollectionItem_ReturnsAddedItem()
         {
             // Arrange
-            var updateCollectionFileAggregatorModel = TestData.CreateUpdateTestCollectionFileAggregatorModel(new Dictionary<string, object>
-            {
-                {
-                    "Id", TestData.EntityIdToUpdate
-                },
-                {
-                    "CollectionName", TestData.CollectionName
-                },
-                {
-                    "Action", UpdateCollectionAction.Add
-                },
-                {
-                    "Model", TestData.CreateTestCollectionFileAggregatorItemModel(new Dictionary<string, object>
-                    {
-                        {
-                            "Id", 3
-                        }
-                    })
-                }
-            });
+            var updateCollectionFileAggregatorModel = CreateUpdateTestCollectionFileAggregatorModel(3, UpdateCollectionAction.Add);
 
             // Act
             var testCollectionFileAggregatorItemModel = await _service.UpdateItem(updateCollectionFileAggregatorModel);
@@ -152,47 +122,9 @@ namespace FitnessApp.Common.IntegrationTests.Abstraction.Services.CollectionFile
         public async Task UpdateItemUpdateCollectionItem_ReturnsUpdatedItem()
         {
             // Arrange
-            await _service.UpdateItem(TestData.CreateUpdateTestCollectionFileAggregatorModel(new Dictionary<string, object>
-            {
-                {
-                    "Id", TestData.EntityIdToUpdate
-                },
-                {
-                    "CollectionName", TestData.CollectionName
-                },
-                {
-                    "Action", UpdateCollectionAction.Add
-                },
-                {
-                    "Model", TestData.CreateTestCollectionFileAggregatorItemModel(new Dictionary<string, object>
-                    {
-                        {
-                            "Id", 4
-                        }
-                    })
-                }
-            }));
+            await _service.UpdateItem(CreateUpdateTestCollectionFileAggregatorModel(4, UpdateCollectionAction.Add));
 
-            var updateCollectionFileAggregatorModel = TestData.CreateUpdateTestCollectionFileAggregatorModel(new Dictionary<string, object>
-            {
-                {
-                    "Id", TestData.EntityIdToUpdate
-                },
-                {
-                    "CollectionName", TestData.CollectionName
-                },
-                {
-                    "Action", UpdateCollectionAction.Update
-                },
-                {
-                    "Model", TestData.CreateTestCollectionFileAggregatorItemModel(new Dictionary<string, object>
-                    {
-                        {
-                            "Id", 4
-                        }
-                    })
-                }
-            });
+            var updateCollectionFileAggregatorModel = CreateUpdateTestCollectionFileAggregatorModel(4, UpdateCollectionAction.Update);
 
             // Act
             var testCollectionFileAggregatorItemModel = await _service.UpdateItem(updateCollectionFileAggregatorModel);
@@ -206,47 +138,9 @@ namespace FitnessApp.Common.IntegrationTests.Abstraction.Services.CollectionFile
         public async Task UpdateItemRemoveCollectionItem_ReturnsRemovedItem()
         {
             // Arrange
-            await _service.UpdateItem(TestData.CreateUpdateTestCollectionFileAggregatorModel(new Dictionary<string, object>
-            {
-                {
-                    "Id", TestData.EntityIdToUpdate
-                },
-                {
-                    "CollectionName", TestData.CollectionName
-                },
-                {
-                    "Action", UpdateCollectionAction.Add
-                },
-                {
-                    "Model", TestData.CreateTestCollectionFileAggregatorItemModel(new Dictionary<string, object>
-                    {
-                        {
-                            "Id", 5
-                        }
-                    })
-                }
-            }));
+            await _service.UpdateItem(CreateUpdateTestCollectionFileAggregatorModel(5, UpdateCollectionAction.Add));
 
-            var updateCollectionFileAggregatorModel = TestData.CreateUpdateTestCollectionFileAggregatorModel(new Dictionary<string, object>
-            {
-                {
-                    "Id", TestData.EntityIdToUpdate
-                },
-                {
-                    "CollectionName", TestData.CollectionName
-                },
-                {
-                    "Action", UpdateCollectionAction.Remove
-                },
-                {
-                    "Model", TestData.CreateTestCollectionFileAggregatorItemModel(new Dictionary<string, object>
-                    {
-                        {
-                            "Id", 5
-                        }
-                    })
-                }
-            });
+            var updateCollectionFileAggregatorModel = CreateUpdateTestCollectionFileAggregatorModel(5, UpdateCollectionAction.Remove);
 
             // Act
             var testCollectionFileAggregatorItemModel = await _service.UpdateItem(updateCollectionFileAggregatorModel);
@@ -264,6 +158,42 @@ namespace FitnessApp.Common.IntegrationTests.Abstraction.Services.CollectionFile
 
             // Assert
             Assert.True(deletedId == TestData.EntityIdToDelete);
+        }
+
+        private UpdateTestCollectionFileAggregatorModel CreateUpdateTestCollectionFileAggregatorModel(int id, UpdateCollectionAction updateCollectionAction)
+        {
+            return TestData.CreateUpdateTestCollectionFileAggregatorModel(new Dictionary<string, object>
+            {
+                {
+                    "Id", TestData.EntityIdToUpdate
+                },
+                {
+                    "CollectionName", TestData.CollectionName
+                },
+                {
+                    "Action", updateCollectionAction
+                },
+                {
+                    "Model", TestData.CreateTestCollectionFileAggregatorItemModel(new Dictionary<string, object>
+                    {
+                        {
+                            "Id", id
+                        }
+                    })
+                }
+            });
+        }
+
+        private GetTestFilteredCollectionItemsModel CreateGetTestFilteredCollectionItemsModel(Func<TestCollectionItemModel, bool> predicate)
+        {
+            return new GetTestFilteredCollectionItemsModel
+            {
+                UserId = TestData.EntityIdToGet,
+                Predicate = predicate,
+                CollectionName = TestData.CollectionName,
+                Page = 0,
+                PageSize = 10
+            };
         }
     }
 }

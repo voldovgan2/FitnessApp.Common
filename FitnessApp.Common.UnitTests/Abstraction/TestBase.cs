@@ -1,11 +1,8 @@
 ﻿using System.Collections.Generic;
-using System.Linq;
 using AutoMapper;
 using FitnessApp.Comon.Tests.Shared;
 using FitnessApp.Comon.Tests.Shared.Abstraction.Db.Entities.Collection;
 using FitnessApp.Comon.Tests.Shared.Abstraction.Db.Entities.Generic;
-using MockQueryable.Moq;
-using Moq;
 
 namespace FitnessApp.Common.UnitTests.Abstraction
 {
@@ -22,47 +19,21 @@ namespace FitnessApp.Common.UnitTests.Abstraction
                 .CreateMapper();
         }
 
-        #region Abstract
-
-        public Mock<IQueryable<T>> GetQueryableMock<T>(List<T> allEntities)
-            where T : class
+        public IEnumerable<TestGenericEntity> GetGenericEntitiesMock()
         {
-            return allEntities.AsQueryable().BuildMock();
+            return TestData.GetAll(TestData.CreateGenericEntity, new Dictionary<string, object>());
         }
 
-        #endregion
-
-        #region Generic initialization
-
-        public Mock<IQueryable<TestGenericEntity>> GetQueryableGenericEntitiesMock()
+        public IEnumerable<TestCollectionEntity> GetCollectionEntitiesMock()
         {
-            return GetQueryableMock(TestData.GetAll(TestData.CreateGenericEntity, new Dictionary<string, object>()));
-        }
-
-        #endregion
-
-        #region Collection initialization
-
-        public Mock<IQueryable<TestCollectionEntity>> GetQueryableCollectionEntitiesMock()
-        {
-            return GetQueryableMock(
-                TestData.GetAll(
-                    TestData.CreateCollectionEntity,
-                    new Dictionary<string, object>
+            return TestData.GetAll(
+                TestData.CreateCollectionEntity,
+                new Dictionary<string, object>
+                {
                     {
-                        {
-                            "ItemsCount", 2
-                        }
+                        "ItemsCount", 2
                     }
-                )
-            );
+                });
         }
-
-        public Mock<IQueryable<TestCollectionEntity>> GetQueryableCollectionEntitiesMock(List<TestCollectionEntity> allItems)
-        {
-            return GetQueryableMock(allItems);
-        }
-
-        #endregion
     }
 }

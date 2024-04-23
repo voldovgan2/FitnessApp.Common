@@ -62,15 +62,7 @@ namespace FitnessApp.Common.IntegrationTests.Abstraction.Services.GenericFileAgg
         public async Task CreateItem_ReturnsCreated()
         {
             // Act
-            var item = await _service.CreateItem(TestData.CreateCreateTestGenericFileAggregatorModel(new Dictionary<string, object>
-            {
-                {
-                    "Id", TestData.EntityIdToCreate
-                },
-                {
-                    "Images", TestData.CreateFileAggregatorImages()
-                }
-            }));
+            var item = await _service.CreateItem(TestData.CreateCreateTestGenericFileAggregatorModel(CreateTestGenericFileAggregatorModelParams(TestData.EntityIdToCreate)));
 
             // Assert
             Assert.NotNull(item.Model.UserId);
@@ -82,15 +74,7 @@ namespace FitnessApp.Common.IntegrationTests.Abstraction.Services.GenericFileAgg
         public async Task UpdateItem_ReturnsUpdated()
         {
             // Act
-            var item = await _service.UpdateItem(TestData.CreateUpdateTestGenericFileAggregatorModel(new Dictionary<string, object>
-            {
-                {
-                    "Id", TestData.EntityIdToUpdate
-                },
-                {
-                    "Images", TestData.CreateFileAggregatorImages()
-                }
-            }));
+            var item = await _service.UpdateItem(TestData.CreateUpdateTestGenericFileAggregatorModel(CreateTestGenericFileAggregatorModelParams(TestData.EntityIdToUpdate)));
 
             // Assert
             Assert.NotNull(item.Model.UserId);
@@ -111,6 +95,19 @@ namespace FitnessApp.Common.IntegrationTests.Abstraction.Services.GenericFileAgg
             // Assert
             Assert.Equal(TestData.EntityIdToDelete, item);
             await Assert.ThrowsAsync<ObjectNotFoundException>(() => _fileFixture.FileService.DownloadFile(_fileFixture.Path, fileName));
+        }
+
+        private Dictionary<string, object> CreateTestGenericFileAggregatorModelParams(object id)
+        {
+            return new Dictionary<string, object>
+            {
+                {
+                    "Id", id
+                },
+                {
+                    "Images", TestData.CreateFileAggregatorImages()
+                }
+            };
         }
     }
 }

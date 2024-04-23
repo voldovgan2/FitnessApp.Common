@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Linq;
 using System.Text;
 using FitnessApp.Common.Serializer.Infrastructure;
 using Newtonsoft.Json;
@@ -9,7 +10,15 @@ namespace FitnessApp.Common.Serializer.JsonSerializer
     {
         public Encoding DefaultEncoding { get; set; } = Encoding.UTF32;
 
-        public byte[] SerializeToBytes(object data, IEnumerable<string> propertiesToIgnore = null)
+        public byte[] SerializeToBytes(object data)
+        {
+            return DefaultEncoding.GetBytes(JsonConvert.SerializeObject(data, new JsonSerializerSettings
+            {
+                ContractResolver = new ContractResolver(Enumerable.Empty<string>())
+            }));
+        }
+
+        public byte[] SerializeToBytes(object data, IEnumerable<string> propertiesToIgnore)
         {
             return DefaultEncoding.GetBytes(JsonConvert.SerializeObject(data, new JsonSerializerSettings
             {
@@ -22,7 +31,15 @@ namespace FitnessApp.Common.Serializer.JsonSerializer
             return JsonConvert.DeserializeObject<T>(DefaultEncoding.GetString(data));
         }
 
-        public string SerializeToString(object data, IEnumerable<string> propertiesToIgnore = null)
+        public string SerializeToString(object data)
+        {
+            return JsonConvert.SerializeObject(data, new JsonSerializerSettings
+            {
+                ContractResolver = new ContractResolver(Enumerable.Empty<string>())
+            });
+        }
+
+        public string SerializeToString(object data, IEnumerable<string> propertiesToIgnore)
         {
             return JsonConvert.SerializeObject(data, new JsonSerializerSettings
             {

@@ -8,15 +8,8 @@ using Serilog;
 
 namespace FitnessApp.Common.Middleware
 {
-    public abstract class AbstractRequestResponseLoggingMiddleware
+    public abstract class AbstractRequestResponseLoggingMiddleware(RequestDelegate next)
     {
-        private readonly RequestDelegate _next;
-
-        protected AbstractRequestResponseLoggingMiddleware(RequestDelegate next)
-        {
-            _next = next;
-        }
-
         public async Task Invoke(HttpContext context)
         {
             context.Features.Get<IHttpMaxRequestBodySizeFeature>().MaxRequestBodySize = 110100480;
@@ -24,7 +17,7 @@ namespace FitnessApp.Common.Middleware
             await AppendRequestData(context.Request, stringBuilder);
             using var copyBodyStream = new MemoryStream();
             context.Response.Body = copyBodyStream;
-            await _next(context);
+            await next(context);
             await AppendResponseBody(context.Response.StatusCode, copyBodyStream, context.Request.Path, stringBuilder);
 
             context.Response.Body = copyBodyStream;

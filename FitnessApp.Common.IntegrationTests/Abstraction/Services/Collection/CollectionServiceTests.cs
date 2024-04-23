@@ -67,21 +67,7 @@ namespace FitnessApp.Common.IntegrationTests.Abstraction.Services.Collection
             var addCollectionItemModel = TestData.CreateCollectionItemModel(Guid.NewGuid());
 
             // Act
-            var updatedItem = await _service.UpdateItem(TestData.CreateUpdateTestCollectionModel(new Dictionary<string, object>
-            {
-                {
-                    "Id", TestData.EntityIdToUpdate
-                },
-                {
-                    "Action", UpdateCollectionAction.Add
-                },
-                {
-                    "CollectionName", TestData.CollectionName
-                },
-                {
-                    "Model", addCollectionItemModel
-                },
-            }));
+            var updatedItem = await _service.UpdateItem(CreateUpdateTestCollectionModel(UpdateCollectionAction.Add, addCollectionItemModel));
             var updatedCollection = await _service.GetCollectionByUserId(TestData.EntityIdToUpdate, TestData.CollectionName);
 
             // Assert
@@ -100,21 +86,7 @@ namespace FitnessApp.Common.IntegrationTests.Abstraction.Services.Collection
             updateCollectionItemModel.TestProperty = "Updated";
 
             // Act
-            var updatedItem = await _service.UpdateItem(TestData.CreateUpdateTestCollectionModel(new Dictionary<string, object>
-            {
-                {
-                    "Id", TestData.EntityIdToUpdate
-                },
-                {
-                    "Action", UpdateCollectionAction.Update
-                },
-                {
-                    "CollectionName", TestData.CollectionName
-                },
-                {
-                    "Model", updateCollectionItemModel
-                },
-            }));
+            var updatedItem = await _service.UpdateItem(CreateUpdateTestCollectionModel(UpdateCollectionAction.Update, updateCollectionItemModel));
             var updatedCollection = await _service.GetCollectionByUserId(TestData.EntityIdToUpdate, TestData.CollectionName);
 
             // Assert
@@ -132,21 +104,7 @@ namespace FitnessApp.Common.IntegrationTests.Abstraction.Services.Collection
             var deleteCollectionItemModel = collection.First();
 
             // Act
-            var updatedItem = await _service.UpdateItem(TestData.CreateUpdateTestCollectionModel(new Dictionary<string, object>
-            {
-                {
-                    "Id", TestData.EntityIdToUpdate
-                },
-                {
-                    "Action", UpdateCollectionAction.Remove
-                },
-                {
-                    "CollectionName", TestData.CollectionName
-                },
-                {
-                    "Model", deleteCollectionItemModel
-                },
-            }));
+            var updatedItem = await _service.UpdateItem(CreateUpdateTestCollectionModel(UpdateCollectionAction.Remove, deleteCollectionItemModel));
             var updatedCollection = await _service.GetCollectionByUserId(TestData.EntityIdToUpdate, TestData.CollectionName);
 
             // Assert
@@ -164,6 +122,25 @@ namespace FitnessApp.Common.IntegrationTests.Abstraction.Services.Collection
 
             // Assert
             Assert.Equal(TestData.EntityIdToDelete, deletedModel.UserId);
+        }
+
+        private UpdateTestCollectionModel CreateUpdateTestCollectionModel(UpdateCollectionAction action, TestCollectionItemModel model)
+        {
+            return TestData.CreateUpdateTestCollectionModel(new Dictionary<string, object>
+            {
+                {
+                    "Id", TestData.Id
+                },
+                {
+                    "Action", action
+                },
+                {
+                    "CollectionName", TestData.CollectionName
+                },
+                {
+                    "Model", model
+                },
+            });
         }
     }
 }

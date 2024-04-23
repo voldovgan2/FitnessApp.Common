@@ -7,24 +7,15 @@ using Serilog;
 
 namespace FitnessApp.Common.Middleware
 {
-    public abstract class AbstractErrorHandlerMiddleware
+    public abstract class AbstractErrorHandlerMiddleware(
+        RequestDelegate next,
+        IJsonSerializer serializer)
     {
-        private readonly RequestDelegate _next;
-        private readonly IJsonSerializer _serializer;
-
-        protected AbstractErrorHandlerMiddleware(
-            RequestDelegate next,
-            IJsonSerializer serializer)
-        {
-            _next = next;
-            _serializer = serializer;
-        }
-
         public async Task Invoke(HttpContext context)
         {
             try
             {
-                await _next(context);
+                await next(context);
             }
             catch (Exception error)
             {
@@ -33,7 +24,7 @@ namespace FitnessApp.Common.Middleware
                 var response = context.Response;
                 response.ContentType = "application/json";
                 response.StatusCode = (int)GetStatusCodeByError(error);
-                var result = _serializer.SerializeToString(new { message = "Ach-ach-ach" });
+                var result = serializer.SerializeToString(new { message = "Ach-ach-ach" });
                 await response.WriteAsync(result);
             }
         }

@@ -1,11 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Linq.Expressions;
 using System.Threading.Tasks;
 using FitnessApp.Common.Abstractions.Db.Configuration;
 using FitnessApp.Common.Abstractions.Db.Entities.Generic;
 using Microsoft.Extensions.Options;
 using MongoDB.Driver;
+using SharpCompress;
 
 namespace FitnessApp.Common.Abstractions.Db.DbContext
 {
@@ -43,10 +45,13 @@ namespace FitnessApp.Common.Abstractions.Db.DbContext
             return result;
         }
 
-        public IQueryable<TGenericEntity> GetAllItems()
+        public Task<IEnumerable<TGenericEntity>> GetAllItems(Expression<Func<TGenericEntity, bool>> predicate)
         {
-            var result = _collection.AsQueryable().AsQueryable();
-            return result;
+            var result = _collection
+                .AsQueryable()
+                .Where(predicate)
+                .ToList();
+            return Task.FromResult(result.Where(i => true));
         }
 
         public async Task<TGenericEntity> CreateItem(TGenericEntity entity)

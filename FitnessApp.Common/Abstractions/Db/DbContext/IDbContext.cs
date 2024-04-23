@@ -1,5 +1,7 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
+using System.Linq.Expressions;
 using System.Threading.Tasks;
 using FitnessApp.Common.Abstractions.Db.Entities.Generic;
 
@@ -11,7 +13,7 @@ namespace FitnessApp.Common.Abstractions.Db.DbContext
         Task<TGenericEntity> GetItemById(string id);
         Task<TGenericEntity> TryGetItemById(string id);
         Task<IEnumerable<TGenericEntity>> GetItemsByIds(IEnumerable<string> ids);
-        IQueryable<TGenericEntity> GetAllItems();
+        Task<IEnumerable<TGenericEntity>> GetAllItems(Expression<Func<TGenericEntity, bool>> predicate);
         Task<TGenericEntity> CreateItem(TGenericEntity entity);
         Task<TGenericEntity> UpdateItem(TGenericEntity entity);
         Task UpdateItems(IEnumerable<TGenericEntity> entities);
