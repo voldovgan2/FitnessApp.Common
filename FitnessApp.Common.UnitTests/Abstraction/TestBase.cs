@@ -6,11 +6,11 @@ using FitnessApp.Comon.Tests.Shared.Abstraction.Db.Entities.Generic;
 
 namespace FitnessApp.Common.UnitTests.Abstraction
 {
-    public class TestBase
+    public abstract class TestBase
     {
         protected readonly IMapper _mapper;
 
-        public TestBase()
+        protected TestBase()
         {
             _mapper = new MapperConfiguration(cfg =>
             {
@@ -19,12 +19,12 @@ namespace FitnessApp.Common.UnitTests.Abstraction
                 .CreateMapper();
         }
 
-        public IEnumerable<TestGenericEntity> GetGenericEntitiesMock()
+        protected IEnumerable<TestGenericEntity> GetGenericEntitiesMock()
         {
             return TestData.GetAll(TestData.CreateGenericEntity, new Dictionary<string, object>());
         }
 
-        public IEnumerable<TestCollectionEntity> GetCollectionEntitiesMock()
+        protected IEnumerable<TestCollectionEntity> GetCollectionEntitiesMock()
         {
             return TestData.GetAll(
                 TestData.CreateCollectionEntity,
