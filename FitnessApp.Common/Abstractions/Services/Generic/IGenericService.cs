@@ -7,7 +7,11 @@ using FitnessApp.Common.Abstractions.Models.Generic;
 
 namespace FitnessApp.Common.Abstractions.Services.Generic
 {
-    public interface IGenericService<TGenericEntity, TGenericModel, TCreateGenericModel, TUpdateGenericModel>
+    public interface IGenericService<
+        TGenericEntity,
+        TGenericModel,
+        TCreateGenericModel,
+        TUpdateGenericModel>
         where TGenericEntity : IGenericEntity
         where TGenericModel : IGenericModel
         where TCreateGenericModel : ICreateGenericModel

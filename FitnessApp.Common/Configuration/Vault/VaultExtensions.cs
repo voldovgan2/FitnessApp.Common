@@ -9,7 +9,7 @@ namespace FitnessApp.Common.Configuration.Vault
 {
     public static class VaultExtensions
     {
-        public static IServiceCollection AddVaultClient(this IServiceCollection services, IConfiguration configuration)
+        public static IServiceCollection ConfigureVault(this IServiceCollection services, IConfiguration configuration)
         {
             ArgumentNullException.ThrowIfNull(services);
 

@@ -16,8 +16,29 @@ using FitnessApp.Common.Files;
 
 namespace FitnessApp.Common.Abstractions.Services.GenericFileAggregator
 {
-    public abstract class GenericFileAggregatorService<TGenericEntity, TGenericFileAggregatorModel, TGenericModel, TCreateGenericFileAggregatorModel, TCreateGenericModel, TUpdateGenericFileAggregatorModel, TUpdateGenericModel>
-        : IGenericFileAggregatorService<TGenericEntity, TGenericFileAggregatorModel, TGenericModel, TCreateGenericFileAggregatorModel, TUpdateGenericFileAggregatorModel>
+    public abstract class GenericFileAggregatorService<
+        TGenericEntity,
+        TGenericFileAggregatorModel,
+        TGenericModel,
+        TCreateGenericFileAggregatorModel,
+        TCreateGenericModel,
+        TUpdateGenericFileAggregatorModel,
+        TUpdateGenericModel>(
+        IGenericService<
+            TGenericEntity,
+            TGenericModel,
+            TCreateGenericModel,
+            TUpdateGenericModel> genericService,
+        IFilesService filesService,
+        IMapper mapper,
+        GenericFileAggregatorSettings genericFileAggregatorSettings
+        )
+        : IGenericFileAggregatorService<
+            TGenericEntity,
+            TGenericFileAggregatorModel,
+            TGenericModel,
+            TCreateGenericFileAggregatorModel,
+            TUpdateGenericFileAggregatorModel>
         where TGenericEntity : IGenericEntity
         where TGenericFileAggregatorModel : IGenericFileAggregatorModel<TGenericModel>
         where TGenericModel : IGenericModel
@@ -26,30 +47,12 @@ namespace FitnessApp.Common.Abstractions.Services.GenericFileAggregator
         where TUpdateGenericFileAggregatorModel : IUpdateGenericFileAggregatorModel
         where TUpdateGenericModel : IUpdateGenericModel
     {
-        protected readonly IGenericService<TGenericEntity, TGenericModel, TCreateGenericModel, TUpdateGenericModel> _genericService;
-        protected readonly IFilesService _filesService;
-        protected readonly IMapper _mapper;
-        protected readonly GenericFileAggregatorSettings _genericFileAggregatorSettings;
-
-        protected GenericFileAggregatorService(
-            IGenericService<TGenericEntity, TGenericModel, TCreateGenericModel, TUpdateGenericModel> genericService,
-            IFilesService filesService,
-            IMapper mapper,
-            GenericFileAggregatorSettings genericFileAggregatorSettings
-        )
-        {
-            _genericService = genericService;
-            _filesService = filesService;
-            _mapper = mapper;
-            _genericFileAggregatorSettings = genericFileAggregatorSettings;
-        }
-
         public async Task<TGenericFileAggregatorModel> CreateItem(TCreateGenericFileAggregatorModel model)
         {
             ValidationHelper.ThrowExceptionIfNotValidFiles(model.Images);
 
-            var createGenericModel = _mapper.Map<TCreateGenericModel>(model);
-            var dataModel = await _genericService.CreateItem(createGenericModel);
+            var createGenericModel = mapper.Map<TCreateGenericModel>(model);
+            var dataModel = await genericService.CreateItem(createGenericModel);
             var result = await SaveAndComposeGenericFileAggregatorModel(dataModel, model.Images);
             return result;
         }
@@ -58,8 +61,8 @@ namespace FitnessApp.Common.Abstractions.Services.GenericFileAggregator
         {
             ValidationHelper.ThrowExceptionIfNotValidFiles(model.Images);
 
-            var updateGenericModel = _mapper.Map<TUpdateGenericModel>(model);
-            var dataModel = await _genericService.UpdateItem(updateGenericModel);
+            var updateGenericModel = mapper.Map<TUpdateGenericModel>(model);
+            var dataModel = await genericService.UpdateItem(updateGenericModel);
             await DeleteItemFiles(model.UserId);
             var result = await SaveAndComposeGenericFileAggregatorModel(dataModel, model.Images);
             return result;
@@ -67,28 +70,28 @@ namespace FitnessApp.Common.Abstractions.Services.GenericFileAggregator
 
         public async Task<string> DeleteItem(string userId)
         {
-            var deleted = await _genericService.DeleteItem(userId);
+            var deleted = await genericService.DeleteItem(userId);
             await DeleteItemFiles(userId);
             return deleted;
         }
 
         public async Task<TGenericFileAggregatorModel> GetItem(string userId)
         {
-            var dataModel = await _genericService.GetItemByUserId(userId);
+            var dataModel = await genericService.GetItemByUserId(userId);
             var result = await LoadAndComposeGenericFileAggregatorModel(dataModel);
             return result;
         }
 
         public async Task<IEnumerable<TGenericFileAggregatorModel>> GetItems(string search, Expression<Func<TGenericEntity, bool>> predicate)
         {
-            var dataModels = await _genericService.GetItems(search, predicate);
+            var dataModels = await genericService.GetItems(search, predicate);
             var result = await LoadAndComposeGenericFileAggregatorModels(dataModels);
             return result;
         }
 
         public async Task<IEnumerable<TGenericFileAggregatorModel>> GetItems(string[] ids)
         {
-            var dataModels = await _genericService.GetItems(ids);
+            var dataModels = await genericService.GetItems(ids);
             var result = await LoadAndComposeGenericFileAggregatorModels(dataModels);
             return result;
         }
@@ -106,7 +109,10 @@ namespace FitnessApp.Common.Abstractions.Services.GenericFileAggregator
                 if (fileField.Value != null)
                 {
                     var fileContent = Encoding.Default.GetBytes(fileField.Value);
-                    await _filesService.UploadFile(_genericFileAggregatorSettings.ContainerName, FilesService.CreateFileName(fileField.FieldName, result.Model.UserId), new MemoryStream(fileContent));
+                    await filesService.UploadFile(
+                        genericFileAggregatorSettings.ContainerName,
+                        FilesService.CreateFileName(fileField.FieldName, result.Model.UserId),
+                        new MemoryStream(fileContent));
                     result.Images.Add(fileField);
                 }
             }
@@ -120,9 +126,9 @@ namespace FitnessApp.Common.Abstractions.Services.GenericFileAggregator
             result.Model = dataModel;
             result.Images = new List<FileImageModel>();
 
-            foreach (var fileField in _genericFileAggregatorSettings.FileFields)
+            foreach (var fileField in genericFileAggregatorSettings.FileFields)
             {
-                var fileContent = await _filesService.DownloadFile(_genericFileAggregatorSettings.ContainerName, FilesService.CreateFileName(fileField, dataModel.UserId));
+                var fileContent = await filesService.DownloadFile(genericFileAggregatorSettings.ContainerName, FilesService.CreateFileName(fileField, dataModel.UserId));
                 if (fileContent != null)
                 {
                     result.Images.Add(new FileImageModel
@@ -149,9 +155,9 @@ namespace FitnessApp.Common.Abstractions.Services.GenericFileAggregator
 
         private async Task DeleteItemFiles(string userId)
         {
-            foreach (var fileField in _genericFileAggregatorSettings.FileFields)
+            foreach (var fileField in genericFileAggregatorSettings.FileFields)
             {
-                await _filesService.DeleteFile(_genericFileAggregatorSettings.ContainerName, FilesService.CreateFileName(fileField, userId));
+                await filesService.DeleteFile(genericFileAggregatorSettings.ContainerName, FilesService.CreateFileName(fileField, userId));
             }
         }
     }

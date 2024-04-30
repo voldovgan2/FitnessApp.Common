@@ -4,7 +4,11 @@ using FitnessApp.Common.Abstractions.Models.Collection;
 
 namespace FitnessApp.Common.Abstractions.Db.Repository.Collection
 {
-    public interface ICollectionRepository<TCollectionModel, TCollectionItemModel, TCreateCollectionModel, TUpdateCollectionModel>
+    public interface ICollectionRepository<
+        TCollectionModel,
+        TCollectionItemModel,
+        TCreateCollectionModel,
+        TUpdateCollectionModel>
         where TCollectionModel : ICollectionModel
         where TCollectionItemModel : ICollectionItemModel
         where TCreateCollectionModel : ICreateCollectionModel

@@ -1,14 +1,16 @@
 ﻿using System;
+using FitnessApp.Common.Files;
 using FitnessApp.Common.Vault;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Minio;
+using MongoDB.Driver;
 
 namespace FitnessApp.Common.Configuration.Files
 {
     public static class FilesExtensions
     {
-        public static IServiceCollection AddFilesService(this IServiceCollection services, IConfiguration configuration)
+        public static IServiceCollection ConfigureFilesService(this IServiceCollection services, IConfiguration configuration)
         {
             ArgumentNullException.ThrowIfNull(services);
 
@@ -24,6 +26,8 @@ namespace FitnessApp.Common.Configuration.Files
                 options.WithSSL(secure);
                 options.Build();
             });
+
+            services.AddTransient<IFilesService, FilesService>();
 
             return services;
         }

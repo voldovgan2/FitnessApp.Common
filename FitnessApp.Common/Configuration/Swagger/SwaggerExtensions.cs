@@ -8,7 +8,7 @@ namespace FitnessApp.Common.Configuration.Swagger
 {
     public static class SwaggerExtensions
     {
-        public static IServiceCollection ConfigureSwaggerConfiguration(this IServiceCollection services, string apiName, string version = "1.0")
+        public static IServiceCollection ConfigureSwagger(this IServiceCollection services, string apiName, string version = "1.0")
         {
             services.AddSwaggerGen(c =>
             {

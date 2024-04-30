@@ -13,10 +13,13 @@ namespace FitnessApp.Common.Middleware
         public async Task Invoke(HttpContext context)
         {
             context.Features.Get<IHttpMaxRequestBodySizeFeature>().MaxRequestBodySize = 110100480;
+
             var stringBuilder = new StringBuilder(Environment.NewLine);
             await AppendRequestData(context.Request, stringBuilder);
+
             using var copyBodyStream = new MemoryStream();
             context.Response.Body = copyBodyStream;
+
             await next(context);
             await AppendResponseBody(context.Response.StatusCode, copyBodyStream, context.Request.Path, stringBuilder);
 
@@ -29,9 +32,7 @@ namespace FitnessApp.Common.Middleware
             stringBuilder.Append($"REQUEST HttpMethod: {request.Method}, Path: {request.Path}, Query: {request.QueryString.Value}");
             stringBuilder.Append($"REQUEST Headers:");
             foreach (var header in request.Headers)
-            {
                 stringBuilder.Append($"{Environment.NewLine} {header.Key} : {header.Value}");
-            }
 
             if (!(request.Headers.ContainsKey("content-type") && request.Headers["content-type"][0].StartsWith("multipart/form-data")))
             {

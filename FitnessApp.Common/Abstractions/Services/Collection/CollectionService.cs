@@ -11,52 +11,56 @@ using FitnessApp.Common.Paged.Models.Output;
 
 namespace FitnessApp.Common.Abstractions.Services.Collection
 {
-    public abstract class CollectionService<TCollectionModel, TCollectionItemModel, TCreateCollectionModel, TUpdateCollectionModel>
-        : ICollectionService<TCollectionModel, TCollectionItemModel, TCreateCollectionModel, TUpdateCollectionModel>
+    public abstract class CollectionService<
+        TCollectionModel,
+        TCollectionItemModel,
+        TCreateCollectionModel,
+        TUpdateCollectionModel>(
+            ICollectionRepository<
+                TCollectionModel,
+                TCollectionItemModel,
+                TCreateCollectionModel,
+                TUpdateCollectionModel> repository
+        ) : ICollectionService<
+            TCollectionModel,
+            TCollectionItemModel,
+            TCreateCollectionModel,
+            TUpdateCollectionModel>
         where TCollectionModel : ICollectionModel
         where TCollectionItemModel : ICollectionItemModel
         where TCreateCollectionModel : ICreateCollectionModel
         where TUpdateCollectionModel : IUpdateCollectionModel
     {
-        private readonly ICollectionRepository<TCollectionModel, TCollectionItemModel, TCreateCollectionModel, TUpdateCollectionModel> _repository;
-
-        protected CollectionService(
-            ICollectionRepository<TCollectionModel, TCollectionItemModel, TCreateCollectionModel, TUpdateCollectionModel> repository
-        )
-        {
-            _repository = repository;
-        }
-
         public virtual async Task<TCollectionModel> GetItemByUserId(string userId)
         {
             ValidationHelper.ThrowExceptionIfNotValidatedEmptyStringField(nameof(userId), userId);
 
-            var result = await _repository.GetItemByUserId(userId);
+            var result = await repository.GetItemByUserId(userId);
             return result;
         }
 
         public virtual async Task<IEnumerable<TCollectionItemModel>> GetCollectionByUserId(string userId, string collectionName)
         {
-            List<ValidationError> validationErrors = new List<ValidationError>();
-            validationErrors.AddIfNotNull(ValidationHelper.ValidateEmptyStringField(nameof(userId), userId));
-            validationErrors.AddIfNotNull(ValidationHelper.ValidateEmptyStringField(nameof(collectionName), collectionName));
-            validationErrors.ThrowIfNotEmpty();
+            List<ValidationError> errors = new List<ValidationError>();
+            errors.AddIfNotNull(ValidationHelper.ValidateEmptyStringField(nameof(userId), userId));
+            errors.AddIfNotNull(ValidationHelper.ValidateEmptyStringField(nameof(collectionName), collectionName));
+            errors.ThrowIfNotEmpty();
 
-            var result = await _repository.GetCollectionByUserId(userId, collectionName);
+            var result = await repository.GetCollectionByUserId(userId, collectionName);
             return result;
         }
 
         public virtual async Task<PagedDataModel<TCollectionItemModel>> GetFilteredCollectionItems(string search, GetFilteredCollectionItemsModel<TCollectionItemModel> model)
         {
-            List<ValidationError> validationErrors = new List<ValidationError>();
-            validationErrors.AddIfNotNull(ValidationHelper.ValidateEmptyStringField(nameof(model.UserId), model.UserId));
-            validationErrors.AddIfNotNull(ValidationHelper.ValidateEmptyStringField(nameof(model.CollectionName), model.CollectionName));
-            validationErrors.AddIfNotNull(ValidationHelper.ValidateRange(0, int.MaxValue, model.Page, nameof(model.Page)));
-            validationErrors.AddIfNotNull(ValidationHelper.ValidateRange(1, int.MaxValue, model.PageSize, nameof(model.PageSize)));
-            validationErrors.ThrowIfNotEmpty();
+            List<ValidationError> errors = new List<ValidationError>();
+            errors.AddIfNotNull(ValidationHelper.ValidateEmptyStringField(nameof(model.UserId), model.UserId));
+            errors.AddIfNotNull(ValidationHelper.ValidateEmptyStringField(nameof(model.CollectionName), model.CollectionName));
+            errors.AddIfNotNull(ValidationHelper.ValidateRange(0, int.MaxValue, model.Page, nameof(model.Page)));
+            errors.AddIfNotNull(ValidationHelper.ValidateRange(1, int.MaxValue, model.PageSize, nameof(model.PageSize)));
+            errors.ThrowIfNotEmpty();
 
             PagedDataModel<TCollectionItemModel> result = null;
-            var allItems = await _repository.GetCollectionByUserId(model.UserId, model.CollectionName);
+            var allItems = await repository.GetCollectionByUserId(model.UserId, model.CollectionName);
             if (allItems != null)
             {
                 allItems = allItems.Where(model.Predicate);
@@ -71,7 +75,7 @@ namespace FitnessApp.Common.Abstractions.Services.Collection
             var validationErrors = ValidateCreateCollectionModel(model);
             validationErrors.ThrowIfNotEmpty();
 
-            var result = await _repository.CreateItem(model);
+            var result = await repository.CreateItem(model);
             return result;
         }
 
@@ -80,7 +84,7 @@ namespace FitnessApp.Common.Abstractions.Services.Collection
             var validationErrors = ValidateUpdateCollectionModel(model);
             validationErrors.ThrowIfNotEmpty();
 
-            var result = await _repository.UpdateItem(model);
+            var result = await repository.UpdateItem(model);
             return result;
         }
 
@@ -88,7 +92,7 @@ namespace FitnessApp.Common.Abstractions.Services.Collection
         {
             ValidationHelper.ThrowExceptionIfNotValidatedEmptyStringField(nameof(userId), userId);
 
-            var result = await _repository.DeleteItem(userId);
+            var result = await repository.DeleteItem(userId);
             return result;
         }
 

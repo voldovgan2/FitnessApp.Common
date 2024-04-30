@@ -4,12 +4,9 @@ using FitnessApp.Common.Abstractions.Models.Validation;
 
 namespace FitnessApp.Common.Exceptions
 {
-    public class FileValidationException : Exception
+    public class FileValidationException(ValidationError fileFieldNameError, ValidationError fileFieldValueError)
+        : Exception(GetErrorMessage(fileFieldNameError, fileFieldValueError))
     {
-        public FileValidationException(ValidationError fileFieldNameError, ValidationError fileFieldValueError)
-            : base(GetErrorMessage(fileFieldNameError, fileFieldValueError))
-        { }
-
         private static string GetErrorMessage(ValidationError fileFieldNameError, ValidationError fileFieldValueError)
         {
             List<string> errors = new List<string>();

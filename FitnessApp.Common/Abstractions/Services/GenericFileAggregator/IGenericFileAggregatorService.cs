@@ -8,7 +8,12 @@ using FitnessApp.Common.Abstractions.Models.GenericFileAggregator;
 
 namespace FitnessApp.Common.Abstractions.Services.GenericFileAggregator
 {
-    public interface IGenericFileAggregatorService<TGenericEntity, TGenericFileAggregatorModel, TGenericModel, TCreateGenericFileAggregatorModel, TUpdateGenericFileAggregatorModel>
+    public interface IGenericFileAggregatorService<
+        TGenericEntity,
+        TGenericFileAggregatorModel,
+        TGenericModel,
+        TCreateGenericFileAggregatorModel,
+        TUpdateGenericFileAggregatorModel>
         where TGenericEntity : IGenericEntity
         where TGenericFileAggregatorModel : IGenericFileAggregatorModel<TGenericModel>
         where TGenericModel : IGenericModel

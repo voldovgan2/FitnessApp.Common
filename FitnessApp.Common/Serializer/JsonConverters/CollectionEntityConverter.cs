@@ -30,9 +30,7 @@ namespace FitnessApp.Common.Serializer.JsonConverters
             {
                 var list = new List<ICollectionItemEntity>();
                 foreach (var item in kvp.Value)
-                {
                     list.Add(item);
-                }
 
                 result.Collection.Add(kvp.Key, list);
             }

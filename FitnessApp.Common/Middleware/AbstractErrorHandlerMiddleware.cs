@@ -7,9 +7,7 @@ using Serilog;
 
 namespace FitnessApp.Common.Middleware
 {
-    public abstract class AbstractErrorHandlerMiddleware(
-        RequestDelegate next,
-        IJsonSerializer serializer)
+    public abstract class AbstractErrorHandlerMiddleware(RequestDelegate next, IJsonSerializer serializer)
     {
         public async Task Invoke(HttpContext context)
         {

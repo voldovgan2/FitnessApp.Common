@@ -5,7 +5,12 @@ using FitnessApp.Common.Paged.Models.Output;
 
 namespace FitnessApp.Common.Abstractions.Services.CollectionFileAggregator
 {
-    public interface ICollectionFileAggregatorService<TCollectionFileAggregatorModel, TCollectionFileAggregatorItemModel, TCollectionItemModel, TCreateCollectionFileAggregatorModel, TUpdateCollectionFileAggregatorModel>
+    public interface ICollectionFileAggregatorService<
+        TCollectionFileAggregatorModel,
+        TCollectionFileAggregatorItemModel,
+        TCollectionItemModel,
+        TCreateCollectionFileAggregatorModel,
+        TUpdateCollectionFileAggregatorModel>
         where TCollectionFileAggregatorModel : ICollectionFileAggregatorModel
         where TCollectionFileAggregatorItemModel : ICollectionFileAggregatorItemModel<ICollectionItemModel>
         where TCollectionItemModel : ICollectionItemModel

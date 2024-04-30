@@ -5,19 +5,13 @@ using NATS.Client;
 
 namespace FitnessApp.Common.ServiceBus.Nats.Services
 {
-    public abstract class MessageBusService : IHostedService
+    public abstract class MessageBusService(IServiceBus serviceBus) : IHostedService
     {
-        private readonly IServiceBus _serviceBus;
         private IAsyncSubscription _eventSubscription;
-
-        protected MessageBusService(IServiceBus serviceBus)
-        {
-            _serviceBus = serviceBus;
-        }
 
         public Task StartAsync(CancellationToken cancellationToken)
         {
-            _eventSubscription = _serviceBus.SubscribeEvent(Topic.NEW_USER_REGISTERED, (sender, args) =>
+            _eventSubscription = serviceBus.SubscribeEvent(Topic.NEW_USER_REGISTERED, (sender, args) =>
             {
                 HandleNewUserRegisteredEvent(args.Message.Data);
             });

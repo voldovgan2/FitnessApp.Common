@@ -1,20 +1,11 @@
 ﻿using System;
-using FitnessApp.Common.Configuration.Nats;
-using Microsoft.Extensions.Options;
 using NATS.Client;
 
 namespace FitnessApp.Common.ServiceBus.Nats.Services
 {
-    public class ServiceBus : IServiceBus
+    public class ServiceBus(IConnectionFactory connectionFactory, string url) : IServiceBus
     {
-        private readonly IConnection _connection = null;
-
-        public ServiceBus(
-            IConnectionFactory connectionFactory,
-            IOptions<ServiceBusSettings> settings)
-        {
-            _connection = connectionFactory.CreateConnection(settings.Value.Url);
-        }
+        private readonly IConnection _connection = connectionFactory.CreateConnection(url);
 
         public void PublishEvent(string subject, byte[] data)
         {

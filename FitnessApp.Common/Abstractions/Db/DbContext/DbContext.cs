@@ -7,7 +7,6 @@ using FitnessApp.Common.Abstractions.Db.Configuration;
 using FitnessApp.Common.Abstractions.Db.Entities.Generic;
 using Microsoft.Extensions.Options;
 using MongoDB.Driver;
-using SharpCompress;
 
 namespace FitnessApp.Common.Abstractions.Db.DbContext
 {

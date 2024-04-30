@@ -19,8 +19,28 @@ using FitnessApp.Common.Paged.Models.Output;
 
 namespace FitnessApp.Common.Abstractions.Services.CollectionFileAggregator
 {
-    public abstract class CollectionFileAggregatorService<TCollectionFileAggregatorModel, TCollectionFileAggregatorItemModel, TCollectionModel, TCollectionItemModel, TCreateCollectionFileAggregatorModel, TCreateCollectionModel, TUpdateCollectionFileAggregatorModel, TUpdateCollectionModel>
-        : ICollectionFileAggregatorService<TCollectionFileAggregatorModel, TCollectionFileAggregatorItemModel, TCollectionItemModel, TCreateCollectionFileAggregatorModel, TUpdateCollectionFileAggregatorModel>
+    public abstract class CollectionFileAggregatorService<
+        TCollectionFileAggregatorModel,
+        TCollectionFileAggregatorItemModel,
+        TCollectionModel, TCollectionItemModel,
+        TCreateCollectionFileAggregatorModel,
+        TCreateCollectionModel,
+        TUpdateCollectionFileAggregatorModel,
+        TUpdateCollectionModel>(
+            ICollectionService<
+                TCollectionModel,
+                TCollectionItemModel,
+                TCreateCollectionModel,
+                TUpdateCollectionModel> collectionService,
+            IFilesService filesService,
+            IMapper mapper,
+            CollectionFileAggregatorSettings collectionFileAggregatorSettings
+        ) : ICollectionFileAggregatorService<
+            TCollectionFileAggregatorModel,
+            TCollectionFileAggregatorItemModel,
+            TCollectionItemModel,
+            TCreateCollectionFileAggregatorModel,
+            TUpdateCollectionFileAggregatorModel>
         where TCollectionFileAggregatorModel : ICollectionFileAggregatorModel
         where TCollectionFileAggregatorItemModel : ICollectionFileAggregatorItemModel<ICollectionItemModel>
         where TCollectionModel : ICollectionModel
@@ -30,44 +50,25 @@ namespace FitnessApp.Common.Abstractions.Services.CollectionFileAggregator
         where TUpdateCollectionFileAggregatorModel : IUpdateCollectionFileAggregatorModel
         where TUpdateCollectionModel : IUpdateCollectionModel
     {
-        private readonly ICollectionService<TCollectionModel, TCollectionItemModel, TCreateCollectionModel, TUpdateCollectionModel> _collectionService;
-        protected readonly IFilesService _filesService;
-        protected readonly IMapper _mapper;
-        private readonly CollectionFileAggregatorSettings _collectionFileAggregatorSettings;
-
-        protected CollectionFileAggregatorService(
-            ICollectionService<TCollectionModel, TCollectionItemModel, TCreateCollectionModel, TUpdateCollectionModel> collectionService,
-            IFilesService filesService,
-            IMapper mapper,
-            CollectionFileAggregatorSettings collectionFileAggregatorSettings
-        )
-        {
-            _collectionService = collectionService;
-            _filesService = filesService;
-            _mapper = mapper;
-            _collectionFileAggregatorSettings = collectionFileAggregatorSettings;
-        }
-
         public virtual async Task<TCollectionFileAggregatorModel> GetItemByUserId(string userId)
         {
             ValidationHelper.ThrowExceptionIfNotValidatedEmptyStringField(nameof(userId), userId);
 
-            var dataModel = await _collectionService.GetItemByUserId(userId);
+            var dataModel = await collectionService.GetItemByUserId(userId);
             var result = await LoadAndComposeGenericFileAggregatorModel(dataModel);
             return result;
         }
 
         public virtual async Task<PagedDataModel<TCollectionFileAggregatorItemModel>> GetFilteredCollectionItems(GetFilteredCollectionItemsModel<TCollectionItemModel> model)
         {
-            List<ValidationError> validationErrors = new List<ValidationError>();
-            validationErrors.AddIfNotNull(ValidationHelper.ValidateEmptyStringField(nameof(model.UserId), model.UserId));
-            validationErrors.AddIfNotNull(ValidationHelper.ValidateEmptyStringField(nameof(model.CollectionName), model.CollectionName));
-            validationErrors.AddIfNotNull(ValidationHelper.ValidateRange(0, int.MaxValue, model.Page, nameof(model.Page)));
-            validationErrors.AddIfNotNull(ValidationHelper.ValidateRange(1, int.MaxValue, model.PageSize, nameof(model.PageSize)));
-            validationErrors.ThrowIfNotEmpty();
+            List<ValidationError> errors = new List<ValidationError>();
+            errors.AddIfNotNull(ValidationHelper.ValidateEmptyStringField(nameof(model.UserId), model.UserId));
+            errors.AddIfNotNull(ValidationHelper.ValidateEmptyStringField(nameof(model.CollectionName), model.CollectionName));
+            errors.AddIfNotNull(ValidationHelper.ValidateRange(0, int.MaxValue, model.Page, nameof(model.Page)));
+            errors.AddIfNotNull(ValidationHelper.ValidateRange(1, int.MaxValue, model.PageSize, nameof(model.PageSize)));
+            errors.ThrowIfNotEmpty();
 
-            var allItems = await _collectionService.GetCollectionByUserId(model.UserId, model.CollectionName);
-
+            var allItems = await collectionService.GetCollectionByUserId(model.UserId, model.CollectionName);
             allItems = allItems.Where(model.Predicate);
             var pagedItems = allItems.ToPaged(model);
             var result = new PagedDataModel<TCollectionFileAggregatorItemModel>
@@ -84,8 +85,8 @@ namespace FitnessApp.Common.Abstractions.Services.CollectionFileAggregator
             var validationErrors = ValidateCreateCollectionModel(model);
             validationErrors.ThrowIfNotEmpty();
 
-            var createCollectionModel = _mapper.Map<TCreateCollectionModel>(model);
-            var result = await _collectionService.CreateItem(createCollectionModel);
+            var createCollectionModel = mapper.Map<TCreateCollectionModel>(model);
+            var result = await collectionService.CreateItem(createCollectionModel);
             return result;
         }
 
@@ -94,9 +95,9 @@ namespace FitnessApp.Common.Abstractions.Services.CollectionFileAggregator
             var validationErrors = ValidateUpdateCollectionModel(model);
             validationErrors.ThrowIfNotEmpty();
 
-            var updateGenericModel = _mapper.Map<TUpdateCollectionModel>(model);
-            var dataModel = await _collectionService.UpdateItem(updateGenericModel);
-            var collectionFileFields = _collectionFileAggregatorSettings.CollectionsFileFields[model.CollectionName];
+            var updateGenericModel = mapper.Map<TUpdateCollectionModel>(model);
+            var dataModel = await collectionService.UpdateItem(updateGenericModel);
+            var collectionFileFields = collectionFileAggregatorSettings.CollectionsFileFields[model.CollectionName];
             await DeleteItemFiles(model.Model.Model.Id, collectionFileFields);
             var fileFields = model.Model.Images.Where(f => collectionFileFields.Contains(f.FieldName));
             var result = await SaveAndComposeGenericFileAggregatorModel(dataModel, fileFields);
@@ -107,7 +108,7 @@ namespace FitnessApp.Common.Abstractions.Services.CollectionFileAggregator
         {
             ValidationHelper.ThrowExceptionIfNotValidatedEmptyStringField(nameof(userId), userId);
 
-            var deleted = await _collectionService.DeleteItem(userId);
+            var deleted = await collectionService.DeleteItem(userId);
             await DeleteItemFiles(deleted);
             return deleted.UserId;
         }
@@ -146,7 +147,10 @@ namespace FitnessApp.Common.Abstractions.Services.CollectionFileAggregator
                 if (fileField.Value != null)
                 {
                     var fileContent = Encoding.Default.GetBytes(fileField.Value);
-                    await _filesService.UploadFile(_collectionFileAggregatorSettings.ContainerName, FilesService.CreateFileName(fileField.FieldName, result.Model.Id), new MemoryStream(fileContent));
+                    await filesService.UploadFile(
+                        collectionFileAggregatorSettings.ContainerName,
+                        FilesService.CreateFileName(fileField.FieldName, result.Model.Id),
+                        new MemoryStream(fileContent));
                     result.Images.Add(fileField);
                 }
             }
@@ -161,9 +165,9 @@ namespace FitnessApp.Common.Abstractions.Services.CollectionFileAggregator
             result.Collection = new Dictionary<string, List<ICollectionFileAggregatorItemModel<ICollectionItemModel>>>();
             foreach (var kvp in model.Collection)
             {
-                var collectionItems = _mapper.Map<IEnumerable<TCollectionItemModel>>(kvp.Value);
+                var collectionItems = mapper.Map<IEnumerable<TCollectionItemModel>>(kvp.Value);
                 var collectionFileAggregatorItems = await LoadAndComposeCollectionFileAggregatorItemModel(kvp.Key, collectionItems);
-                var collection = _mapper.Map<List<ICollectionFileAggregatorItemModel<ICollectionItemModel>>>(collectionFileAggregatorItems);
+                var collection = mapper.Map<List<ICollectionFileAggregatorItemModel<ICollectionItemModel>>>(collectionFileAggregatorItems);
                 result.Collection.Add(kvp.Key, collection);
             }
 
@@ -178,10 +182,10 @@ namespace FitnessApp.Common.Abstractions.Services.CollectionFileAggregator
                 var collectionFileAggregatorItemModel = Activator.CreateInstance<TCollectionFileAggregatorItemModel>();
                 collectionFileAggregatorItemModel.Model = collectionItemModel;
                 collectionFileAggregatorItemModel.Images = new List<FileImageModel>();
-                var collectionFileFields = _collectionFileAggregatorSettings.CollectionsFileFields[collectionName];
+                var collectionFileFields = collectionFileAggregatorSettings.CollectionsFileFields[collectionName];
                 foreach (var fileField in collectionFileFields)
                 {
-                    var fileContent = await _filesService.DownloadFile(_collectionFileAggregatorSettings.ContainerName, FilesService.CreateFileName(fileField, collectionItemModel.Id));
+                    var fileContent = await filesService.DownloadFile(collectionFileAggregatorSettings.ContainerName, FilesService.CreateFileName(fileField, collectionItemModel.Id));
                     if (fileContent != null)
                     {
                         collectionFileAggregatorItemModel.Images.Add(new FileImageModel
@@ -202,7 +206,7 @@ namespace FitnessApp.Common.Abstractions.Services.CollectionFileAggregator
         {
             foreach (var kvp in model.Collection)
             {
-                var fileFields = _collectionFileAggregatorSettings.CollectionsFileFields[kvp.Key];
+                var fileFields = collectionFileAggregatorSettings.CollectionsFileFields[kvp.Key];
                 foreach (var item in kvp.Value)
                 {
                     await DeleteItemFiles(item.Id, fileFields);
@@ -214,7 +218,7 @@ namespace FitnessApp.Common.Abstractions.Services.CollectionFileAggregator
         {
             foreach (var fileField in fileFields)
             {
-                await _filesService.DeleteFile(_collectionFileAggregatorSettings.ContainerName, FilesService.CreateFileName(fileField, itemId));
+                await filesService.DeleteFile(collectionFileAggregatorSettings.ContainerName, FilesService.CreateFileName(fileField, itemId));
             }
         }
     }

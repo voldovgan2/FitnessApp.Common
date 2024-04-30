@@ -10,8 +10,17 @@ using FitnessApp.Common.Abstractions.Models.Generic;
 
 namespace FitnessApp.Common.Abstractions.Db.Repository.Generic
 {
-    public abstract class GenericRepository<TGenericEntity, TGenericModel, TCreateGenericModel, TUpdateGenericModel>(IDbContext<TGenericEntity> dbContext, IMapper mapper)
-        : IGenericRepository<TGenericEntity, TGenericModel, TCreateGenericModel, TUpdateGenericModel>
+    public abstract class GenericRepository<
+        TGenericEntity,
+        TGenericModel,
+        TCreateGenericModel,
+        TUpdateGenericModel>
+        (IDbContext<TGenericEntity> dbContext, IMapper mapper)
+        : IGenericRepository<
+            TGenericEntity,
+            TGenericModel,
+            TCreateGenericModel,
+            TUpdateGenericModel>
         where TGenericEntity : IGenericEntity
         where TGenericModel : IGenericModel
         where TCreateGenericModel : ICreateGenericModel

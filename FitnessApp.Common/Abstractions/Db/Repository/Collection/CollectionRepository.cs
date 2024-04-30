@@ -12,8 +12,18 @@ using Microsoft.Extensions.Logging;
 
 namespace FitnessApp.Common.Abstractions.Db.Repository.Collection
 {
-    public abstract class CollectionRepository<TCollectionEntity, TCollectionItemEntity, TCollectionModel, TCollectionItemModel, TCreateCollectionModel, TUpdateCollectionModel>
-        : ICollectionRepository<TCollectionModel, TCollectionItemModel, TCreateCollectionModel, TUpdateCollectionModel>
+    public abstract class CollectionRepository<
+        TCollectionEntity,
+        TCollectionItemEntity,
+        TCollectionModel,
+        TCollectionItemModel,
+        TCreateCollectionModel,
+        TUpdateCollectionModel>(IDbContext<TCollectionEntity> dbContext, IMapper mapper)
+        : ICollectionRepository<
+            TCollectionModel,
+            TCollectionItemModel,
+            TCreateCollectionModel,
+            TUpdateCollectionModel>
         where TCollectionEntity : ICollectionEntity
         where TCollectionItemEntity : ICollectionItemEntity
         where TCollectionModel : ICollectionModel
@@ -21,15 +31,17 @@ namespace FitnessApp.Common.Abstractions.Db.Repository.Collection
         where TCreateCollectionModel : ICreateCollectionModel
         where TUpdateCollectionModel : IUpdateCollectionModel
     {
-        protected readonly IDbContext<TCollectionEntity> _dbContext;
-        protected readonly IMapper _mapper;
-        protected readonly ILogger<CollectionRepository<TCollectionEntity, TCollectionItemEntity, TCollectionModel, TCollectionItemModel, TCreateCollectionModel, TUpdateCollectionModel>> _log;
-
-        protected CollectionRepository(IDbContext<TCollectionEntity> dbContext, IMapper mapper)
-        {
-            _dbContext = dbContext;
-            _mapper = mapper;
-        }
+        protected readonly IDbContext<TCollectionEntity> _dbContext = dbContext;
+        protected readonly IMapper _mapper = mapper;
+        protected readonly ILogger<
+            CollectionRepository<
+                TCollectionEntity,
+                TCollectionItemEntity,
+                TCollectionModel,
+                TCollectionItemModel,
+                TCreateCollectionModel,
+                TUpdateCollectionModel>
+            > _log;
 
         public async Task<TCollectionModel> GetItemByUserId(string userId)
         {

@@ -5,7 +5,11 @@ using FitnessApp.Common.Paged.Models.Output;
 
 namespace FitnessApp.Common.Abstractions.Services.Collection
 {
-    public interface ICollectionService<TCollectionModel, TCollectionItemModel, TCreateCollectionModel, TUpdateCollectionModel>
+    public interface ICollectionService<
+        TCollectionModel,
+        TCollectionItemModel,
+        TCreateCollectionModel,
+        TUpdateCollectionModel>
         where TCollectionModel : ICollectionModel
         where TCollectionItemModel : ICollectionItemModel
         where TCreateCollectionModel : ICreateCollectionModel

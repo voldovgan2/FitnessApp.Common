@@ -13,9 +13,7 @@ namespace FitnessApp.Common.Abstractions.Services.Validation
         {
             ValidationError result = null;
             if (string.IsNullOrWhiteSpace(value))
-            {
                 result = new ValidationError($"{fieldName} can't be empty", fieldName);
-            }
 
             return result;
         }
@@ -44,14 +42,16 @@ namespace FitnessApp.Common.Abstractions.Services.Validation
                 throw new AggregateException(errors);
         }
 
-        public static ValidationError ValidateRange<T>(T min, T max, T value, string fieldName)
+        public static ValidationError ValidateRange<T>(
+            T min,
+            T max,
+            T value,
+            string fieldName)
             where T : IComparable<T>
         {
             ValidationError result = null;
             if (value.CompareTo(min) < 0 || value.CompareTo(max) > 0)
-            {
                 result = new ValidationError($"{fieldName} should be within the range [{min}, {max}]", fieldName);
-            }
 
             return result;
         }

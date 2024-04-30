@@ -13,11 +13,23 @@ using FitnessApp.Common.Abstractions.Services.Validation;
 
 namespace FitnessApp.Common.Abstractions.Services.Generic
 {
-    public abstract class GenericService<TGenericEntity, TGenericModel, TCreateGenericModel, TUpdateGenericModel>(
-        IGenericRepository<TGenericEntity, TGenericModel, TCreateGenericModel, TUpdateGenericModel> repository,
-        IMapper mapper
+    public abstract class GenericService<
+        TGenericEntity,
+        TGenericModel,
+        TCreateGenericModel,
+        TUpdateGenericModel>(
+            IGenericRepository<
+                TGenericEntity,
+                TGenericModel,
+                TCreateGenericModel,
+                TUpdateGenericModel> repository,
+            IMapper mapper
         )
-        : IGenericService<TGenericEntity, TGenericModel, TCreateGenericModel, TUpdateGenericModel>
+        : IGenericService<
+            TGenericEntity,
+            TGenericModel,
+            TCreateGenericModel,
+            TUpdateGenericModel>
         where TGenericEntity : IGenericEntity
         where TGenericModel : IGenericModel
         where TCreateGenericModel : ICreateGenericModel
@@ -26,6 +38,7 @@ namespace FitnessApp.Common.Abstractions.Services.Generic
         public async Task<TGenericModel> GetItemByUserId(string userId)
         {
             ValidationHelper.ThrowExceptionIfNotValidatedEmptyStringField(nameof(userId), userId);
+
             var result = await repository.GetItemByUserId(userId);
             return result;
         }
