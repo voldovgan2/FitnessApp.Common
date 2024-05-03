@@ -6,7 +6,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Minio;
 using MongoDB.Driver;
 
-namespace FitnessApp.Common.Configuration.Files
+namespace FitnessApp.Common.Configuration
 {
     public static class FilesExtensions
     {

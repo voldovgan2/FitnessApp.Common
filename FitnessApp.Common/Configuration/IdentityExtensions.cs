@@ -2,7 +2,7 @@
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 
-namespace FitnessApp.Common.Configuration.Identity
+namespace FitnessApp.Common.Configuration
 {
     public static class IdentityExtensions
     {

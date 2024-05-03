@@ -5,7 +5,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using MongoDB.Driver;
 
-namespace FitnessApp.Common.Configuration.Mongo
+namespace FitnessApp.Common.Configuration
 {
     public static class MongoClientExtensions
     {

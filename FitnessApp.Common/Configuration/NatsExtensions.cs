@@ -4,7 +4,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using NATS.Client;
 
-namespace FitnessApp.Common.Configuration.Nats
+namespace FitnessApp.Common.Configuration
 {
     public static class NatsExtensions
     {

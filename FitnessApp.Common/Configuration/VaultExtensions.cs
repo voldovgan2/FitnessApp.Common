@@ -5,7 +5,7 @@ using Microsoft.Extensions.DependencyInjection;
 using VaultSharp;
 using VaultSharp.V1.AuthMethods.Token;
 
-namespace FitnessApp.Common.Configuration.Vault
+namespace FitnessApp.Common.Configuration
 {
     public static class VaultExtensions
     {

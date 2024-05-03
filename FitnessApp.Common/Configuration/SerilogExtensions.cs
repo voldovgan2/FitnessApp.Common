@@ -6,7 +6,7 @@ using Serilog;
 using Serilog.Exceptions;
 using Serilog.Sinks.Elasticsearch;
 
-namespace FitnessApp.Common.Configuration.Serilog
+namespace FitnessApp.Common.Configuration
 {
     public static class SerilogExtensions
     {

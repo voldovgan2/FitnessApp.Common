@@ -1,7 +1,7 @@
 ﻿using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Hosting;
 
-namespace FitnessApp.Common.Configuration.AppConfiguration
+namespace FitnessApp.Common.Configuration
 {
     public static class AppConfigurationExtensions
     {

@@ -1,10 +1,11 @@
 ﻿using System;
 using System.IO;
+using Microsoft.AspNetCore.Builder;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.OpenApi.Models;
 using Swashbuckle.AspNetCore.Filters;
 
-namespace FitnessApp.Common.Configuration.Swagger
+namespace FitnessApp.Common.Configuration
 {
     public static class SwaggerExtensions
     {
@@ -31,6 +32,16 @@ namespace FitnessApp.Common.Configuration.Swagger
                 c.OperationFilter<SecurityRequirementsOperationFilter>();
             });
             return services;
+        }
+
+        public static void UseSwaggerAndUi(this WebApplication app)
+        {
+            app.UseSwagger();
+            app.UseSwaggerUI();
+            app.UseSwaggerUI(c =>
+            {
+                c.SwaggerEndpoint("/swagger/v1/swagger.json", "Swagger XML Api Demo v1");
+            });
         }
     }
 }
