@@ -8,7 +8,7 @@ using Serilog;
 
 namespace FitnessApp.Common.Middleware
 {
-    public abstract class AbstractRequestResponseLoggingMiddleware(RequestDelegate next)
+    public abstract class AbstractRequestResponseLoggingMiddleware(RequestDelegate next, ILogger logger)
     {
         public async Task Invoke(HttpContext context)
         {
@@ -24,7 +24,7 @@ namespace FitnessApp.Common.Middleware
             await AppendResponseBody(context.Response.StatusCode, copyBodyStream, context.Request.Path, stringBuilder);
 
             context.Response.Body = copyBodyStream;
-            context.Features.Get<ILogger>().Information(stringBuilder.ToString());
+            logger.Information(stringBuilder.ToString());
         }
 
         private async Task AppendRequestData(HttpRequest request, StringBuilder stringBuilder)
