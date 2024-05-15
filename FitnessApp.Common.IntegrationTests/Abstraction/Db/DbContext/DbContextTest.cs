@@ -7,19 +7,13 @@ using Xunit;
 namespace FitnessApp.Common.IntegrationTests.Abstraction.Db.DbContext
 {
     [Collection("DbContext collection")]
-    public class DbContextTest : IClassFixture<GenericDbContextFixture>
+    public class DbContextTest(GenericDbContextFixture fixture) : IClassFixture<GenericDbContextFixture>
     {
-        private readonly GenericDbContextFixture _fixture;
-        public DbContextTest(GenericDbContextFixture fixture)
-        {
-            _fixture = fixture;
-        }
-
         [Fact]
         public async Task GetItemById_ReturnsSingleItem()
         {
             // Act
-            var item = await _fixture.DbContext.GetItemById(TestData.EntityIdToGet);
+            var item = await fixture.DbContext.GetItemById(TestData.EntityIdToGet);
 
             // Assert
             Assert.NotNull(item);
@@ -30,7 +24,7 @@ namespace FitnessApp.Common.IntegrationTests.Abstraction.Db.DbContext
         public async Task CreateItem_ReturnsCreated()
         {
             // Act
-            var item = await _fixture.DbContext.CreateItem(TestData.CreateGenericEntity(new Dictionary<string, object>
+            var item = await fixture.DbContext.CreateItem(TestData.CreateGenericEntity(new Dictionary<string, object>
             {
                 {
                     "Id", TestData.EntityIdToCreate
@@ -46,11 +40,11 @@ namespace FitnessApp.Common.IntegrationTests.Abstraction.Db.DbContext
         public async Task UpdateItem_ReturnsUpdated()
         {
             // Arrange
-            var existingItem = await _fixture.DbContext.GetItemById(TestData.EntityIdToUpdate);
+            var existingItem = await fixture.DbContext.GetItemById(TestData.EntityIdToUpdate);
             existingItem.TestProperty1 = "Updated";
 
             // Act
-            var updatedItem = await _fixture.DbContext.UpdateItem(existingItem);
+            var updatedItem = await fixture.DbContext.UpdateItem(existingItem);
 
             // Assert
             Assert.NotNull(updatedItem);
@@ -62,7 +56,7 @@ namespace FitnessApp.Common.IntegrationTests.Abstraction.Db.DbContext
         public async Task DeleteItem_ReturnsDeleted()
         {
             // Act
-            var item = await _fixture.DbContext.DeleteItem(TestData.EntityIdToDelete);
+            var item = await fixture.DbContext.DeleteItem(TestData.EntityIdToDelete);
 
             // Assert
             Assert.NotNull(item);

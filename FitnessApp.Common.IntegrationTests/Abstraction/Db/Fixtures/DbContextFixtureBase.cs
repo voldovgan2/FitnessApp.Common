@@ -18,7 +18,7 @@ namespace FitnessApp.Common.IntegrationTests.Abstraction.Db.Fixtures
         where TEntity : IGenericEntity
     {
         public DbContext<TEntity> DbContext { get; }
-        private readonly IMongoClient _mongoClient;
+        private readonly MongoClient _mongoClient;
         private readonly MongoDbSettings _mongoDbSettings;
 
         public DbContextFixtureBase(string databaseName, Func<string, TEntity> createEntityFacotryMethod)
@@ -33,12 +33,12 @@ namespace FitnessApp.Common.IntegrationTests.Abstraction.Db.Fixtures
             };
             _mongoClient = new MongoClient(_mongoDbSettings.ConnectionString);
             DbContext = new DbContext<TEntity>(_mongoClient, Options.Create(_mongoDbSettings));
-            IEnumerable<string> itemIds = new string[]
-            {
+            IEnumerable<string> itemIds =
+            [
                 TestData.EntityIdToGet,
                 TestData.EntityIdToDelete,
                 TestData.EntityIdToUpdate
-            };
+            ];
             var createdItemsTasks = itemIds.Select(itemId => DbContext.CreateItem(createEntityFacotryMethod(itemId)));
             Task.WhenAll(createdItemsTasks).GetAwaiter().GetResult();
         }
