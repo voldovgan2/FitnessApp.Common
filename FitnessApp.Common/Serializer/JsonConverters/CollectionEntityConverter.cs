@@ -10,12 +10,12 @@ namespace FitnessApp.Common.Serializer.JsonConverters
         where TEntity : ICollectionEntity
         where TCollectionItemEntity : ICollectionItemEntity
     {
-        public override void WriteJson(JsonWriter writer, object value, Newtonsoft.Json.JsonSerializer serializer)
+        public override void WriteJson(JsonWriter writer, object value, JsonSerializer serializer)
         {
             JToken.FromObject(value).WriteTo(writer);
         }
 
-        public override object ReadJson(JsonReader reader, Type objectType, object existingValue, Newtonsoft.Json.JsonSerializer serializer)
+        public override object ReadJson(JsonReader reader, Type objectType, object existingValue, JsonSerializer serializer)
         {
             JObject jObject = JObject.Load(reader);
             var result = Activator.CreateInstance<TEntity>();

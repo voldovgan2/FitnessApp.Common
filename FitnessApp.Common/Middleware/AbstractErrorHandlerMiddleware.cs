@@ -1,13 +1,13 @@
 ﻿using System;
 using System.Net;
+using System.Text.Json;
 using System.Threading.Tasks;
-using FitnessApp.Common.Serializer.JsonSerializer;
 using Microsoft.AspNetCore.Http;
 using Serilog;
 
 namespace FitnessApp.Common.Middleware
 {
-    public abstract class AbstractErrorHandlerMiddleware(RequestDelegate next, IJsonSerializer serializer)
+    public abstract class AbstractErrorHandlerMiddleware(RequestDelegate next)
     {
         public async Task Invoke(HttpContext context)
         {
@@ -22,7 +22,7 @@ namespace FitnessApp.Common.Middleware
                 var response = context.Response;
                 response.ContentType = "application/json";
                 response.StatusCode = (int)GetStatusCodeByError(error);
-                var result = serializer.SerializeToString(new { message = "Ach-ach-ach" });
+                var result = JsonSerializer.Serialize(new { message = "Ach-ach-ach" });
                 await response.WriteAsync(result);
             }
         }
