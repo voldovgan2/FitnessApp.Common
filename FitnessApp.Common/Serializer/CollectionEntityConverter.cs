@@ -4,20 +4,20 @@ using FitnessApp.Common.Abstractions.Db.Entities.Collection;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 
-namespace FitnessApp.Common.Serializer.JsonConverters
+namespace FitnessApp.Common.Serializer
 {
     public class CollectionEntityConverter<TEntity, TCollectionItemEntity> : JsonConverter
         where TEntity : ICollectionEntity
         where TCollectionItemEntity : ICollectionItemEntity
     {
-        public override void WriteJson(JsonWriter writer, object value, Newtonsoft.Json.JsonSerializer serializer)
+        public override void WriteJson(JsonWriter writer, object value, JsonSerializer serializer)
         {
             JToken.FromObject(value).WriteTo(writer);
         }
 
-        public override object ReadJson(JsonReader reader, Type objectType, object existingValue, Newtonsoft.Json.JsonSerializer serializer)
+        public override object ReadJson(JsonReader reader, Type objectType, object existingValue, JsonSerializer serializer)
         {
-            JObject jObject = JObject.Load(reader);
+            var jObject = JObject.Load(reader);
             var result = Activator.CreateInstance<TEntity>();
 
             var userIdToken = jObject.SelectToken("id");

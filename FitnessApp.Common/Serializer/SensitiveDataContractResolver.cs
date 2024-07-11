@@ -6,7 +6,7 @@ using FitnessApp.Common.Attributes;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Serialization;
 
-namespace FitnessApp.Common.Serializer.Infrastructure
+namespace FitnessApp.Common.Serializer
 {
     public class SensitiveDataContractResolver : DefaultContractResolver
     {
