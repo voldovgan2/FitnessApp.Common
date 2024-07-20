@@ -6,10 +6,15 @@ using FitnessApp.Comon.Tests.Shared.Abstraction.Models.Generic;
 
 namespace FitnessApp.Comon.Tests.Shared.Abstraction.Services.Generic;
 
-public class GenericServiceMock : GenericService<TestGenericEntity, TestGenericModel, CreateTestGenericModel, UpdateTestGenericModel>
-{
-    public GenericServiceMock(
-        IGenericRepository<TestGenericEntity, TestGenericModel, CreateTestGenericModel, UpdateTestGenericModel> repository,
+public class GenericServiceMock(
+        IGenericRepository<
+            TestGenericEntity,
+            TestGenericModel,
+            CreateTestGenericModel,
+            UpdateTestGenericModel> repository,
         IMapper mapper
-        ) : base(repository, mapper) { }
-}
+        ) : GenericService<
+            TestGenericEntity,
+            TestGenericModel,
+            CreateTestGenericModel,
+            UpdateTestGenericModel>(repository, mapper);

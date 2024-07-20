@@ -6,8 +6,9 @@ using FitnessApp.Comon.Tests.Shared.Abstraction.Models.Generic;
 
 namespace FitnessApp.Comon.Tests.Shared.Abstraction.Db.Repository.Generic;
 
-public class GenericRepositoryMock : GenericRepository<TestGenericEntity, TestGenericModel, CreateTestGenericModel, UpdateTestGenericModel>
-{
-    public GenericRepositoryMock(IDbContext<TestGenericEntity> dbContext, IMapper mapper)
-        : base(dbContext, mapper) { }
-}
+public class GenericRepositoryMock(IDbContext<TestGenericEntity> dbContext, IMapper mapper) :
+    GenericRepository<
+    TestGenericEntity,
+    TestGenericModel,
+    CreateTestGenericModel,
+    UpdateTestGenericModel>(dbContext, mapper);

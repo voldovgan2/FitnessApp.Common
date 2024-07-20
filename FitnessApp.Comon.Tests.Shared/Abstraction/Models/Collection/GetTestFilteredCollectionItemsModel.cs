@@ -2,6 +2,4 @@
 
 namespace FitnessApp.Comon.Tests.Shared.Abstraction.Models.Collection;
 
-public class GetTestFilteredCollectionItemsModel : GetFilteredCollectionItemsModel<TestCollectionItemModel>
-{
-}
+public class GetTestFilteredCollectionItemsModel : GetFilteredCollectionItemsModel<TestCollectionItemModel>;

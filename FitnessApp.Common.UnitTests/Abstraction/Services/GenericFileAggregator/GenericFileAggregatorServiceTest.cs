@@ -17,7 +17,13 @@ namespace FitnessApp.Common.UnitTests.Abstraction.Services.GenericFileAggregator
 
 public class GenericFileAggregatorServiceTest : TestBase
 {
-    private readonly Mock<IGenericService<TestGenericEntity, TestGenericModel, CreateTestGenericModel, UpdateTestGenericModel>> _genericService;
+    private readonly Mock<
+        IGenericService<
+            TestGenericEntity,
+            TestGenericModel,
+            CreateTestGenericModel,
+            UpdateTestGenericModel>
+        > _genericService;
     private readonly Mock<IFilesService> _fileService;
     private readonly GenericFileAggregatorServiceMock _genericFileAggregatorService;
     private readonly Dictionary<string, object> _defaultGenericModelParameters = new()
@@ -38,7 +44,12 @@ public class GenericFileAggregatorServiceTest : TestBase
 
     public GenericFileAggregatorServiceTest()
     {
-        _genericService = new Mock<IGenericService<TestGenericEntity, TestGenericModel, CreateTestGenericModel, UpdateTestGenericModel>>();
+        _genericService = new Mock<
+            IGenericService<
+                TestGenericEntity,
+                TestGenericModel,
+                CreateTestGenericModel,
+                UpdateTestGenericModel>>();
         _fileService = new Mock<IFilesService>();
         _genericFileAggregatorService = new GenericFileAggregatorServiceMock(
             _genericService.Object,

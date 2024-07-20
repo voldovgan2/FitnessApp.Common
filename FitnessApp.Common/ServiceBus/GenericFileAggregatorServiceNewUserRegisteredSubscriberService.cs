@@ -12,9 +12,9 @@ public abstract class GenericFileAggregatorServiceNewUserRegisteredSubscriberSer
     TGenericFileAggregatorModel,
     TGenericModel,
     TCreateGenericFileAggregatorModel>(
-    IServiceBus serviceBus,
-    Func<TCreateGenericFileAggregatorModel, Task<TGenericFileAggregatorModel>> createItemMethod)
-    : MessageBusService(serviceBus)
+        IServiceBus serviceBus,
+        Func<TCreateGenericFileAggregatorModel,
+        Task<TGenericFileAggregatorModel>> createItemMethod) : MessageBusService(serviceBus)
     where TGenericFileAggregatorModel : IGenericFileAggregatorModel<TGenericModel>
     where TGenericModel : IGenericModel
     where TCreateGenericFileAggregatorModel : ICreateGenericFileAggregatorModel

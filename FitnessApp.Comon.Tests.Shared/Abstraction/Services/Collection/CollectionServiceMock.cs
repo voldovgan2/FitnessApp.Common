@@ -4,9 +4,15 @@ using FitnessApp.Comon.Tests.Shared.Abstraction.Models.Collection;
 
 namespace FitnessApp.Comon.Tests.Shared.Abstraction.Services.Collection;
 
-public class CollectionServiceMock : CollectionService<TestCollectionModel, TestCollectionItemModel, CreateTestCollectionModel, UpdateTestCollectionModel>
-{
-    public CollectionServiceMock(
-        ICollectionRepository<TestCollectionModel, TestCollectionItemModel, CreateTestCollectionModel, UpdateTestCollectionModel> repository
-        ) : base(repository) { }
-}
+public class CollectionServiceMock(
+        ICollectionRepository<
+            TestCollectionModel,
+            TestCollectionItemModel,
+            CreateTestCollectionModel,
+            UpdateTestCollectionModel> repository
+        ) :
+    CollectionService<
+        TestCollectionModel,
+        TestCollectionItemModel,
+        CreateTestCollectionModel,
+        UpdateTestCollectionModel>(repository);

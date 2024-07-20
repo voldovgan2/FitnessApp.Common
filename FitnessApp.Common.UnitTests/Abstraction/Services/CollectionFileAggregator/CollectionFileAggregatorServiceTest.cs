@@ -16,7 +16,13 @@ namespace FitnessApp.Common.UnitTests.Abstraction.Services.CollectionFileAggrega
 
 public class CollectionFileAggregatorServiceTest : TestBase
 {
-    private readonly Mock<ICollectionService<TestCollectionModel, TestCollectionItemModel, CreateTestCollectionModel, UpdateTestCollectionModel>> _collectionService;
+    private readonly Mock<
+        ICollectionService<
+            TestCollectionModel,
+            TestCollectionItemModel,
+            CreateTestCollectionModel,
+            UpdateTestCollectionModel>
+        > _collectionService;
     private readonly CollectionFileAggregatorServiceMock _collectionFilesAggregatorService;
     private readonly Mock<IFilesService> _fileService;
     private readonly Dictionary<string, object> _defaultTestCollectionEntityParameters = new()
@@ -31,7 +37,13 @@ public class CollectionFileAggregatorServiceTest : TestBase
 
     public CollectionFileAggregatorServiceTest()
     {
-        _collectionService = new Mock<ICollectionService<TestCollectionModel, TestCollectionItemModel, CreateTestCollectionModel, UpdateTestCollectionModel>>();
+        _collectionService = new Mock<
+            ICollectionService<
+                TestCollectionModel,
+                TestCollectionItemModel,
+                CreateTestCollectionModel,
+                UpdateTestCollectionModel>
+            >();
         _fileService = new Mock<IFilesService>();
         _collectionFilesAggregatorService = new CollectionFileAggregatorServiceMock(
             _collectionService.Object,

@@ -8,12 +8,25 @@ using FitnessApp.Comon.Tests.Shared.Abstraction.Models.CollectionFileAggregator;
 
 namespace FitnessApp.Comon.Tests.Shared.Abstraction.Services.CollectionFileAggregatorServiceMock;
 
-public class CollectionFileAggregatorServiceMock : CollectionFileAggregatorService<TestCollectionFileAggregatorModel, TestCollectionFileAggregatorItemModel, TestCollectionModel, TestCollectionItemModel, CreateTestCollectionFileAggregatorModel, CreateTestCollectionModel, UpdateTestCollectionFileAggregatorModel, UpdateTestCollectionModel>
-{
-    public CollectionFileAggregatorServiceMock(
-        ICollectionService<TestCollectionModel, TestCollectionItemModel, CreateTestCollectionModel, UpdateTestCollectionModel> collectionService,
+public class CollectionFileAggregatorServiceMock(
+        ICollectionService<
+            TestCollectionModel,
+            TestCollectionItemModel,
+            CreateTestCollectionModel,
+            UpdateTestCollectionModel> collectionService,
         IFilesService filesService,
         IMapper mapper,
         CollectionFileAggregatorSettings collectionFileAggregatorSettings
-    ) : base(collectionService, filesService, mapper, collectionFileAggregatorSettings) { }
-}
+    ) : CollectionFileAggregatorService<
+        TestCollectionFileAggregatorModel,
+        TestCollectionFileAggregatorItemModel,
+        TestCollectionModel,
+        TestCollectionItemModel,
+        CreateTestCollectionFileAggregatorModel,
+        CreateTestCollectionModel,
+        UpdateTestCollectionFileAggregatorModel,
+        UpdateTestCollectionModel>(
+        collectionService,
+        filesService,
+        mapper,
+        collectionFileAggregatorSettings);

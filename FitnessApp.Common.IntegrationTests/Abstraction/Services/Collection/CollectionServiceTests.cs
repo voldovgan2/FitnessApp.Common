@@ -16,7 +16,11 @@ namespace FitnessApp.Common.IntegrationTests.Abstraction.Services.Collection;
 [Collection("CollectionService collection")]
 public class CollectionServiceTests : IClassFixture<CollectionServiceFixture>
 {
-    private readonly ICollectionService<TestCollectionModel, TestCollectionItemModel, CreateTestCollectionModel, UpdateTestCollectionModel> _service;
+    private readonly ICollectionService<
+        TestCollectionModel,
+        TestCollectionItemModel,
+        CreateTestCollectionModel,
+        UpdateTestCollectionModel> _service;
 
     public CollectionServiceTests(CollectionServiceFixture fixture)
     {

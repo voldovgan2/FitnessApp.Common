@@ -15,7 +15,11 @@ namespace FitnessApp.Common.IntegrationTests.Abstraction.Db.Repository.Collectio
 [Collection("CollectionRepository collection")]
 public class CollectionRepositoryTests : IClassFixture<CollectionRepositoryDbContextFixture>
 {
-    private readonly ICollectionRepository<TestCollectionModel, TestCollectionItemModel, CreateTestCollectionModel, UpdateTestCollectionModel> _repository;
+    private readonly ICollectionRepository<
+        TestCollectionModel,
+        TestCollectionItemModel,
+        CreateTestCollectionModel,
+        UpdateTestCollectionModel> _repository;
 
     public CollectionRepositoryTests(CollectionRepositoryDbContextFixture fixture)
     {

@@ -13,7 +13,13 @@ namespace FitnessApp.Common.UnitTests.Abstraction.Services.Collection;
 
 public class CollectionServiceTest : TestBase
 {
-    private readonly Mock<ICollectionRepository<TestCollectionModel, TestCollectionItemModel, CreateTestCollectionModel, UpdateTestCollectionModel>> _repositoryMock;
+    private readonly Mock<
+        ICollectionRepository<
+            TestCollectionModel,
+            TestCollectionItemModel,
+            CreateTestCollectionModel,
+            UpdateTestCollectionModel>
+        > _repositoryMock;
     private readonly CollectionServiceMock _service;
     private readonly Dictionary<string, object> _defaultTestCollectionEntityParameters = new()
     {
@@ -27,7 +33,13 @@ public class CollectionServiceTest : TestBase
 
     public CollectionServiceTest() : base()
     {
-        _repositoryMock = new Mock<ICollectionRepository<TestCollectionModel, TestCollectionItemModel, CreateTestCollectionModel, UpdateTestCollectionModel>>();
+        _repositoryMock = new Mock<
+            ICollectionRepository<
+                TestCollectionModel,
+                TestCollectionItemModel,
+                CreateTestCollectionModel,
+                UpdateTestCollectionModel>
+            >();
         _service = new CollectionServiceMock(_repositoryMock.Object);
     }
 

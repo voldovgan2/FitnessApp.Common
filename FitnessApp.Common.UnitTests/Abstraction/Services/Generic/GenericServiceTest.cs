@@ -15,7 +15,11 @@ namespace FitnessApp.Common.UnitTests.Abstraction.Services.Generic;
 
 public class GenericServiceTest : TestBase
 {
-    private readonly Mock<IGenericRepository<TestGenericEntity, TestGenericModel, CreateTestGenericModel, UpdateTestGenericModel>> _repositoryMock;
+    private readonly Mock<IGenericRepository<
+        TestGenericEntity,
+        TestGenericModel,
+        CreateTestGenericModel,
+        UpdateTestGenericModel>> _repositoryMock;
     private readonly GenericServiceMock _serviceMock;
     private readonly Dictionary<string, object> _defaultGenericModelParameters = new()
     {
@@ -26,7 +30,12 @@ public class GenericServiceTest : TestBase
 
     public GenericServiceTest() : base()
     {
-        _repositoryMock = new Mock<IGenericRepository<TestGenericEntity, TestGenericModel, CreateTestGenericModel, UpdateTestGenericModel>>();
+        _repositoryMock = new Mock<
+            IGenericRepository<
+                TestGenericEntity,
+                TestGenericModel,
+                CreateTestGenericModel,
+                UpdateTestGenericModel>>();
         _serviceMock = new GenericServiceMock(_repositoryMock.Object, _mapper);
     }
 

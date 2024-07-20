@@ -14,7 +14,11 @@ namespace FitnessApp.Common.IntegrationTests.Abstraction.Services.Generic;
 [Collection("GenericService collection")]
 public class GenericServiceTest : IClassFixture<GenericServiceFixture>
 {
-    private readonly IGenericService<TestGenericEntity, TestGenericModel, CreateTestGenericModel, UpdateTestGenericModel> _service;
+    private readonly IGenericService<
+        TestGenericEntity,
+        TestGenericModel,
+        CreateTestGenericModel,
+        UpdateTestGenericModel> _service;
 
     public GenericServiceTest(GenericServiceFixture fixture)
     {

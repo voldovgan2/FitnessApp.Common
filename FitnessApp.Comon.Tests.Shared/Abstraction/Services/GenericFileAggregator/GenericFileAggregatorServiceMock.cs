@@ -9,12 +9,24 @@ using FitnessApp.Comon.Tests.Shared.Abstraction.Models.GenericFileAggregator;
 
 namespace FitnessApp.Comon.Tests.Shared.Abstraction.Services.GenericFileAggregator;
 
-public class GenericFileAggregatorServiceMock : GenericFileAggregatorService<TestGenericEntity, TestGenericFileAggregatorModel, TestGenericModel, CreateTestGenericFileAggregatorModel, CreateTestGenericModel, UpdateTestGenericFileAggregatorModel, UpdateTestGenericModel>
-{
-    public GenericFileAggregatorServiceMock(
-        IGenericService<TestGenericEntity, TestGenericModel, CreateTestGenericModel, UpdateTestGenericModel> genericService,
+public class GenericFileAggregatorServiceMock(
+        IGenericService<
+            TestGenericEntity,
+            TestGenericModel,
+            CreateTestGenericModel,
+            UpdateTestGenericModel> genericService,
         IFilesService filesService,
         IMapper mapper,
-        GenericFileAggregatorSettings genericFileAggregatorSettings
-        ) : base(genericService, filesService, mapper, genericFileAggregatorSettings) { }
-}
+        GenericFileAggregatorSettings genericFileAggregatorSettings) :
+    GenericFileAggregatorService<
+        TestGenericEntity,
+        TestGenericFileAggregatorModel,
+        TestGenericModel,
+        CreateTestGenericFileAggregatorModel,
+        CreateTestGenericModel,
+        UpdateTestGenericFileAggregatorModel,
+        UpdateTestGenericModel>(
+        genericService,
+        filesService,
+        mapper,
+        genericFileAggregatorSettings);

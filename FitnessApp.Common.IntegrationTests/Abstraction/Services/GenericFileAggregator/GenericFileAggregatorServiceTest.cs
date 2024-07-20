@@ -19,9 +19,16 @@ using Xunit;
 namespace FitnessApp.Common.IntegrationTests.Abstraction.Services.GenericFileAggregator;
 
 [Collection("GenericFileAggregatorService collection")]
-public class GenericFileAggregatorServiceTest : IClassFixture<GenericFileAggregatorServiceGenericServiceFixture>, IClassFixture<GenericFileAggregatorServiceFileFixture>
+public class GenericFileAggregatorServiceTest :
+    IClassFixture<GenericFileAggregatorServiceGenericServiceFixture>,
+    IClassFixture<GenericFileAggregatorServiceFileFixture>
 {
-    private readonly IGenericFileAggregatorService<TestGenericEntity, TestGenericFileAggregatorModel, TestGenericModel, CreateTestGenericFileAggregatorModel, UpdateTestGenericFileAggregatorModel> _service;
+    private readonly IGenericFileAggregatorService<
+        TestGenericEntity,
+        TestGenericFileAggregatorModel,
+        TestGenericModel,
+        CreateTestGenericFileAggregatorModel,
+        UpdateTestGenericFileAggregatorModel> _service;
     private readonly GenericFileAggregatorServiceFileFixture _fileFixture;
 
     public GenericFileAggregatorServiceTest(GenericFileAggregatorServiceGenericServiceFixture dbContextFixture, GenericFileAggregatorServiceFileFixture fileFixture)

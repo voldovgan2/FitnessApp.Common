@@ -6,8 +6,11 @@ using FitnessApp.Comon.Tests.Shared.Abstraction.Models.Collection;
 
 namespace FitnessApp.Comon.Tests.Shared.Abstraction.Db.Repository.Collection;
 
-public class CollectionRepositoryMock : CollectionRepository<TestCollectionEntity, TestCollectionItemEntity, TestCollectionModel, TestCollectionItemModel, CreateTestCollectionModel, UpdateTestCollectionModel>
-{
-    public CollectionRepositoryMock(IDbContext<TestCollectionEntity> dbContext, IMapper mapper)
-        : base(dbContext, mapper) { }
-}
+public class CollectionRepositoryMockCollectionRepositoryMock(IDbContext<TestCollectionEntity> dbContext, IMapper mapper) :
+    CollectionRepository<
+        TestCollectionEntity,
+        TestCollectionItemEntity,
+        TestCollectionModel,
+        TestCollectionItemModel,
+        CreateTestCollectionModel,
+        UpdateTestCollectionModel>(dbContext, mapper);
