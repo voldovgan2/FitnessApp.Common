@@ -1,9 +1,8 @@
 ﻿using System;
 
-namespace FitnessApp.Common.Attributes
+namespace FitnessApp.Common.Attributes;
+
+[AttributeUsage(AttributeTargets.Property)]
+public class SingleWordSearchableAttribute : Attribute
 {
-    [AttributeUsage(AttributeTargets.Property)]
-    public class SingleWordSearchableAttribute : Attribute
-    {
-    }
 }

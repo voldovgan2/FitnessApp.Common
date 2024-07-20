@@ -1,7 +1,6 @@
-﻿namespace FitnessApp.Common.Abstractions.Models.Generic
+﻿namespace FitnessApp.Common.Abstractions.Models.Generic;
+
+public interface ICreateGenericModel
 {
-    public interface ICreateGenericModel
-    {
-        string UserId { get; set; }
-    }
+    string UserId { get; set; }
 }

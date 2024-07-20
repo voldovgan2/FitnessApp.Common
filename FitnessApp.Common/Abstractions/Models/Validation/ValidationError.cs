@@ -1,10 +1,9 @@
-﻿namespace FitnessApp.Common.Abstractions.Models.Validation
+﻿namespace FitnessApp.Common.Abstractions.Models.Validation;
+
+public class ValidationError(string message, string field)
 {
-    public class ValidationError(string message, string field)
+    public override string ToString()
     {
-        public override string ToString()
-        {
-            return $"Field validation failed, field name: {field} , message: {message}.";
-        }
+        return $"Field validation failed, field name: {field} , message: {message}.";
     }
 }

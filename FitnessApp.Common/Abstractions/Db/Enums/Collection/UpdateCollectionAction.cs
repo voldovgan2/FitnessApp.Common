@@ -1,9 +1,8 @@
-﻿namespace FitnessApp.Common.Abstractions.Db.Enums.Collection
+﻿namespace FitnessApp.Common.Abstractions.Db.Enums.Collection;
+
+public enum UpdateCollectionAction
 {
-    public enum UpdateCollectionAction
-    {
-        Add,
-        Update,
-        Remove
-    }
+    Add,
+    Update,
+    Remove
 }

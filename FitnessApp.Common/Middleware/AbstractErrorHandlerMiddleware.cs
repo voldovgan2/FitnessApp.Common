@@ -5,36 +5,35 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
 using Serilog;
 
-namespace FitnessApp.Common.Middleware
+namespace FitnessApp.Common.Middleware;
+
+public abstract class AbstractErrorHandlerMiddleware(RequestDelegate next)
 {
-    public abstract class AbstractErrorHandlerMiddleware(RequestDelegate next)
+    public async Task Invoke(HttpContext context)
     {
-        public async Task Invoke(HttpContext context)
+        try
         {
-            try
-            {
-                await next(context);
-            }
-            catch (Exception error)
-            {
-                await HandleGlobalError(context, error);
-                Log.Error(error, "");
-                var response = context.Response;
-                response.ContentType = "application/json";
-                response.StatusCode = (int)GetStatusCodeByError(error);
-                var result = JsonSerializer.Serialize(new { message = "Ach-ach-ach" });
-                await response.WriteAsync(result);
-            }
+            await next(context);
         }
-
-        protected string GetCorrelationId(HttpContext context)
+        catch (Exception error)
         {
-            context.Request.Headers.TryGetValue(MiddlewareConstants.CorrelationIdHeaderName, out var correlationId);
-            return correlationId;
+            await HandleGlobalError(context, error);
+            Log.Error(error, "");
+            var response = context.Response;
+            response.ContentType = "application/json";
+            response.StatusCode = (int)GetStatusCodeByError(error);
+            var result = JsonSerializer.Serialize(new { message = "Ach-ach-ach" });
+            await response.WriteAsync(result);
         }
-
-        protected abstract Task HandleGlobalError(HttpContext context, Exception error);
-
-        protected abstract HttpStatusCode GetStatusCodeByError(Exception error);
     }
+
+    protected string GetCorrelationId(HttpContext context)
+    {
+        context.Request.Headers.TryGetValue(MiddlewareConstants.CorrelationIdHeaderName, out var correlationId);
+        return correlationId;
+    }
+
+    protected abstract Task HandleGlobalError(HttpContext context, Exception error);
+
+    protected abstract HttpStatusCode GetStatusCodeByError(Exception error);
 }

@@ -1,10 +1,9 @@
 ﻿using System.Collections.Generic;
 
-namespace FitnessApp.Common.Abstractions.Services.Configuration
+namespace FitnessApp.Common.Abstractions.Services.Configuration;
+
+public class CollectionFileAggregatorSettings
 {
-    public class CollectionFileAggregatorSettings
-    {
-        public string ContainerName { get; set; }
-        public Dictionary<string, string[]> CollectionsFileFields { get; set; }
-    }
+    public string ContainerName { get; set; }
+    public Dictionary<string, string[]> CollectionsFileFields { get; set; }
 }

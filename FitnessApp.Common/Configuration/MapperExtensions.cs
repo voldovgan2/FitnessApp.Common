@@ -2,21 +2,20 @@
 using AutoMapper;
 using Microsoft.Extensions.DependencyInjection;
 
-namespace FitnessApp.Common.Configuration
+namespace FitnessApp.Common.Configuration;
+
+public static class MapperExtensions
 {
-    public static class MapperExtensions
+    public static IServiceCollection ConfigureMapper(this IServiceCollection services, Profile profile)
     {
-        public static IServiceCollection ConfigureMapper(this IServiceCollection services, Profile profile)
+        ArgumentNullException.ThrowIfNull(services);
+
+        var mapperConfig = new MapperConfiguration(mc =>
         {
-            ArgumentNullException.ThrowIfNull(services);
+            mc.AddProfile(profile);
+        });
+        services.AddSingleton(mapperConfig.CreateMapper());
 
-            var mapperConfig = new MapperConfiguration(mc =>
-            {
-                mc.AddProfile(profile);
-            });
-            services.AddSingleton(mapperConfig.CreateMapper());
-
-            return services;
-        }
+        return services;
     }
 }

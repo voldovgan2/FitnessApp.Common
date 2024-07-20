@@ -1,9 +1,8 @@
-﻿namespace FitnessApp.Common.Abstractions.Db.Configuration
+﻿namespace FitnessApp.Common.Abstractions.Db.Configuration;
+
+public class MongoDbSettings
 {
-    public class MongoDbSettings
-    {
-        public string ConnectionString { get; set; }
-        public string DatabaseName { get; set; }
-        public string CollecttionName { get; set; }
-    }
+    public string ConnectionString { get; set; }
+    public string DatabaseName { get; set; }
+    public string CollecttionName { get; set; }
 }

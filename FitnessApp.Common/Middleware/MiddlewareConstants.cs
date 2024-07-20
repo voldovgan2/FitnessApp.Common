@@ -1,7 +1,6 @@
-﻿namespace FitnessApp.Common.Middleware
+﻿namespace FitnessApp.Common.Middleware;
+
+public static class MiddlewareConstants
 {
-    public static class MiddlewareConstants
-    {
-        public const string CorrelationIdHeaderName = "X-Correlation-Id";
-    }
+    public const string CorrelationIdHeaderName = "X-Correlation-Id";
 }

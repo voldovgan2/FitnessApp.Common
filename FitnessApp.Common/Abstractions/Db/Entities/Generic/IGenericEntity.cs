@@ -1,7 +1,6 @@
-﻿namespace FitnessApp.Common.Abstractions.Db.Entities.Generic
+﻿namespace FitnessApp.Common.Abstractions.Db.Entities.Generic;
+
+public interface IGenericEntity
 {
-    public interface IGenericEntity
-    {
-        public string UserId { get; set; }
-    }
+    public string UserId { get; set; }
 }

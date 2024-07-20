@@ -1,7 +1,6 @@
-﻿namespace FitnessApp.Common.Abstractions.Models.CollectionFileAggregator
+﻿namespace FitnessApp.Common.Abstractions.Models.CollectionFileAggregator;
+
+public interface ICreateCollectionFileAggregatorModel
 {
-    public interface ICreateCollectionFileAggregatorModel
-    {
-        string UserId { get; set; }
-    }
+    string UserId { get; set; }
 }

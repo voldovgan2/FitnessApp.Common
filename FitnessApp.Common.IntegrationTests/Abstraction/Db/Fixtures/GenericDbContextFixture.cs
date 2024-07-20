@@ -2,18 +2,17 @@
 using FitnessApp.Comon.Tests.Shared;
 using FitnessApp.Comon.Tests.Shared.Abstraction.Db.Entities.Generic;
 
-namespace FitnessApp.Common.IntegrationTests.Abstraction.Db.Fixtures
+namespace FitnessApp.Common.IntegrationTests.Abstraction.Db.Fixtures;
+
+public class GenericDbContextFixture : DbContextFixtureBase<TestGenericEntity>
 {
-    public class GenericDbContextFixture : DbContextFixtureBase<TestGenericEntity>
-    {
-        public GenericDbContextFixture()
-            : base("DbContext", (itemId) => TestData.CreateGenericEntity(new Dictionary<string, object>
+    public GenericDbContextFixture()
+        : base("DbContext", (itemId) => TestData.CreateGenericEntity(new Dictionary<string, object>
+            {
                 {
-                    {
-                        "Id", itemId
-                    }
-                }))
-        {
-        }
+                    "Id", itemId
+                }
+            }))
+    {
     }
 }

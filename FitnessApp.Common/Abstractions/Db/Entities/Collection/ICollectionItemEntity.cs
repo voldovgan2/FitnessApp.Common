@@ -1,7 +1,6 @@
-﻿namespace FitnessApp.Common.Abstractions.Db.Entities.Collection
+﻿namespace FitnessApp.Common.Abstractions.Db.Entities.Collection;
+
+public interface ICollectionItemEntity
 {
-    public interface ICollectionItemEntity
-    {
-        string Id { get; set; }
-    }
+    string Id { get; set; }
 }

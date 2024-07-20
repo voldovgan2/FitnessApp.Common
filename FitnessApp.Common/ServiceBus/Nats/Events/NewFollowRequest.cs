@@ -1,8 +1,7 @@
-﻿namespace FitnessApp.Common.ServiceBus.Nats.Events
+﻿namespace FitnessApp.Common.ServiceBus.Nats.Events;
+
+public class NewFollowRequest
 {
-    public class NewFollowRequest
-    {
-        public string UserId { get; set; }
-        public string UserToFollowId { get; set; }
-    }
+    public string UserId { get; set; }
+    public string UserToFollowId { get; set; }
 }

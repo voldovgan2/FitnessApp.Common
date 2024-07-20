@@ -1,6 +1,5 @@
 ﻿using System.Collections.Generic;
 using System.Threading.Tasks;
-using FitnessApp.Common.Abstractions.Db.Repository.Generic;
 using FitnessApp.Common.Abstractions.Services.Generic;
 using FitnessApp.Common.IntegrationTests.Abstraction.Services.Fixtures;
 using FitnessApp.Comon.Tests.Shared;
@@ -10,75 +9,74 @@ using FitnessApp.Comon.Tests.Shared.Abstraction.Models.Generic;
 using FitnessApp.Comon.Tests.Shared.Abstraction.Services.Generic;
 using Xunit;
 
-namespace FitnessApp.Common.IntegrationTests.Abstraction.Services.Generic
+namespace FitnessApp.Common.IntegrationTests.Abstraction.Services.Generic;
+
+[Collection("GenericService collection")]
+public class GenericServiceTest : IClassFixture<GenericServiceFixture>
 {
-    [Collection("GenericService collection")]
-    public class GenericServiceTest : IClassFixture<GenericServiceFixture>
+    private readonly IGenericService<TestGenericEntity, TestGenericModel, CreateTestGenericModel, UpdateTestGenericModel> _service;
+
+    public GenericServiceTest(GenericServiceFixture fixture)
     {
-        private readonly IGenericService<TestGenericEntity, TestGenericModel, CreateTestGenericModel, UpdateTestGenericModel> _service;
+        _service = new GenericServiceMock(new GenericRepositoryMock(fixture.DbContext, fixture.Mapper), fixture.Mapper);
+    }
 
-        public GenericServiceTest(GenericServiceFixture fixture)
-        {
-            _service = new GenericServiceMock(new GenericRepositoryMock(fixture.DbContext, fixture.Mapper), fixture.Mapper);
-        }
+    [Fact]
+    public async Task GetItemByUserId_ReturnsSingleItem()
+    {
+        // Act
+        var item = await _service.GetItemByUserId(TestData.EntityIdToGet);
 
-        [Fact]
-        public async Task GetItemByUserId_ReturnsSingleItem()
-        {
-            // Act
-            var item = await _service.GetItemByUserId(TestData.EntityIdToGet);
+        // Assert
+        Assert.NotNull(item);
+        Assert.Equal(TestData.EntityIdToGet, item.UserId);
+    }
 
-            // Assert
-            Assert.NotNull(item);
-            Assert.Equal(TestData.EntityIdToGet, item.UserId);
-        }
-
-        [Fact]
-        public async Task CreateItem_ReturnsCreated()
-        {
-            // Act
-            var item = await _service.CreateItem(TestData.CreateCreateTestGenericModel(
-                new Dictionary<string, object>
-                {
-                    {
-                        "Id", TestData.EntityIdToCreate
-                    }
-                }
-            ));
-
-            // Assert
-            Assert.NotNull(item);
-            Assert.Equal(TestData.EntityIdToCreate, item.UserId);
-        }
-
-        [Fact]
-        public async Task UpdateItem_ReturnsUpdated()
-        {
-            // Arrange
-            var existingItem = await _service.GetItemByUserId(TestData.EntityIdToUpdate);
-            existingItem.TestProperty1 = "Updated";
-
-            // Act
-            var updatedItem = await _service.UpdateItem(new UpdateTestGenericModel
+    [Fact]
+    public async Task CreateItem_ReturnsCreated()
+    {
+        // Act
+        var item = await _service.CreateItem(TestData.CreateCreateTestGenericModel(
+            new Dictionary<string, object>
             {
-                UserId = existingItem.UserId,
-                TestProperty1 = existingItem.TestProperty1
-            });
+                {
+                    "Id", TestData.EntityIdToCreate
+                }
+            }
+        ));
 
-            // Assert
-            Assert.NotNull(updatedItem);
-            Assert.Equal(TestData.EntityIdToUpdate, updatedItem.UserId);
-            Assert.Equal(existingItem.TestProperty1, updatedItem.TestProperty1);
-        }
+        // Assert
+        Assert.NotNull(item);
+        Assert.Equal(TestData.EntityIdToCreate, item.UserId);
+    }
 
-        [Fact]
-        public async Task DeleteItem_ReturnsDeleted()
+    [Fact]
+    public async Task UpdateItem_ReturnsUpdated()
+    {
+        // Arrange
+        var existingItem = await _service.GetItemByUserId(TestData.EntityIdToUpdate);
+        existingItem.TestProperty1 = "Updated";
+
+        // Act
+        var updatedItem = await _service.UpdateItem(new UpdateTestGenericModel
         {
-            // Act
-            var itemId = await _service.DeleteItem(TestData.EntityIdToDelete);
+            UserId = existingItem.UserId,
+            TestProperty1 = existingItem.TestProperty1
+        });
 
-            // Assert
-            Assert.Equal(TestData.EntityIdToDelete, itemId);
-        }
+        // Assert
+        Assert.NotNull(updatedItem);
+        Assert.Equal(TestData.EntityIdToUpdate, updatedItem.UserId);
+        Assert.Equal(existingItem.TestProperty1, updatedItem.TestProperty1);
+    }
+
+    [Fact]
+    public async Task DeleteItem_ReturnsDeleted()
+    {
+        // Act
+        var itemId = await _service.DeleteItem(TestData.EntityIdToDelete);
+
+        // Assert
+        Assert.Equal(TestData.EntityIdToDelete, itemId);
     }
 }

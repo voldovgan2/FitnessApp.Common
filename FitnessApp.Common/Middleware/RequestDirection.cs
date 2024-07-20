@@ -1,8 +1,7 @@
-﻿namespace FitnessApp.Common.Middleware
+﻿namespace FitnessApp.Common.Middleware;
+
+public enum RequestDirection
 {
-    public enum RequestDirection
-    {
-        In,
-        Out
-    }
+    In,
+    Out
 }

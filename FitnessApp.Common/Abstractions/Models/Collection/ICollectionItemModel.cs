@@ -1,7 +1,6 @@
-﻿namespace FitnessApp.Common.Abstractions.Models.Collection
+﻿namespace FitnessApp.Common.Abstractions.Models.Collection;
+
+public interface ICollectionItemModel
 {
-    public interface ICollectionItemModel
-    {
-        string Id { get; set; }
-    }
+    string Id { get; set; }
 }

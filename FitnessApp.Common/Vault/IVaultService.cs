@@ -1,9 +1,8 @@
 ﻿using System.Threading.Tasks;
 
-namespace FitnessApp.Common.Vault
+namespace FitnessApp.Common.Vault;
+
+public interface IVaultService
 {
-    public interface IVaultService
-    {
-        Task<string> GetSecret(string secretKey);
-    }
+    Task<string> GetSecret(string secretKey);
 }

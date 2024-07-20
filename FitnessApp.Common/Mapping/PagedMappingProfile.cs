@@ -2,13 +2,12 @@
 using FitnessApp.Common.Paged.Contracts.Output;
 using FitnessApp.Common.Paged.Models.Output;
 
-namespace FitnessApp.Common.Mapping
+namespace FitnessApp.Common.Mapping;
+
+public class PagedMappingProfile<TContract, TModel> : Profile
 {
-    public class PagedMappingProfile<TContract, TModel> : Profile
+    public PagedMappingProfile()
     {
-        public PagedMappingProfile()
-        {
-            CreateMap<PagedDataModel<TModel>, PagedDataContract<TContract>>();
-        }
+        CreateMap<PagedDataModel<TModel>, PagedDataContract<TContract>>();
     }
 }

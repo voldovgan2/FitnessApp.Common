@@ -2,10 +2,9 @@
 using FitnessApp.Common.Abstractions.Models.Collection;
 using FitnessApp.Common.Abstractions.Models.Generic;
 
-namespace FitnessApp.Common.Abstractions.Models.CollectionFileAggregator
+namespace FitnessApp.Common.Abstractions.Models.CollectionFileAggregator;
+
+public interface ICollectionFileAggregatorModel : IGenericModel
 {
-    public interface ICollectionFileAggregatorModel : IGenericModel
-    {
-        Dictionary<string, List<ICollectionFileAggregatorItemModel<ICollectionItemModel>>> Collection { get; set; }
-    }
+    Dictionary<string, List<ICollectionFileAggregatorItemModel<ICollectionItemModel>>> Collection { get; set; }
 }

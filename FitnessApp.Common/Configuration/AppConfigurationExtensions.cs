@@ -1,17 +1,16 @@
 ﻿using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Hosting;
 
-namespace FitnessApp.Common.Configuration
+namespace FitnessApp.Common.Configuration;
+
+public static class AppConfigurationExtensions
 {
-    public static class AppConfigurationExtensions
+    public static IHostBuilder ConfigureAppConfiguration(this IHostBuilder host)
     {
-        public static IHostBuilder ConfigureAppConfiguration(this IHostBuilder host)
+        host.ConfigureAppConfiguration((context, config) =>
         {
-            host.ConfigureAppConfiguration((context, config) =>
-            {
-                config.AddJsonFile("appsettings.Development.json");
-            });
-            return host;
-        }
+            config.AddJsonFile("appsettings.Development.json");
+        });
+        return host;
     }
 }

@@ -4,13 +4,12 @@ using FitnessApp.Common.Abstractions.Services.Generic;
 using FitnessApp.Comon.Tests.Shared.Abstraction.Db.Entities.Generic;
 using FitnessApp.Comon.Tests.Shared.Abstraction.Models.Generic;
 
-namespace FitnessApp.Comon.Tests.Shared.Abstraction.Services.Generic
+namespace FitnessApp.Comon.Tests.Shared.Abstraction.Services.Generic;
+
+public class GenericServiceMock : GenericService<TestGenericEntity, TestGenericModel, CreateTestGenericModel, UpdateTestGenericModel>
 {
-    public class GenericServiceMock : GenericService<TestGenericEntity, TestGenericModel, CreateTestGenericModel, UpdateTestGenericModel>
-    {
-        public GenericServiceMock(
-            IGenericRepository<TestGenericEntity, TestGenericModel, CreateTestGenericModel, UpdateTestGenericModel> repository,
-            IMapper mapper
-            ) : base(repository, mapper) { }
-    }
+    public GenericServiceMock(
+        IGenericRepository<TestGenericEntity, TestGenericModel, CreateTestGenericModel, UpdateTestGenericModel> repository,
+        IMapper mapper
+        ) : base(repository, mapper) { }
 }
