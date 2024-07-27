@@ -14,7 +14,6 @@ using FitnessApp.Common.Abstractions.Services.Collection;
 using FitnessApp.Common.Abstractions.Services.Configuration;
 using FitnessApp.Common.Abstractions.Services.Validation;
 using FitnessApp.Common.Files;
-using FitnessApp.Common.Paged.Extensions;
 using FitnessApp.Common.Paged.Models.Output;
 
 namespace FitnessApp.Common.Abstractions.Services.CollectionFileAggregator;
@@ -38,7 +37,6 @@ public abstract class CollectionFileAggregatorService<
     ) : ICollectionFileAggregatorService<
         TCollectionFileAggregatorModel,
         TCollectionFileAggregatorItemModel,
-        TCollectionItemModel,
         TCreateCollectionFileAggregatorModel,
         TUpdateCollectionFileAggregatorModel>
     where TCollectionFileAggregatorModel : ICollectionFileAggregatorModel
@@ -50,7 +48,7 @@ public abstract class CollectionFileAggregatorService<
     where TUpdateCollectionFileAggregatorModel : IUpdateCollectionFileAggregatorModel
     where TUpdateCollectionModel : IUpdateCollectionModel
 {
-    public virtual async Task<TCollectionFileAggregatorModel> GetItemByUserId(string userId)
+    public async Task<TCollectionFileAggregatorModel> GetItemByUserId(string userId)
     {
         ValidationHelper.ThrowExceptionIfNotValidatedEmptyStringField(nameof(userId), userId);
 
@@ -59,7 +57,18 @@ public abstract class CollectionFileAggregatorService<
         return result;
     }
 
-    public virtual async Task<PagedDataModel<TCollectionFileAggregatorItemModel>> GetFilteredCollectionItems(GetFilteredCollectionItemsModel<TCollectionItemModel> model)
+    public async Task<IEnumerable<TCollectionFileAggregatorItemModel>> GetCollectionByUserId(string userId, string collectionName)
+    {
+        List<ValidationError> errors = new List<ValidationError>();
+        errors.AddIfNotNull(ValidationHelper.ValidateEmptyStringField(nameof(userId), userId));
+        errors.AddIfNotNull(ValidationHelper.ValidateEmptyStringField(nameof(collectionName), collectionName));
+        errors.ThrowIfNotEmpty();
+
+        var allItems = await collectionService.GetCollectionByUserId(userId, collectionName);
+        return await LoadAndComposeCollectionFileAggregatorItemModel(collectionName, allItems);
+    }
+
+    public async Task<PagedDataModel<TCollectionFileAggregatorItemModel>> GetFilteredCollectionItems(GetFilteredCollectionItemsModel model)
     {
         List<ValidationError> errors = new List<ValidationError>();
         errors.AddIfNotNull(ValidationHelper.ValidateEmptyStringField(nameof(model.UserId), model.UserId));
@@ -68,9 +77,7 @@ public abstract class CollectionFileAggregatorService<
         errors.AddIfNotNull(ValidationHelper.ValidateRange(1, int.MaxValue, model.PageSize, nameof(model.PageSize)));
         errors.ThrowIfNotEmpty();
 
-        var allItems = await collectionService.GetCollectionByUserId(model.UserId, model.CollectionName);
-        allItems = allItems.Where(model.Predicate);
-        var pagedItems = allItems.ToPaged(model);
+        var pagedItems = await collectionService.GetFilteredCollectionItems(model);
         var result = new PagedDataModel<TCollectionFileAggregatorItemModel>
         {
             TotalCount = pagedItems.TotalCount,
@@ -80,7 +87,7 @@ public abstract class CollectionFileAggregatorService<
         return result;
     }
 
-    public virtual async Task<string> CreateItem(TCreateCollectionFileAggregatorModel model)
+    public async Task<string> CreateItem(TCreateCollectionFileAggregatorModel model)
     {
         var validationErrors = ValidateCreateCollectionModel(model);
         validationErrors.ThrowIfNotEmpty();
@@ -90,7 +97,7 @@ public abstract class CollectionFileAggregatorService<
         return result;
     }
 
-    public virtual async Task<TCollectionFileAggregatorItemModel> UpdateItem(TUpdateCollectionFileAggregatorModel model)
+    public async Task<TCollectionFileAggregatorItemModel> UpdateItem(TUpdateCollectionFileAggregatorModel model)
     {
         var validationErrors = ValidateUpdateCollectionModel(model);
         validationErrors.ThrowIfNotEmpty();
@@ -104,7 +111,7 @@ public abstract class CollectionFileAggregatorService<
         return result;
     }
 
-    public virtual async Task<string> DeleteItem(string userId)
+    public async Task<string> DeleteItem(string userId)
     {
         ValidationHelper.ThrowExceptionIfNotValidatedEmptyStringField(nameof(userId), userId);
 

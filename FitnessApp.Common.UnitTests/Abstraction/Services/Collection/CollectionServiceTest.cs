@@ -98,13 +98,10 @@ public class CollectionServiceTest : TestBase
         };
         var filteredBySearchItems = collectionItems.Take(2).Select(i => i.Id);
 
-        var testProperty = "TestProperty1";
-
         var getModel = new GetTestFilteredCollectionItemsModel
         {
             UserId = TestData.Id,
             CollectionName = TestData.CollectionName,
-            Predicate = itemModel => itemModel.TestProperty == testProperty,
             Page = 0,
             PageSize = 10
         };

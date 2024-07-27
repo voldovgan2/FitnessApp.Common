@@ -1,9 +1,9 @@
 ﻿using System.Collections.Generic;
-using System.Linq;
 using System.Threading.Tasks;
 using FitnessApp.Common.Abstractions.Db.Repository.Collection;
 using FitnessApp.Common.Abstractions.Extensions;
 using FitnessApp.Common.Abstractions.Models.Collection;
+using FitnessApp.Common.Abstractions.Models.CollectionFileAggregator;
 using FitnessApp.Common.Abstractions.Models.Validation;
 using FitnessApp.Common.Abstractions.Services.Validation;
 using FitnessApp.Common.Paged.Extensions;
@@ -45,12 +45,11 @@ public abstract class CollectionService<
         errors.AddIfNotNull(ValidationHelper.ValidateEmptyStringField(nameof(userId), userId));
         errors.AddIfNotNull(ValidationHelper.ValidateEmptyStringField(nameof(collectionName), collectionName));
         errors.ThrowIfNotEmpty();
-
         var result = await repository.GetCollectionByUserId(userId, collectionName);
         return result;
     }
 
-    public async Task<PagedDataModel<TCollectionItemModel>> GetFilteredCollectionItems(GetFilteredCollectionItemsModel<TCollectionItemModel> model)
+    public async Task<PagedDataModel<TCollectionItemModel>> GetFilteredCollectionItems(GetFilteredCollectionItemsModel model)
     {
         List<ValidationError> errors = new List<ValidationError>();
         errors.AddIfNotNull(ValidationHelper.ValidateEmptyStringField(nameof(model.UserId), model.UserId));
@@ -59,14 +58,8 @@ public abstract class CollectionService<
         errors.AddIfNotNull(ValidationHelper.ValidateRange(1, int.MaxValue, model.PageSize, nameof(model.PageSize)));
         errors.ThrowIfNotEmpty();
 
-        PagedDataModel<TCollectionItemModel> result = null;
         var allItems = await repository.GetCollectionByUserId(model.UserId, model.CollectionName);
-        if (allItems != null)
-        {
-            allItems = allItems.Where(model.Predicate);
-            result = allItems.ToPaged(model);
-        }
-
+        var result = allItems.ToPaged(model);
         return result;
     }
 

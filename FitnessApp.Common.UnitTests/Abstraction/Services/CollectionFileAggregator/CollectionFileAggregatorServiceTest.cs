@@ -98,7 +98,6 @@ public class CollectionFileAggregatorServiceTest : TestBase
         var getFilteredCollectionItemsModel = new GetTestFilteredCollectionItemsModel
         {
             UserId = TestData.Id,
-            Predicate = i => i.TestProperty.Contains("Property"),
             CollectionName = TestData.CollectionName,
             Page = 0,
             PageSize = 10

@@ -25,7 +25,6 @@ public class CollectionFileAggregatorServiceTest :
     private readonly ICollectionFileAggregatorService<
         TestCollectionFileAggregatorModel,
         TestCollectionFileAggregatorItemModel,
-        TestCollectionItemModel,
         CreateTestCollectionFileAggregatorModel,
         UpdateTestCollectionFileAggregatorModel> _service;
 
@@ -56,27 +55,10 @@ public class CollectionFileAggregatorServiceTest :
     }
 
     [Fact]
-    public async Task GetItem_ReturnsSingleItem()
-    {
-        // Arrange
-        var getFilteredCollectionItemsModel = CreateGetTestFilteredCollectionItemsModel(i => i.TestProperty.Contains("Property"));
-
-        // Act
-        var testCollectionFileAggregatorItemModel = await _service.GetFilteredCollectionItems(getFilteredCollectionItemsModel);
-
-        // Assert
-        Assert.Collection(
-            testCollectionFileAggregatorItemModel.Items,
-            item => Assert.NotNull(item.Images.Single().FieldName),
-            item => Assert.NotNull(item.Images.Single().Value)
-        );
-    }
-
-    [Fact]
     public async Task GetFilteredCollectionItems_ReturnsItemsWithFiles()
     {
         // Arrange
-        var getFilteredCollectionItemsModel = CreateGetTestFilteredCollectionItemsModel(i => true);
+        var getFilteredCollectionItemsModel = CreateGetTestFilteredCollectionItemsModel();
 
         // Act
         var testCollectionFileAggregatorItemModel = await _service.GetFilteredCollectionItems(getFilteredCollectionItemsModel);
@@ -189,12 +171,11 @@ public class CollectionFileAggregatorServiceTest :
         });
     }
 
-    private GetTestFilteredCollectionItemsModel CreateGetTestFilteredCollectionItemsModel(Func<TestCollectionItemModel, bool> predicate)
+    private GetTestFilteredCollectionItemsModel CreateGetTestFilteredCollectionItemsModel()
     {
         return new GetTestFilteredCollectionItemsModel
         {
             UserId = TestData.EntityIdToGet,
-            Predicate = predicate,
             CollectionName = TestData.CollectionName,
             Page = 0,
             PageSize = 10

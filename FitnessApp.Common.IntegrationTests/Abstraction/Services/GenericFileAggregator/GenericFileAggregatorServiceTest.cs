@@ -24,7 +24,6 @@ public class GenericFileAggregatorServiceTest :
     IClassFixture<GenericFileAggregatorServiceFileFixture>
 {
     private readonly IGenericFileAggregatorService<
-        TestGenericEntity,
         TestGenericFileAggregatorModel,
         TestGenericModel,
         CreateTestGenericFileAggregatorModel,

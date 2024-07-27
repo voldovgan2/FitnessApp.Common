@@ -17,7 +17,6 @@ public abstract class GenericRepository<
     TUpdateGenericModel>
     (IDbContext<TGenericEntity> dbContext, IMapper mapper) :
     IGenericRepository<
-        TGenericEntity,
         TGenericModel,
         TCreateGenericModel,
         TUpdateGenericModel>
@@ -85,13 +84,13 @@ public abstract class GenericRepository<
         return result;
     }
 
-    private TGenericModel Map(TGenericEntity entity)
+    protected TGenericModel Map(TGenericEntity entity)
     {
         var result = mapper.Map<TGenericModel>(entity);
         return result;
     }
 
-    private IEnumerable<TGenericModel> Map(IEnumerable<TGenericEntity> entity)
+    protected IEnumerable<TGenericModel> Map(IEnumerable<TGenericEntity> entity)
     {
         var result = mapper.Map<IEnumerable<TGenericModel>>(entity);
         return result;

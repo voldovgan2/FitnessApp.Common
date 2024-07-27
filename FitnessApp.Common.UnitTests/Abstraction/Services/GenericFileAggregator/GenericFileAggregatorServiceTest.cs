@@ -1,13 +1,10 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using System.Linq.Expressions;
 using System.Threading.Tasks;
 using FitnessApp.Common.Abstractions.Services.Generic;
 using FitnessApp.Common.Files;
 using FitnessApp.Comon.Tests.Shared;
-using FitnessApp.Comon.Tests.Shared.Abstraction.Db.Entities.Generic;
 using FitnessApp.Comon.Tests.Shared.Abstraction.Models.Generic;
 using FitnessApp.Comon.Tests.Shared.Abstraction.Services.GenericFileAggregator;
 using Moq;
@@ -19,7 +16,6 @@ public class GenericFileAggregatorServiceTest : TestBase
 {
     private readonly Mock<
         IGenericService<
-            TestGenericEntity,
             TestGenericModel,
             CreateTestGenericModel,
             UpdateTestGenericModel>
@@ -46,7 +42,6 @@ public class GenericFileAggregatorServiceTest : TestBase
     {
         _genericService = new Mock<
             IGenericService<
-                TestGenericEntity,
                 TestGenericModel,
                 CreateTestGenericModel,
                 UpdateTestGenericModel>>();
@@ -82,31 +77,6 @@ public class GenericFileAggregatorServiceTest : TestBase
         Assert.Equal(genericModel.TestProperty1, testGenericFileAggregatorModel.Model.TestProperty1);
         Assert.Equal(TestData.FileFieldName, testGenericFileAggregatorModel.Images.Single().FieldName);
         Assert.Equal(TestData.FileFieldContent, testGenericFileAggregatorModel.Images.Single().Value);
-    }
-
-    [Fact]
-    public async Task FilterItems_ReturnsMatchedByPredicateItems()
-    {
-        // Arrange
-        var genericModel = TestData.CreateGenericModel(_defaultGenericModelParameters);
-
-        _genericService
-            .Setup(s => s.FilterItems(It.IsAny<Expression<Func<TestGenericEntity, bool>>>()))
-            .ReturnsAsync(new List<TestGenericModel> { genericModel });
-
-        var fileContent = TestData.CreateFileResult();
-        _fileService
-            .Setup(s => s.DownloadFile(It.IsAny<string>(), It.IsAny<string>()))
-            .ReturnsAsync(fileContent);
-
-        // Act
-        var testGenericFileAggregatorModels = await _genericFileAggregatorService.FilterItems(e => e.UserId == TestData.Id);
-
-        // Assert
-        Assert.All(testGenericFileAggregatorModels, testGenericFileAggregatorModel => Assert.Equal(genericModel.UserId, testGenericFileAggregatorModel.Model.UserId));
-        Assert.All(testGenericFileAggregatorModels, testGenericFileAggregatorModel => Assert.Equal(genericModel.TestProperty1, testGenericFileAggregatorModel.Model.TestProperty1));
-        Assert.All(testGenericFileAggregatorModels, testGenericFileAggregatorModel => Assert.Equal(TestData.FileFieldName, testGenericFileAggregatorModel.Images.Single().FieldName));
-        Assert.All(testGenericFileAggregatorModels, testGenericFileAggregatorModel => Assert.Equal(TestData.FileFieldContent, testGenericFileAggregatorModel.Images.Single().Value));
     }
 
     [Fact]

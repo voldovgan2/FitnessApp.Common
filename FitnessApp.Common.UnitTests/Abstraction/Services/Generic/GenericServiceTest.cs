@@ -1,11 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Linq.Expressions;
 using System.Threading.Tasks;
 using FitnessApp.Common.Abstractions.Db.Repository.Generic;
 using FitnessApp.Comon.Tests.Shared;
-using FitnessApp.Comon.Tests.Shared.Abstraction.Db.Entities.Generic;
 using FitnessApp.Comon.Tests.Shared.Abstraction.Models.Generic;
 using FitnessApp.Comon.Tests.Shared.Abstraction.Services.Generic;
 using Moq;
@@ -16,7 +14,6 @@ namespace FitnessApp.Common.UnitTests.Abstraction.Services.Generic;
 public class GenericServiceTest : TestBase
 {
     private readonly Mock<IGenericRepository<
-        TestGenericEntity,
         TestGenericModel,
         CreateTestGenericModel,
         UpdateTestGenericModel>> _repositoryMock;
@@ -32,7 +29,6 @@ public class GenericServiceTest : TestBase
     {
         _repositoryMock = new Mock<
             IGenericRepository<
-                TestGenericEntity,
                 TestGenericModel,
                 CreateTestGenericModel,
                 UpdateTestGenericModel>>();
@@ -53,25 +49,6 @@ public class GenericServiceTest : TestBase
 
         // Assert
         Assert.Equal(TestData.Id, entity.UserId);
-    }
-
-    [Fact]
-    public async Task FilterItems_ReturnsMatchedBySearchCriteriaItems()
-    {
-        // Arrange
-        var allDataMock = CreateDefaultMockedData();
-        _repositoryMock
-           .Setup(s => s.FilterItems(It.IsAny<Expression<Func<TestGenericEntity, bool>>>()))
-           .ReturnsAsync(allDataMock);
-        var filteredBySearchItems = allDataMock.Take(2).Select(i => i.UserId);
-
-        var testProperty = "TestProperty1";
-
-        // Act
-        var models = await _serviceMock.FilterItems(e => e.TestProperty1 == testProperty);
-
-        // Assert
-        Assert.All(models, m => filteredBySearchItems.Contains(m.UserId));
     }
 
     [Fact]

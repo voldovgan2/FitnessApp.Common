@@ -1,26 +1,19 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq.Expressions;
+﻿using System.Collections.Generic;
 using System.Threading.Tasks;
-using FitnessApp.Common.Abstractions.Db.Entities.Generic;
 using FitnessApp.Common.Abstractions.Models.Generic;
 
 namespace FitnessApp.Common.Abstractions.Services.Generic;
 
 public interface IGenericService<
-    TGenericEntity,
     TGenericModel,
     TCreateGenericModel,
     TUpdateGenericModel>
-    where TGenericEntity : IGenericEntity
     where TGenericModel : IGenericModel
     where TCreateGenericModel : ICreateGenericModel
     where TUpdateGenericModel : IUpdateGenericModel
 {
     Task<TGenericModel> GetItemByUserId(string userId);
-    Task<TGenericModel> TryGetItemByUserId(string userId);
     Task<IEnumerable<TGenericModel>> GetItemsByIds(IEnumerable<string> ids);
-    Task<IEnumerable<TGenericModel>> FilterItems(Expression<Func<TGenericEntity, bool>> predicate);
     Task<TGenericModel> CreateItem(TCreateGenericModel model);
     Task<TGenericModel> UpdateItem(TUpdateGenericModel model);
     Task<string> DeleteItem(string userId);

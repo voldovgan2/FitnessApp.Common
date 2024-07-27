@@ -1,11 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
-using System.Linq.Expressions;
 using System.Text;
 using System.Threading.Tasks;
 using AutoMapper;
-using FitnessApp.Common.Abstractions.Db.Entities.Generic;
 using FitnessApp.Common.Abstractions.Models.FileImage;
 using FitnessApp.Common.Abstractions.Models.Generic;
 using FitnessApp.Common.Abstractions.Models.GenericFileAggregator;
@@ -17,7 +15,6 @@ using FitnessApp.Common.Files;
 namespace FitnessApp.Common.Abstractions.Services.GenericFileAggregator;
 
 public abstract class GenericFileAggregatorService<
-    TGenericEntity,
     TGenericFileAggregatorModel,
     TGenericModel,
     TCreateGenericFileAggregatorModel,
@@ -25,7 +22,6 @@ public abstract class GenericFileAggregatorService<
     TUpdateGenericFileAggregatorModel,
     TUpdateGenericModel>(
     IGenericService<
-        TGenericEntity,
         TGenericModel,
         TCreateGenericModel,
         TUpdateGenericModel> genericService,
@@ -34,12 +30,10 @@ public abstract class GenericFileAggregatorService<
     GenericFileAggregatorSettings genericFileAggregatorSettings
     )
     : IGenericFileAggregatorService<
-        TGenericEntity,
         TGenericFileAggregatorModel,
         TGenericModel,
         TCreateGenericFileAggregatorModel,
         TUpdateGenericFileAggregatorModel>
-    where TGenericEntity : IGenericEntity
     where TGenericFileAggregatorModel : IGenericFileAggregatorModel<TGenericModel>
     where TGenericModel : IGenericModel
     where TCreateGenericFileAggregatorModel : ICreateGenericFileAggregatorModel
@@ -54,23 +48,9 @@ public abstract class GenericFileAggregatorService<
         return result;
     }
 
-    public async Task<TGenericFileAggregatorModel> TryGetItemByUserId(string userId)
-    {
-        var dataModel = await genericService.TryGetItemByUserId(userId);
-        var result = await LoadAndComposeGenericFileAggregatorModel(dataModel);
-        return result;
-    }
-
     public async Task<IEnumerable<TGenericFileAggregatorModel>> GetItemsByIds(string[] ids)
     {
         var dataModels = await genericService.GetItemsByIds(ids);
-        var result = await LoadAndComposeGenericFileAggregatorModels(dataModels);
-        return result;
-    }
-
-    public async Task<IEnumerable<TGenericFileAggregatorModel>> FilterItems(Expression<Func<TGenericEntity, bool>> predicate)
-    {
-        var dataModels = await genericService.FilterItems(predicate);
         var result = await LoadAndComposeGenericFileAggregatorModels(dataModels);
         return result;
     }

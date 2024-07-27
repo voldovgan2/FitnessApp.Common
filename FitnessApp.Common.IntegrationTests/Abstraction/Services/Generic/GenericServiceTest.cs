@@ -3,7 +3,6 @@ using System.Threading.Tasks;
 using FitnessApp.Common.Abstractions.Services.Generic;
 using FitnessApp.Common.IntegrationTests.Abstraction.Services.Fixtures;
 using FitnessApp.Comon.Tests.Shared;
-using FitnessApp.Comon.Tests.Shared.Abstraction.Db.Entities.Generic;
 using FitnessApp.Comon.Tests.Shared.Abstraction.Db.Repository.Generic;
 using FitnessApp.Comon.Tests.Shared.Abstraction.Models.Generic;
 using FitnessApp.Comon.Tests.Shared.Abstraction.Services.Generic;
@@ -15,7 +14,6 @@ namespace FitnessApp.Common.IntegrationTests.Abstraction.Services.Generic;
 public class GenericServiceTest : IClassFixture<GenericServiceFixture>
 {
     private readonly IGenericService<
-        TestGenericEntity,
         TestGenericModel,
         CreateTestGenericModel,
         UpdateTestGenericModel> _service;

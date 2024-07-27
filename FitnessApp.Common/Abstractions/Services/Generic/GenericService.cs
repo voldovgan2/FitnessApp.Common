@@ -1,10 +1,7 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
-using System.Linq.Expressions;
 using System.Threading.Tasks;
 using AutoMapper;
-using FitnessApp.Common.Abstractions.Db.Entities.Generic;
 using FitnessApp.Common.Abstractions.Db.Repository.Generic;
 using FitnessApp.Common.Abstractions.Extensions;
 using FitnessApp.Common.Abstractions.Models.Generic;
@@ -14,23 +11,19 @@ using FitnessApp.Common.Abstractions.Services.Validation;
 namespace FitnessApp.Common.Abstractions.Services.Generic;
 
 public abstract class GenericService<
-    TGenericEntity,
     TGenericModel,
     TCreateGenericModel,
     TUpdateGenericModel>(
         IGenericRepository<
-            TGenericEntity,
             TGenericModel,
             TCreateGenericModel,
             TUpdateGenericModel> repository,
         IMapper mapper
     )
     : IGenericService<
-        TGenericEntity,
         TGenericModel,
         TCreateGenericModel,
         TUpdateGenericModel>
-    where TGenericEntity : IGenericEntity
     where TGenericModel : IGenericModel
     where TCreateGenericModel : ICreateGenericModel
     where TUpdateGenericModel : IUpdateGenericModel
@@ -43,25 +36,10 @@ public abstract class GenericService<
         return result;
     }
 
-    public async Task<TGenericModel> TryGetItemByUserId(string userId)
-    {
-        ValidationHelper.ThrowExceptionIfNotValidatedEmptyStringField(nameof(userId), userId);
-
-        var result = await repository.TryGetItemByUserId(userId);
-        return result;
-    }
-
     public async Task<IEnumerable<TGenericModel>> GetItemsByIds(IEnumerable<string> ids)
     {
         var data = await repository.GetItemsByIds(ids.Where(id => !string.IsNullOrWhiteSpace(id)));
         var result = data.Select(entity => mapper.Map<TGenericModel>(entity));
-        return result;
-    }
-
-    public async Task<IEnumerable<TGenericModel>> FilterItems(Expression<Func<TGenericEntity, bool>> predicate)
-    {
-        var data = (await repository.FilterItems(predicate)).ToList();
-        var result = mapper.Map<List<TGenericModel>>(data);
         return result;
     }
 
