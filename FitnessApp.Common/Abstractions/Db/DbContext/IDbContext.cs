@@ -12,7 +12,7 @@ public interface IDbContext<TGenericEntity>
     Task<TGenericEntity> GetItemById(string id);
     Task<TGenericEntity> TryGetItemById(string id);
     Task<IEnumerable<TGenericEntity>> GetItemsByIds(IEnumerable<string> ids);
-    Task<IEnumerable<TGenericEntity>> GetAllItems(Expression<Func<TGenericEntity, bool>> predicate);
+    Task<IEnumerable<TGenericEntity>> FilterItems(Expression<Func<TGenericEntity, bool>> predicate);
     Task<TGenericEntity> CreateItem(TGenericEntity entity);
     Task<TGenericEntity> UpdateItem(TGenericEntity entity);
     Task UpdateItems(IEnumerable<TGenericEntity> entities);

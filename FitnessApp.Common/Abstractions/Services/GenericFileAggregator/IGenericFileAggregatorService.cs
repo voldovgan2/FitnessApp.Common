@@ -20,10 +20,11 @@ public interface IGenericFileAggregatorService<
     where TCreateGenericFileAggregatorModel : ICreateGenericFileAggregatorModel
     where TUpdateGenericFileAggregatorModel : IUpdateGenericFileAggregatorModel
 {
+    Task<TGenericFileAggregatorModel> GetItemByUserId(string userId);
+    Task<TGenericFileAggregatorModel> TryGetItemByUserId(string userId);
+    Task<IEnumerable<TGenericFileAggregatorModel>> FilterItems(Expression<Func<TGenericEntity, bool>> predicate);
+    Task<IEnumerable<TGenericFileAggregatorModel>> GetItemsByIds(string[] ids);
     Task<TGenericFileAggregatorModel> CreateItem(TCreateGenericFileAggregatorModel model);
     Task<TGenericFileAggregatorModel> UpdateItem(TUpdateGenericFileAggregatorModel model);
     Task<string> DeleteItem(string userId);
-    Task<TGenericFileAggregatorModel> GetItem(string userId);
-    Task<IEnumerable<TGenericFileAggregatorModel>> GetItems(string search, Expression<Func<TGenericEntity, bool>> predicate);
-    Task<IEnumerable<TGenericFileAggregatorModel>> GetItems(string[] ids);
 }

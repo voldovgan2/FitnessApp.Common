@@ -31,7 +31,7 @@ public abstract class CollectionService<
     where TCreateCollectionModel : ICreateCollectionModel
     where TUpdateCollectionModel : IUpdateCollectionModel
 {
-    public virtual async Task<TCollectionModel> GetItemByUserId(string userId)
+    public async Task<TCollectionModel> GetItemByUserId(string userId)
     {
         ValidationHelper.ThrowExceptionIfNotValidatedEmptyStringField(nameof(userId), userId);
 
@@ -39,7 +39,7 @@ public abstract class CollectionService<
         return result;
     }
 
-    public virtual async Task<IEnumerable<TCollectionItemModel>> GetCollectionByUserId(string userId, string collectionName)
+    public async Task<IEnumerable<TCollectionItemModel>> GetCollectionByUserId(string userId, string collectionName)
     {
         List<ValidationError> errors = new List<ValidationError>();
         errors.AddIfNotNull(ValidationHelper.ValidateEmptyStringField(nameof(userId), userId));
@@ -50,7 +50,7 @@ public abstract class CollectionService<
         return result;
     }
 
-    public virtual async Task<PagedDataModel<TCollectionItemModel>> GetFilteredCollectionItems(string search, GetFilteredCollectionItemsModel<TCollectionItemModel> model)
+    public async Task<PagedDataModel<TCollectionItemModel>> GetFilteredCollectionItems(GetFilteredCollectionItemsModel<TCollectionItemModel> model)
     {
         List<ValidationError> errors = new List<ValidationError>();
         errors.AddIfNotNull(ValidationHelper.ValidateEmptyStringField(nameof(model.UserId), model.UserId));
@@ -70,7 +70,7 @@ public abstract class CollectionService<
         return result;
     }
 
-    public virtual async Task<string> CreateItem(TCreateCollectionModel model)
+    public async Task<string> CreateItem(TCreateCollectionModel model)
     {
         var validationErrors = ValidateCreateCollectionModel(model);
         validationErrors.ThrowIfNotEmpty();
@@ -79,7 +79,7 @@ public abstract class CollectionService<
         return result;
     }
 
-    public virtual async Task<TCollectionItemModel> UpdateItem(TUpdateCollectionModel model)
+    public async Task<TCollectionItemModel> UpdateItem(TUpdateCollectionModel model)
     {
         var validationErrors = ValidateUpdateCollectionModel(model);
         validationErrors.ThrowIfNotEmpty();
@@ -88,7 +88,7 @@ public abstract class CollectionService<
         return result;
     }
 
-    public virtual async Task<TCollectionModel> DeleteItem(string userId)
+    public async Task<TCollectionModel> DeleteItem(string userId)
     {
         ValidationHelper.ThrowExceptionIfNotValidatedEmptyStringField(nameof(userId), userId);
 

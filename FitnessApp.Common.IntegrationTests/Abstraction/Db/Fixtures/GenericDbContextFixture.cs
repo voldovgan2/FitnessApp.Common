@@ -7,7 +7,7 @@ namespace FitnessApp.Common.IntegrationTests.Abstraction.Db.Fixtures;
 public class GenericDbContextFixture : DbContextFixtureBase<TestGenericEntity>
 {
     public GenericDbContextFixture()
-        : base("DbContext", (itemId) => TestData.CreateGenericEntity(new Dictionary<string, object>
+        : base((itemId) => TestData.CreateGenericEntity(new Dictionary<string, object>
             {
                 {
                     "Id", itemId

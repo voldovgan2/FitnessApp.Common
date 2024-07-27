@@ -30,12 +30,12 @@ public class DbContext<TGenericEntity> : IDbContext<TGenericEntity>
 
     public async Task<TGenericEntity> GetItemById(string id)
     {
-        return (await GetItemsByIds(new string[] { id })).Single();
+        return (await GetItemsByIds([id])).Single();
     }
 
     public async Task<TGenericEntity> TryGetItemById(string id)
     {
-        return (await GetItemsByIds(new string[] { id })).SingleOrDefault();
+        return (await GetItemsByIds([id])).SingleOrDefault();
     }
 
     public async Task<IEnumerable<TGenericEntity>> GetItemsByIds(IEnumerable<string> ids)
@@ -44,13 +44,13 @@ public class DbContext<TGenericEntity> : IDbContext<TGenericEntity>
         return result;
     }
 
-    public Task<IEnumerable<TGenericEntity>> GetAllItems(Expression<Func<TGenericEntity, bool>> predicate)
+    public Task<IEnumerable<TGenericEntity>> FilterItems(Expression<Func<TGenericEntity, bool>> predicate)
     {
         var result = _collection
             .AsQueryable()
             .Where(predicate)
-            .ToList();
-        return Task.FromResult(result.Where(i => true));
+            .AsEnumerable();
+        return Task.FromResult(result);
     }
 
     public async Task<TGenericEntity> CreateItem(TGenericEntity entity)

@@ -17,9 +17,10 @@ public interface IGenericRepository<
     where TCreateGenericModel : ICreateGenericModel
     where TUpdateGenericModel : IUpdateGenericModel
 {
-    Task<IEnumerable<TGenericEntity>> GetAllItems(Expression<Func<TGenericEntity, bool>> predicate);
     Task<TGenericModel> GetItemByUserId(string userId);
-    Task<IEnumerable<TGenericEntity>> GetItemsByIds(IEnumerable<string> ids);
+    Task<TGenericModel> TryGetItemByUserId(string userId);
+    Task<IEnumerable<TGenericModel>> GetItemsByIds(IEnumerable<string> ids);
+    Task<IEnumerable<TGenericModel>> FilterItems(Expression<Func<TGenericEntity, bool>> predicate);
     Task<TGenericModel> CreateItem(TCreateGenericModel model);
     Task<TGenericModel> UpdateItem(TUpdateGenericModel model);
     Task<string> DeleteItem(string userId);

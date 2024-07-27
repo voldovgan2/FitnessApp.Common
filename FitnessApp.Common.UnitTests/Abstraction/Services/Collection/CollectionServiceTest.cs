@@ -114,7 +114,7 @@ public class CollectionServiceTest : TestBase
            .ReturnsAsync(collectionItems);
 
         // Act
-        var items = await _service.GetFilteredCollectionItems("", getModel);
+        var items = await _service.GetFilteredCollectionItems(getModel);
 
         // Assert
         Assert.All(items.Items, m => filteredBySearchItems.Contains(m.Id));

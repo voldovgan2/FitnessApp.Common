@@ -60,7 +60,7 @@ public class GenericFileAggregatorServiceTest : TestBase
     }
 
     [Fact]
-    public async Task GetItem_ReturnsSingleItem()
+    public async Task GetItemByUserId_ReturnsSingleItem()
     {
         // Arrange
         var genericModel = TestData.CreateGenericModel(_defaultGenericModelParameters);
@@ -75,7 +75,7 @@ public class GenericFileAggregatorServiceTest : TestBase
             .ReturnsAsync(fileContent);
 
         // Act
-        var testGenericFileAggregatorModel = await _genericFileAggregatorService.GetItem(TestData.Id);
+        var testGenericFileAggregatorModel = await _genericFileAggregatorService.GetItemByUserId(TestData.Id);
 
         // Assert
         Assert.Equal(genericModel.UserId, testGenericFileAggregatorModel.Model.UserId);
@@ -85,13 +85,13 @@ public class GenericFileAggregatorServiceTest : TestBase
     }
 
     [Fact]
-    public async Task GetItems_ReturnsMatchedByPredicateItems()
+    public async Task FilterItems_ReturnsMatchedByPredicateItems()
     {
         // Arrange
         var genericModel = TestData.CreateGenericModel(_defaultGenericModelParameters);
 
         _genericService
-            .Setup(s => s.GetItems(It.IsAny<string>(), It.IsAny<Expression<Func<TestGenericEntity, bool>>>()))
+            .Setup(s => s.FilterItems(It.IsAny<Expression<Func<TestGenericEntity, bool>>>()))
             .ReturnsAsync(new List<TestGenericModel> { genericModel });
 
         var fileContent = TestData.CreateFileResult();
@@ -100,7 +100,7 @@ public class GenericFileAggregatorServiceTest : TestBase
             .ReturnsAsync(fileContent);
 
         // Act
-        var testGenericFileAggregatorModels = await _genericFileAggregatorService.GetItems("", e => e.UserId == TestData.Id);
+        var testGenericFileAggregatorModels = await _genericFileAggregatorService.FilterItems(e => e.UserId == TestData.Id);
 
         // Assert
         Assert.All(testGenericFileAggregatorModels, testGenericFileAggregatorModel => Assert.Equal(genericModel.UserId, testGenericFileAggregatorModel.Model.UserId));
@@ -110,13 +110,13 @@ public class GenericFileAggregatorServiceTest : TestBase
     }
 
     [Fact]
-    public async Task GetItems_ReturnsMatchedByIdsItems()
+    public async Task GetItemsByIds_ReturnsMatchedByIdsItems()
     {
         // Arrange
         var genericModel = TestData.CreateGenericModel(_defaultGenericModelParameters);
 
         _genericService
-            .Setup(s => s.GetItems(It.IsAny<IEnumerable<string>>()))
+            .Setup(s => s.GetItemsByIds(It.IsAny<IEnumerable<string>>()))
            .ReturnsAsync(new List<TestGenericModel> { genericModel });
 
         var fileContent = TestData.CreateFileResult();
@@ -125,7 +125,7 @@ public class GenericFileAggregatorServiceTest : TestBase
             .ReturnsAsync(fileContent);
 
         // Act
-        var testGenericFileAggregatorModels = await _genericFileAggregatorService.GetItems(TestData.Ids);
+        var testGenericFileAggregatorModels = await _genericFileAggregatorService.GetItemsByIds(TestData.Ids);
 
         // Assert
         Assert.All(testGenericFileAggregatorModels, testGenericFileAggregatorModel => Assert.Equal(genericModel.UserId, testGenericFileAggregatorModel.Model.UserId));

@@ -8,7 +8,6 @@ using FitnessApp.Common.Abstractions.Db.Entities.Collection;
 using FitnessApp.Common.Abstractions.Db.Enums.Collection;
 using FitnessApp.Common.Abstractions.Models.Collection;
 using FitnessApp.Common.Exceptions;
-using Microsoft.Extensions.Logging;
 
 namespace FitnessApp.Common.Abstractions.Db.Repository.Collection;
 
@@ -33,15 +32,6 @@ public abstract class CollectionRepository<
 {
     protected readonly IDbContext<TCollectionEntity> _dbContext = dbContext;
     protected readonly IMapper _mapper = mapper;
-    protected readonly ILogger<
-        CollectionRepository<
-            TCollectionEntity,
-            TCollectionItemEntity,
-            TCollectionModel,
-            TCollectionItemModel,
-            TCreateCollectionModel,
-            TUpdateCollectionModel>
-        > _log;
 
     public async Task<TCollectionModel> GetItemByUserId(string userId)
     {
@@ -50,14 +40,14 @@ public abstract class CollectionRepository<
         return result;
     }
 
-    public virtual async Task<IEnumerable<TCollectionItemModel>> GetCollectionByUserId(string userId, string collectionName)
+    public async Task<IEnumerable<TCollectionItemModel>> GetCollectionByUserId(string userId, string collectionName)
     {
         var entity = await _dbContext.GetItemById(userId);
         var result = _mapper.Map<IEnumerable<TCollectionItemModel>>(entity.Collection[collectionName]);
         return result;
     }
 
-    public virtual async Task<string> CreateItem(TCreateCollectionModel model)
+    public async Task<string> CreateItem(TCreateCollectionModel model)
     {
         var entity = _mapper.Map<TCollectionEntity>(model);
         entity = await _dbContext.CreateItem(entity);
@@ -65,7 +55,7 @@ public abstract class CollectionRepository<
         return result;
     }
 
-    public virtual async Task<TCollectionItemModel> UpdateItem(TUpdateCollectionModel model)
+    public async Task<TCollectionItemModel> UpdateItem(TUpdateCollectionModel model)
     {
         var entity = await _dbContext.GetItemById(model.UserId);
         var updateItemCollectionResult = UpdateItemCollection(entity, model);
@@ -74,14 +64,14 @@ public abstract class CollectionRepository<
         return result;
     }
 
-    public virtual async Task UpdateItems(IEnumerable<TUpdateCollectionModel> models)
+    public async Task UpdateItems(IEnumerable<TUpdateCollectionModel> models)
     {
         var distinctEntities = await _dbContext.GetItemsByIds(models.Select(m => m.UserId).Distinct());
         var entitiesToUpdte = models.Select(model => UpdateItemCollection(distinctEntities.Single(e => e.UserId == model.UserId), model).Item1);
         await _dbContext.UpdateItems(entitiesToUpdte);
     }
 
-    public virtual async Task<TCollectionModel> DeleteItem(string userId)
+    public async Task<TCollectionModel> DeleteItem(string userId)
     {
         var deleted = await _dbContext.DeleteItem(userId);
         var result = _mapper.Map<TCollectionModel>(deleted);

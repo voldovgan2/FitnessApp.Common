@@ -31,22 +31,6 @@ public class GenericRepositoryTests : TestBase
     }
 
     [Fact]
-    public async Task GetAllItems_ReturnsAllItems()
-    {
-        // Arrange
-        var allEntities = TestData.GetAll(TestData.CreateGenericEntity, new Dictionary<string, object>());
-        _dbContextMock
-            .Setup(s => s.GetAllItems(It.IsAny<Expression<Func<TestGenericEntity, bool>>>()))
-            .ReturnsAsync(allEntities);
-
-        // Act
-        var entities = await _repository.GetAllItems(i => true);
-
-        // Assert
-        Assert.All(entities, i => Assert.NotNull(allEntities.Single(e => e.UserId == i.UserId)));
-    }
-
-    [Fact]
     public async Task GetItemByUserId_ReturnsSingleItem()
     {
         // Arrange
@@ -60,6 +44,22 @@ public class GenericRepositoryTests : TestBase
 
         // Assert
         Assert.Equal(TestData.Id, entity.UserId);
+    }
+
+    [Fact]
+    public async Task FilterItems_ReturnsAllItems()
+    {
+        // Arrange
+        var allEntities = TestData.GetAll(TestData.CreateGenericEntity, new Dictionary<string, object>());
+        _dbContextMock
+            .Setup(s => s.FilterItems(It.IsAny<Expression<Func<TestGenericEntity, bool>>>()))
+            .ReturnsAsync(allEntities);
+
+        // Act
+        var entities = await _repository.FilterItems(i => true);
+
+        // Assert
+        Assert.All(entities, i => Assert.NotNull(allEntities.Single(e => e.UserId == i.UserId)));
     }
 
     [Fact]

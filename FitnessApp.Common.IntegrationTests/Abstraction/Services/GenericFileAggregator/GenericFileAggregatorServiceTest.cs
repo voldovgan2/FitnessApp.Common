@@ -57,7 +57,7 @@ public class GenericFileAggregatorServiceTest :
     public async Task GetItem_ReturnsSingleItem()
     {
         // Act
-        var testGenericFileAggregatorModel = await _service.GetItem(TestData.EntityIdToGet);
+        var testGenericFileAggregatorModel = await _service.GetItemByUserId(TestData.EntityIdToGet);
 
         // Assert
         Assert.NotNull(testGenericFileAggregatorModel.Model.UserId);

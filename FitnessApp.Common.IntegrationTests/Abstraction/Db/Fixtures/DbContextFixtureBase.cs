@@ -21,14 +21,14 @@ public class DbContextFixtureBase<TEntity> : TestBase, IDisposable
     private readonly MongoClient _mongoClient;
     private readonly MongoDbSettings _mongoDbSettings;
 
-    public DbContextFixtureBase(string databaseName, Func<string, TEntity> createEntityFacotryMethod)
+    public DbContextFixtureBase(Func<string, TEntity> createEntityFacotryMethod)
     {
         var objectSerializer = new ObjectSerializer(type => true);
         BsonSerializer.RegisterSerializer(objectSerializer);
         _mongoDbSettings = new MongoDbSettings
         {
             ConnectionString = Configuration.GetValue<string>("MongoConnection:ConnectionString"),
-            DatabaseName = databaseName,
+            DatabaseName = GetType().Name,
             CollecttionName = "Items",
         };
         _mongoClient = new MongoClient(_mongoDbSettings.ConnectionString);

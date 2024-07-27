@@ -17,7 +17,7 @@ public interface ICollectionService<
 {
     Task<TCollectionModel> GetItemByUserId(string userId);
     Task<IEnumerable<TCollectionItemModel>> GetCollectionByUserId(string userId, string collectionName);
-    Task<PagedDataModel<TCollectionItemModel>> GetFilteredCollectionItems(string search, GetFilteredCollectionItemsModel<TCollectionItemModel> model);
+    Task<PagedDataModel<TCollectionItemModel>> GetFilteredCollectionItems(GetFilteredCollectionItemsModel<TCollectionItemModel> model);
     Task<string> CreateItem(TCreateCollectionModel model);
     Task<TCollectionItemModel> UpdateItem(TUpdateCollectionModel model);
     Task<TCollectionModel> DeleteItem(string userId);

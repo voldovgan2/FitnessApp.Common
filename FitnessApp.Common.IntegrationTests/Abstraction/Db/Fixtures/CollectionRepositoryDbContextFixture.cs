@@ -7,7 +7,7 @@ namespace FitnessApp.Common.IntegrationTests.Abstraction.Db.Fixtures;
 public class CollectionRepositoryDbContextFixture : DbContextFixtureBase<TestCollectionEntity>
 {
     public CollectionRepositoryDbContextFixture()
-        : base("CollectionRepository", (itemId) => TestData.CreateCollectionEntity(new Dictionary<string, object>
+        : base((itemId) => TestData.CreateCollectionEntity(new Dictionary<string, object>
             {
                 {
                     "Id", itemId

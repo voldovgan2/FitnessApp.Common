@@ -56,26 +56,26 @@ public class GenericServiceTest : TestBase
     }
 
     [Fact]
-    public async Task GetItems_ReturnsMatchedBySearchCriteriaItems()
+    public async Task FilterItems_ReturnsMatchedBySearchCriteriaItems()
     {
         // Arrange
         var allDataMock = CreateDefaultMockedData();
         _repositoryMock
-           .Setup(s => s.GetAllItems(It.IsAny<Expression<Func<TestGenericEntity, bool>>>()))
+           .Setup(s => s.FilterItems(It.IsAny<Expression<Func<TestGenericEntity, bool>>>()))
            .ReturnsAsync(allDataMock);
         var filteredBySearchItems = allDataMock.Take(2).Select(i => i.UserId);
 
         var testProperty = "TestProperty1";
 
         // Act
-        var models = await _serviceMock.GetItems("", e => e.TestProperty1 == testProperty);
+        var models = await _serviceMock.FilterItems(e => e.TestProperty1 == testProperty);
 
         // Assert
         Assert.All(models, m => filteredBySearchItems.Contains(m.UserId));
     }
 
     [Fact]
-    public async Task GetItems_ReturnsMatchedByIdsItems()
+    public async Task GetItemsByIds_ReturnsMatchedByIdsItems()
     {
         // Arrange
         var genericEntitiesMock = CreateDefaultMockedData();
@@ -84,7 +84,7 @@ public class GenericServiceTest : TestBase
            .ReturnsAsync(genericEntitiesMock.Where(e => TestData.Ids.Contains(e.UserId)));
 
         // Act
-        var models = await _serviceMock.GetItems(TestData.Ids);
+        var models = await _serviceMock.GetItemsByIds(TestData.Ids);
 
         // Assert
         Assert.All(models, m => Assert.Contains(m.UserId, TestData.Ids));
@@ -141,8 +141,8 @@ public class GenericServiceTest : TestBase
         Assert.Equal(TestData.Id, deletedId);
     }
 
-    private IEnumerable<TestGenericEntity> CreateDefaultMockedData()
+    private IEnumerable<TestGenericModel> CreateDefaultMockedData()
     {
-        return TestData.GetAll(TestData.CreateGenericEntity, new Dictionary<string, object>());
+        return TestData.GetAll(TestData.CreateGenericModel, new Dictionary<string, object>());
     }
 }

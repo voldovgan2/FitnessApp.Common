@@ -43,17 +43,25 @@ public abstract class GenericService<
         return result;
     }
 
-    public async Task<IEnumerable<TGenericModel>> GetItems(string search, Expression<Func<TGenericEntity, bool>> predicate)
+    public async Task<TGenericModel> TryGetItemByUserId(string userId)
     {
-        var data = (await repository.GetAllItems(predicate)).ToList();
-        var result = mapper.Map<List<TGenericModel>>(data);
+        ValidationHelper.ThrowExceptionIfNotValidatedEmptyStringField(nameof(userId), userId);
+
+        var result = await repository.TryGetItemByUserId(userId);
         return result;
     }
 
-    public async Task<IEnumerable<TGenericModel>> GetItems(IEnumerable<string> ids)
+    public async Task<IEnumerable<TGenericModel>> GetItemsByIds(IEnumerable<string> ids)
     {
         var data = await repository.GetItemsByIds(ids.Where(id => !string.IsNullOrWhiteSpace(id)));
         var result = data.Select(entity => mapper.Map<TGenericModel>(entity));
+        return result;
+    }
+
+    public async Task<IEnumerable<TGenericModel>> FilterItems(Expression<Func<TGenericEntity, bool>> predicate)
+    {
+        var data = (await repository.FilterItems(predicate)).ToList();
+        var result = mapper.Map<List<TGenericModel>>(data);
         return result;
     }
 
