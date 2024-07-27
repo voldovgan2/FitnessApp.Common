@@ -3,8 +3,10 @@ using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 using FitnessApp.Common.Abstractions.Db.Enums.Collection;
+using FitnessApp.Common.Abstractions.Models.Collection;
 using FitnessApp.Common.Abstractions.Services.Collection;
 using FitnessApp.Common.Files;
+using FitnessApp.Common.Paged.Extensions;
 using FitnessApp.Comon.Tests.Shared;
 using FitnessApp.Comon.Tests.Shared.Abstraction.Models.Collection;
 using FitnessApp.Comon.Tests.Shared.Abstraction.Models.CollectionFileAggregator;
@@ -87,14 +89,6 @@ public class CollectionFileAggregatorServiceTest : TestBase
             TestData.CreateCollectionItemModel(2)
         };
 
-        _collectionService
-            .Setup(s => s.GetCollectionByUserId(It.IsAny<string>(), It.IsAny<string>()))
-            .ReturnsAsync(collectionItems);
-
-        _fileService
-            .Setup(s => s.DownloadFile(It.IsAny<string>(), It.IsAny<string>()))
-            .ReturnsAsync(TestData.CreateFileResult());
-
         var getFilteredCollectionItemsModel = new GetTestFilteredCollectionItemsModel
         {
             UserId = TestData.Id,
@@ -102,6 +96,14 @@ public class CollectionFileAggregatorServiceTest : TestBase
             Page = 0,
             PageSize = 10
         };
+
+        _collectionService
+            .Setup(s => s.GetFilteredCollectionItems(It.IsAny<GetFilteredCollectionItemsModel>()))
+            .ReturnsAsync(collectionItems.ToPaged(getFilteredCollectionItemsModel));
+
+        _fileService
+            .Setup(s => s.DownloadFile(It.IsAny<string>(), It.IsAny<string>()))
+            .ReturnsAsync(TestData.CreateFileResult());
 
         // Act
         var testCollectionFileAggregatorItemModel = await _collectionFilesAggregatorService.GetFilteredCollectionItems(getFilteredCollectionItemsModel);
