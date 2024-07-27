@@ -83,31 +83,7 @@ public abstract class GenericFileAggregatorService<
         return deleted;
     }
 
-    private async Task<TGenericFileAggregatorModel> SaveAndComposeGenericFileAggregatorModel(
-        TGenericModel dataModel,
-        IEnumerable<FileImageModel> fileFields)
-    {
-        var result = Activator.CreateInstance<TGenericFileAggregatorModel>();
-        result.Model = dataModel;
-        result.Images = new List<FileImageModel>();
-
-        foreach (var fileField in fileFields)
-        {
-            if (fileField.Value != null)
-            {
-                var fileContent = Encoding.Default.GetBytes(fileField.Value);
-                await filesService.UploadFile(
-                    genericFileAggregatorSettings.ContainerName,
-                    FilesService.CreateFileName(fileField.FieldName, result.Model.UserId),
-                    new MemoryStream(fileContent));
-                result.Images.Add(fileField);
-            }
-        }
-
-        return result;
-    }
-
-    private async Task<TGenericFileAggregatorModel> LoadAndComposeGenericFileAggregatorModel(TGenericModel dataModel)
+    protected async Task<TGenericFileAggregatorModel> LoadAndComposeGenericFileAggregatorModel(TGenericModel dataModel)
     {
         var result = Activator.CreateInstance<TGenericFileAggregatorModel>();
         result.Model = dataModel;
@@ -129,12 +105,36 @@ public abstract class GenericFileAggregatorService<
         return result;
     }
 
-    private async Task<IEnumerable<TGenericFileAggregatorModel>> LoadAndComposeGenericFileAggregatorModels(IEnumerable<TGenericModel> dataModels)
+    protected async Task<IEnumerable<TGenericFileAggregatorModel>> LoadAndComposeGenericFileAggregatorModels(IEnumerable<TGenericModel> dataModels)
     {
         var result = new List<TGenericFileAggregatorModel>();
         foreach (var dataModel in dataModels)
         {
             result.Add(await LoadAndComposeGenericFileAggregatorModel(dataModel));
+        }
+
+        return result;
+    }
+
+    private async Task<TGenericFileAggregatorModel> SaveAndComposeGenericFileAggregatorModel(
+        TGenericModel dataModel,
+        IEnumerable<FileImageModel> fileFields)
+    {
+        var result = Activator.CreateInstance<TGenericFileAggregatorModel>();
+        result.Model = dataModel;
+        result.Images = new List<FileImageModel>();
+
+        foreach (var fileField in fileFields)
+        {
+            if (fileField.Value != null)
+            {
+                var fileContent = Encoding.Default.GetBytes(fileField.Value);
+                await filesService.UploadFile(
+                    genericFileAggregatorSettings.ContainerName,
+                    FilesService.CreateFileName(fileField.FieldName, result.Model.UserId),
+                    new MemoryStream(fileContent));
+                result.Images.Add(fileField);
+            }
         }
 
         return result;

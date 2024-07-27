@@ -143,28 +143,6 @@ public abstract class CollectionFileAggregatorService<
         return errors;
     }
 
-    private async Task<TCollectionFileAggregatorItemModel> SaveAndComposeGenericFileAggregatorModel(TCollectionItemModel dataModel, IEnumerable<FileImageModel> fileFields)
-    {
-        var result = Activator.CreateInstance<TCollectionFileAggregatorItemModel>();
-        result.Model = dataModel;
-        result.Images = new List<FileImageModel>();
-
-        foreach (var fileField in fileFields)
-        {
-            if (fileField.Value != null)
-            {
-                var fileContent = Encoding.Default.GetBytes(fileField.Value);
-                await filesService.UploadFile(
-                    collectionFileAggregatorSettings.ContainerName,
-                    FilesService.CreateFileName(fileField.FieldName, result.Model.Id),
-                    new MemoryStream(fileContent));
-                result.Images.Add(fileField);
-            }
-        }
-
-        return result;
-    }
-
     private async Task<TCollectionFileAggregatorModel> LoadAndComposeGenericFileAggregatorModel(TCollectionModel model)
     {
         var result = Activator.CreateInstance<TCollectionFileAggregatorModel>();
@@ -204,6 +182,28 @@ public abstract class CollectionFileAggregatorService<
             }
 
             result.Add(collectionFileAggregatorItemModel);
+        }
+
+        return result;
+    }
+
+    private async Task<TCollectionFileAggregatorItemModel> SaveAndComposeGenericFileAggregatorModel(TCollectionItemModel dataModel, IEnumerable<FileImageModel> fileFields)
+    {
+        var result = Activator.CreateInstance<TCollectionFileAggregatorItemModel>();
+        result.Model = dataModel;
+        result.Images = new List<FileImageModel>();
+
+        foreach (var fileField in fileFields)
+        {
+            if (fileField.Value != null)
+            {
+                var fileContent = Encoding.Default.GetBytes(fileField.Value);
+                await filesService.UploadFile(
+                    collectionFileAggregatorSettings.ContainerName,
+                    FilesService.CreateFileName(fileField.FieldName, result.Model.Id),
+                    new MemoryStream(fileContent));
+                result.Images.Add(fileField);
+            }
         }
 
         return result;
