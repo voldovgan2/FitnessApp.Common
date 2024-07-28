@@ -1,12 +1,14 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Linq.Expressions;
 using System.Threading.Tasks;
 using AutoMapper;
 using FitnessApp.Common.Abstractions.Db.DbContext;
 using FitnessApp.Common.Abstractions.Db.Entities.Generic;
 using FitnessApp.Common.Abstractions.Models.Generic;
+using FitnessApp.Common.Paged.Extensions;
+using FitnessApp.Common.Paged.Models.Input;
+using FitnessApp.Common.Paged.Models.Output;
 
 namespace FitnessApp.Common.Abstractions.Db.Repository.Generic;
 
@@ -28,25 +30,19 @@ public abstract class GenericRepository<
     public async Task<TGenericModel> GetItemByUserId(string userId)
     {
         var entity = await dbContext.GetItemById(userId);
-        return Map(entity);
-    }
-
-    public async Task<TGenericModel> TryGetItemByUserId(string userId)
-    {
-        var entity = await dbContext.TryGetItemById(userId);
-        return Map(entity);
+        return mapper.Map<TGenericModel>(entity);
     }
 
     public async Task<IEnumerable<TGenericModel>> GetItemsByIds(IEnumerable<string> ids)
     {
         var items = await dbContext.GetItemsByIds(ids);
-        return Map(items);
+        return mapper.Map<IEnumerable<TGenericModel>>(items);
     }
 
-    public async Task<IEnumerable<TGenericModel>> FilterItems(Expression<Func<TGenericEntity, bool>> predicate)
+    public async Task<PagedDataModel<TGenericModel>> GetItemsByIds(GetPagedByIdsDataModel model)
     {
-        var items = await dbContext.FilterItems(predicate);
-        return Map(items);
+        var items = await dbContext.GetItemsByIds(model.Ids);
+        return mapper.Map<IEnumerable<TGenericModel>>(items).ToPaged(model);
     }
 
     public async Task<TGenericModel> CreateItem(TCreateGenericModel model)
@@ -81,18 +77,6 @@ public abstract class GenericRepository<
     {
         var deleted = await dbContext.DeleteItem(userId);
         string result = deleted.UserId;
-        return result;
-    }
-
-    protected TGenericModel Map(TGenericEntity entity)
-    {
-        var result = mapper.Map<TGenericModel>(entity);
-        return result;
-    }
-
-    protected IEnumerable<TGenericModel> Map(IEnumerable<TGenericEntity> entity)
-    {
-        var result = mapper.Map<IEnumerable<TGenericModel>>(entity);
         return result;
     }
 }

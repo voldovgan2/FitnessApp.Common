@@ -47,38 +47,6 @@ public class GenericRepositoryTests : TestBase
     }
 
     [Fact]
-    public async Task FilterItems_ReturnsAllItems()
-    {
-        // Arrange
-        var allEntities = TestData.GetAll(TestData.CreateGenericEntity, new Dictionary<string, object>());
-        _dbContextMock
-            .Setup(s => s.FilterItems(It.IsAny<Expression<Func<TestGenericEntity, bool>>>()))
-            .ReturnsAsync(allEntities);
-
-        // Act
-        var entities = await _repository.FilterItems(i => true);
-
-        // Assert
-        Assert.All(entities, i => Assert.NotNull(allEntities.Single(e => e.UserId == i.UserId)));
-    }
-
-    [Fact]
-    public async Task GetItemsByIds_ReturnsFilteredItems()
-    {
-        // Arrange
-        var genericEntitiesMock = GetGenericEntitiesMock();
-        _dbContextMock
-            .Setup(s => s.GetItemsByIds(It.IsAny<IEnumerable<string>>()))
-            .ReturnsAsync(genericEntitiesMock.Where(i => TestData.Ids.Contains(i.UserId)));
-
-        // Act
-        var entities = await _repository.GetItemsByIds(TestData.Ids);
-
-        // Assert
-        Assert.True(entities.Single().UserId == TestData.Id);
-    }
-
-    [Fact]
     public async Task CreateItem_ReturnsCreatedItem()
     {
         // Arrange

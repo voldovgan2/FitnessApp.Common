@@ -11,6 +11,9 @@ using FitnessApp.Common.Abstractions.Services.Configuration;
 using FitnessApp.Common.Abstractions.Services.Generic;
 using FitnessApp.Common.Abstractions.Services.Validation;
 using FitnessApp.Common.Files;
+using FitnessApp.Common.Paged.Extensions;
+using FitnessApp.Common.Paged.Models.Input;
+using FitnessApp.Common.Paged.Models.Output;
 
 namespace FitnessApp.Common.Abstractions.Services.GenericFileAggregator;
 
@@ -52,6 +55,13 @@ public abstract class GenericFileAggregatorService<
     {
         var dataModels = await genericService.GetItemsByIds(ids);
         var result = await LoadAndComposeGenericFileAggregatorModels(dataModels);
+        return result;
+    }
+
+    public async Task<PagedDataModel<TGenericFileAggregatorModel>> GetItemsByIds(GetPagedByIdsDataModel model)
+    {
+        var dataModels = await genericService.GetItemsByIds(model);
+        var result = (await LoadAndComposeGenericFileAggregatorModels(dataModels.Items)).ToPaged(model);
         return result;
     }
 

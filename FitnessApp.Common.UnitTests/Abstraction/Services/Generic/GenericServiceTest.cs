@@ -32,7 +32,7 @@ public class GenericServiceTest : TestBase
                 TestGenericModel,
                 CreateTestGenericModel,
                 UpdateTestGenericModel>>();
-        _serviceMock = new GenericServiceMock(_repositoryMock.Object, _mapper);
+        _serviceMock = new GenericServiceMock(_repositoryMock.Object);
     }
 
     [Fact]

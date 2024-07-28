@@ -1,12 +1,12 @@
 ﻿using System.Collections.Generic;
-using System.Linq;
 using System.Threading.Tasks;
-using AutoMapper;
 using FitnessApp.Common.Abstractions.Db.Repository.Generic;
 using FitnessApp.Common.Abstractions.Extensions;
 using FitnessApp.Common.Abstractions.Models.Generic;
 using FitnessApp.Common.Abstractions.Models.Validation;
 using FitnessApp.Common.Abstractions.Services.Validation;
+using FitnessApp.Common.Paged.Models.Input;
+using FitnessApp.Common.Paged.Models.Output;
 
 namespace FitnessApp.Common.Abstractions.Services.Generic;
 
@@ -17,8 +17,7 @@ public abstract class GenericService<
         IGenericRepository<
             TGenericModel,
             TCreateGenericModel,
-            TUpdateGenericModel> repository,
-        IMapper mapper
+            TUpdateGenericModel> repository
     )
     : IGenericService<
         TGenericModel,
@@ -38,8 +37,13 @@ public abstract class GenericService<
 
     public async Task<IEnumerable<TGenericModel>> GetItemsByIds(IEnumerable<string> ids)
     {
-        var data = await repository.GetItemsByIds(ids.Where(id => !string.IsNullOrWhiteSpace(id)));
-        var result = data.Select(entity => mapper.Map<TGenericModel>(entity));
+        var result = await repository.GetItemsByIds(ids);
+        return result;
+    }
+
+    public async Task<PagedDataModel<TGenericModel>> GetItemsByIds(GetPagedByIdsDataModel model)
+    {
+        var result = await repository.GetItemsByIds(model);
         return result;
     }
 

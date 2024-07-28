@@ -2,7 +2,7 @@
 
 namespace FitnessApp.Common.Abstractions.Models.Collection;
 
-public abstract class GetFilteredCollectionItemsModel : GetPagedDataModel
+public abstract class GetFilteredCollectionItemsModel : GetPagedSearchDataModel
 {
     public string UserId { get; set; }
     public string CollectionName { get; set; }
