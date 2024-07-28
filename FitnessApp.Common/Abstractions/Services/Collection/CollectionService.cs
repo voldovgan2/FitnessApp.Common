@@ -14,12 +14,8 @@ public abstract class CollectionService<
     TCollectionModel,
     TCollectionItemModel,
     TCreateCollectionModel,
-    TUpdateCollectionModel>(
-        ICollectionRepository<
-            TCollectionModel,
-            TCollectionItemModel,
-            TCreateCollectionModel,
-            TUpdateCollectionModel> repository) : ICollectionService<
+    TUpdateCollectionModel> :
+    ICollectionService<
         TCollectionModel,
         TCollectionItemModel,
         TCreateCollectionModel,
@@ -29,11 +25,24 @@ public abstract class CollectionService<
     where TCreateCollectionModel : ICreateCollectionModel
     where TUpdateCollectionModel : IUpdateCollectionModel
 {
+    protected ICollectionRepository<TCollectionModel,
+            TCollectionItemModel,
+            TCreateCollectionModel,
+            TUpdateCollectionModel> Repository { get; }
+
+    protected CollectionService(ICollectionRepository<TCollectionModel,
+            TCollectionItemModel,
+            TCreateCollectionModel,
+            TUpdateCollectionModel> repository)
+    {
+        Repository = repository;
+    }
+
     public async Task<TCollectionModel> GetItemByUserId(string userId)
     {
         ValidationHelper.ThrowExceptionIfNotValidatedEmptyStringField(nameof(userId), userId);
 
-        var result = await repository.GetItemByUserId(userId);
+        var result = await Repository.GetItemByUserId(userId);
         return result;
     }
 
@@ -43,7 +52,7 @@ public abstract class CollectionService<
         errors.AddIfNotNull(ValidationHelper.ValidateEmptyStringField(nameof(userId), userId));
         errors.AddIfNotNull(ValidationHelper.ValidateEmptyStringField(nameof(collectionName), collectionName));
         errors.ThrowIfNotEmpty();
-        var result = await repository.GetCollectionByUserId(userId, collectionName);
+        var result = await Repository.GetCollectionByUserId(userId, collectionName);
         return result;
     }
 
@@ -56,7 +65,7 @@ public abstract class CollectionService<
         errors.AddIfNotNull(ValidationHelper.ValidateRange(1, int.MaxValue, model.PageSize, nameof(model.PageSize)));
         errors.ThrowIfNotEmpty();
 
-        var allItems = await repository.GetCollectionByUserId(model.UserId, model.CollectionName);
+        var allItems = await Repository.GetCollectionByUserId(model.UserId, model.CollectionName);
         allItems = FilterItems(allItems, model.Search);
         var result = allItems.ToPaged(model);
         return result;
@@ -67,7 +76,7 @@ public abstract class CollectionService<
         var validationErrors = ValidateCreateCollectionModel(model);
         validationErrors.ThrowIfNotEmpty();
 
-        var result = await repository.CreateItem(model);
+        var result = await Repository.CreateItem(model);
         return result;
     }
 
@@ -76,7 +85,7 @@ public abstract class CollectionService<
         var validationErrors = ValidateUpdateCollectionModel(model);
         validationErrors.ThrowIfNotEmpty();
 
-        var result = await repository.UpdateItem(model);
+        var result = await Repository.UpdateItem(model);
         return result;
     }
 
@@ -84,7 +93,7 @@ public abstract class CollectionService<
     {
         ValidationHelper.ThrowExceptionIfNotValidatedEmptyStringField(nameof(userId), userId);
 
-        var result = await repository.DeleteItem(userId);
+        var result = await Repository.DeleteItem(userId);
         return result;
     }
 

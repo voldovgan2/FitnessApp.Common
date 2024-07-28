@@ -16,8 +16,7 @@ public abstract class GenericRepository<
     TGenericEntity,
     TGenericModel,
     TCreateGenericModel,
-    TUpdateGenericModel>
-    (IDbContext<TGenericEntity> dbContext, IMapper mapper) :
+    TUpdateGenericModel> :
     IGenericRepository<
         TGenericModel,
         TCreateGenericModel,
@@ -27,35 +26,44 @@ public abstract class GenericRepository<
     where TCreateGenericModel : ICreateGenericModel
     where TUpdateGenericModel : IUpdateGenericModel
 {
+    protected IDbContext<TGenericEntity> DbContext { get; }
+    protected IMapper Mapper { get; }
+
+    protected GenericRepository(IDbContext<TGenericEntity> dbContext, IMapper mapper)
+    {
+        DbContext = dbContext;
+        Mapper = mapper;
+    }
+
     public async Task<TGenericModel> GetItemByUserId(string userId)
     {
-        var entity = await dbContext.GetItemById(userId);
-        return mapper.Map<TGenericModel>(entity);
+        var entity = await DbContext.GetItemById(userId);
+        return Mapper.Map<TGenericModel>(entity);
     }
 
     public async Task<IEnumerable<TGenericModel>> GetItemsByIds(IEnumerable<string> ids)
     {
-        var items = await dbContext.GetItemsByIds(ids);
-        return mapper.Map<IEnumerable<TGenericModel>>(items);
+        var items = await DbContext.GetItemsByIds(ids);
+        return Mapper.Map<IEnumerable<TGenericModel>>(items);
     }
 
     public async Task<PagedDataModel<TGenericModel>> GetItemsByIds(GetPagedByIdsDataModel model)
     {
-        var items = await dbContext.GetItemsByIds(model.Ids);
-        return mapper.Map<IEnumerable<TGenericModel>>(items).ToPaged(model);
+        var items = await DbContext.GetItemsByIds(model.Ids);
+        return Mapper.Map<IEnumerable<TGenericModel>>(items).ToPaged(model);
     }
 
     public async Task<TGenericModel> CreateItem(TCreateGenericModel model)
     {
-        var entity = mapper.Map<TGenericEntity>(model);
-        var created = await dbContext.CreateItem(entity);
-        var result = mapper.Map<TGenericModel>(created);
+        var entity = Mapper.Map<TGenericEntity>(model);
+        var created = await DbContext.CreateItem(entity);
+        var result = Mapper.Map<TGenericModel>(created);
         return result;
     }
 
     public async Task<TGenericModel> UpdateItem(TUpdateGenericModel model)
     {
-        var entity = await dbContext.GetItemById(model.UserId);
+        var entity = await DbContext.GetItemById(model.UserId);
         var propertiesToUpdate = model
             .GetType()
             .GetProperties()
@@ -68,14 +76,14 @@ public abstract class GenericRepository<
             entityProperty.SetValue(entity, propertyToUpdate.GetValue(model, null));
         }
 
-        var replaced = await dbContext.UpdateItem(entity);
-        var result = mapper.Map<TGenericModel>(replaced);
+        var replaced = await DbContext.UpdateItem(entity);
+        var result = Mapper.Map<TGenericModel>(replaced);
         return result;
     }
 
     public async Task<string> DeleteItem(string userId)
     {
-        var deleted = await dbContext.DeleteItem(userId);
+        var deleted = await DbContext.DeleteItem(userId);
         string result = deleted.UserId;
         return result;
     }

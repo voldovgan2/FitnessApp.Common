@@ -17,7 +17,7 @@ public abstract class CollectionRepository<
     TCollectionModel,
     TCollectionItemModel,
     TCreateCollectionModel,
-    TUpdateCollectionModel>(IDbContext<TCollectionEntity> dbContext, IMapper mapper)
+    TUpdateCollectionModel>
     : ICollectionRepository<
         TCollectionModel,
         TCollectionItemModel,
@@ -30,51 +30,57 @@ public abstract class CollectionRepository<
     where TCreateCollectionModel : ICreateCollectionModel
     where TUpdateCollectionModel : IUpdateCollectionModel
 {
-    protected readonly IDbContext<TCollectionEntity> _dbContext = dbContext;
-    protected readonly IMapper _mapper = mapper;
+    protected IDbContext<TCollectionEntity> DbContext { get; }
+    protected IMapper Mapper { get; }
+
+    protected CollectionRepository(IDbContext<TCollectionEntity> dbContext, IMapper mapper)
+    {
+        DbContext = dbContext;
+        Mapper = mapper;
+    }
 
     public async Task<TCollectionModel> GetItemByUserId(string userId)
     {
-        var entity = await _dbContext.GetItemById(userId);
-        var result = _mapper.Map<TCollectionModel>(entity);
+        var entity = await DbContext.GetItemById(userId);
+        var result = Mapper.Map<TCollectionModel>(entity);
         return result;
     }
 
     public async Task<IEnumerable<TCollectionItemModel>> GetCollectionByUserId(string userId, string collectionName)
     {
-        var entity = await _dbContext.GetItemById(userId);
-        var result = _mapper.Map<IEnumerable<TCollectionItemModel>>(entity.Collection[collectionName]);
+        var entity = await DbContext.GetItemById(userId);
+        var result = Mapper.Map<IEnumerable<TCollectionItemModel>>(entity.Collection[collectionName]);
         return result;
     }
 
     public async Task<string> CreateItem(TCreateCollectionModel model)
     {
-        var entity = _mapper.Map<TCollectionEntity>(model);
-        entity = await _dbContext.CreateItem(entity);
+        var entity = Mapper.Map<TCollectionEntity>(model);
+        entity = await DbContext.CreateItem(entity);
         string result = entity.UserId;
         return result;
     }
 
     public async Task<TCollectionItemModel> UpdateItem(TUpdateCollectionModel model)
     {
-        var entity = await _dbContext.GetItemById(model.UserId);
+        var entity = await DbContext.GetItemById(model.UserId);
         var updateItemCollectionResult = UpdateItemCollection(entity, model);
-        await _dbContext.UpdateItem(updateItemCollectionResult.Item1);
-        var result = _mapper.Map<TCollectionItemModel>(updateItemCollectionResult.Item2);
+        await DbContext.UpdateItem(updateItemCollectionResult.Item1);
+        var result = Mapper.Map<TCollectionItemModel>(updateItemCollectionResult.Item2);
         return result;
     }
 
     public async Task UpdateItems(IEnumerable<TUpdateCollectionModel> models)
     {
-        var distinctEntities = await _dbContext.GetItemsByIds(models.Select(m => m.UserId).Distinct());
+        var distinctEntities = await DbContext.GetItemsByIds(models.Select(m => m.UserId).Distinct());
         var entitiesToUpdte = models.Select(model => UpdateItemCollection(distinctEntities.Single(e => e.UserId == model.UserId), model).Item1);
-        await _dbContext.UpdateItems(entitiesToUpdte);
+        await DbContext.UpdateItems(entitiesToUpdte);
     }
 
     public async Task<TCollectionModel> DeleteItem(string userId)
     {
-        var deleted = await _dbContext.DeleteItem(userId);
-        var result = _mapper.Map<TCollectionModel>(deleted);
+        var deleted = await DbContext.DeleteItem(userId);
+        var result = Mapper.Map<TCollectionModel>(deleted);
         return result;
     }
 
@@ -88,7 +94,7 @@ public abstract class CollectionRepository<
                 {
                     if (collection.Exists(i => i.Id == model.Model.Id))
                         throw new DuplicateCollectionItemException(model.Model.Id);
-                    var added = _mapper.Map<TCollectionItemEntity>(model.Model);
+                    var added = Mapper.Map<TCollectionItemEntity>(model.Model);
                     collection.Add(added);
                     itemEntity = added;
                 }
@@ -107,7 +113,7 @@ public abstract class CollectionRepository<
                         entityProperty.SetValue(updated, propertyToUpdate.GetValue(model.Model, null));
                     }
 
-                    itemEntity = _mapper.Map<TCollectionItemEntity>(updated);
+                    itemEntity = Mapper.Map<TCollectionItemEntity>(updated);
                 }
 
                 break;
@@ -115,7 +121,7 @@ public abstract class CollectionRepository<
                 {
                     var removed = collection.Single(i => i.Id == model.Model.Id);
                     collection.Remove(removed);
-                    itemEntity = _mapper.Map<TCollectionItemEntity>(removed);
+                    itemEntity = Mapper.Map<TCollectionItemEntity>(removed);
                 }
 
                 break;

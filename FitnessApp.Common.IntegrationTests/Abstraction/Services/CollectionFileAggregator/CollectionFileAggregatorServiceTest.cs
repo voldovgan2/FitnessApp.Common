@@ -48,7 +48,7 @@ public class CollectionFileAggregatorServiceTest :
             new CollectionServiceMock(
                 new CollectionRepositoryMock(dbContextFixture.DbContext, dbContextFixture.Mapper)
             ),
-            fileFixture.FileService,
+            fileFixture.FilesService,
             dbContextFixture.Mapper,
             collectionFileAggregatorSettings
         );

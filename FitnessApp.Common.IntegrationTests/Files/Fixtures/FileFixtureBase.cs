@@ -14,7 +14,7 @@ namespace FitnessApp.Common.IntegrationTests.File.Fixtures;
 public class FileFixtureBase<T> : TestBase, IDisposable
     where T : class
 {
-    public FilesService FileService { get; private set; }
+    public FilesService FilesService { get; private set; }
     public string Path { get; private set; }
     public FileFixtureBase()
     {
@@ -28,7 +28,7 @@ public class FileFixtureBase<T> : TestBase, IDisposable
             .WithCredentials(accessKey, secretKey)
             .WithSSL(secure)
             .Build();
-        FileService = new FilesService(minIoClient);
+        FilesService = new FilesService(minIoClient);
 
         var itemIds = new string[]
         {
@@ -52,7 +52,7 @@ public class FileFixtureBase<T> : TestBase, IDisposable
                     .Select(item => FilesService.CreateFileName(TestData.FileFieldName, item.Id))
             );
         var createdItemsTasks = itemIds
-            .Select(itemId => FileService.UploadFile(
+            .Select(itemId => FilesService.UploadFile(
                 Path.ToLower(),
                 itemId,
                 new MemoryStream(Encoding.Default.GetBytes(itemId))));

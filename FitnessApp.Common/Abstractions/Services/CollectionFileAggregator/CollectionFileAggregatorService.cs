@@ -25,16 +25,8 @@ public abstract class CollectionFileAggregatorService<
     TCreateCollectionFileAggregatorModel,
     TCreateCollectionModel,
     TUpdateCollectionFileAggregatorModel,
-    TUpdateCollectionModel>(
-        ICollectionService<
-            TCollectionModel,
-            TCollectionItemModel,
-            TCreateCollectionModel,
-            TUpdateCollectionModel> collectionService,
-        IFilesService filesService,
-        IMapper mapper,
-        CollectionFileAggregatorSettings collectionFileAggregatorSettings
-    ) : ICollectionFileAggregatorService<
+    TUpdateCollectionModel> :
+    ICollectionFileAggregatorService<
         TCollectionFileAggregatorModel,
         TCollectionFileAggregatorItemModel,
         TCreateCollectionFileAggregatorModel,
@@ -48,11 +40,37 @@ public abstract class CollectionFileAggregatorService<
     where TUpdateCollectionFileAggregatorModel : IUpdateCollectionFileAggregatorModel
     where TUpdateCollectionModel : IUpdateCollectionModel
 {
+    protected ICollectionService<
+            TCollectionModel,
+            TCollectionItemModel,
+            TCreateCollectionModel,
+            TUpdateCollectionModel> CollectionService
+    { get; }
+    protected IFilesService FilesService { get; }
+    protected IMapper Mapper { get; }
+    protected CollectionFileAggregatorSettings CollectionFileAggregatorSettings { get; }
+
+    protected CollectionFileAggregatorService(
+        ICollectionService<
+            TCollectionModel,
+            TCollectionItemModel,
+            TCreateCollectionModel,
+            TUpdateCollectionModel> collectionService,
+        IFilesService filesService,
+        IMapper mapper,
+        CollectionFileAggregatorSettings collectionFileAggregatorSettings)
+    {
+        CollectionService = collectionService;
+        FilesService = filesService;
+        Mapper = mapper;
+        CollectionFileAggregatorSettings = collectionFileAggregatorSettings;
+    }
+
     public async Task<TCollectionFileAggregatorModel> GetItemByUserId(string userId)
     {
         ValidationHelper.ThrowExceptionIfNotValidatedEmptyStringField(nameof(userId), userId);
 
-        var dataModel = await collectionService.GetItemByUserId(userId);
+        var dataModel = await CollectionService.GetItemByUserId(userId);
         var result = await LoadAndComposeGenericFileAggregatorModel(dataModel);
         return result;
     }
@@ -64,7 +82,7 @@ public abstract class CollectionFileAggregatorService<
         errors.AddIfNotNull(ValidationHelper.ValidateEmptyStringField(nameof(collectionName), collectionName));
         errors.ThrowIfNotEmpty();
 
-        var allItems = await collectionService.GetCollectionByUserId(userId, collectionName);
+        var allItems = await CollectionService.GetCollectionByUserId(userId, collectionName);
         return await LoadAndComposeCollectionFileAggregatorItemModel(collectionName, allItems);
     }
 
@@ -77,7 +95,7 @@ public abstract class CollectionFileAggregatorService<
         errors.AddIfNotNull(ValidationHelper.ValidateRange(1, int.MaxValue, model.PageSize, nameof(model.PageSize)));
         errors.ThrowIfNotEmpty();
 
-        var pagedItems = await collectionService.GetFilteredCollectionItems(model);
+        var pagedItems = await CollectionService.GetFilteredCollectionItems(model);
         var result = new PagedDataModel<TCollectionFileAggregatorItemModel>
         {
             TotalCount = pagedItems.TotalCount,
@@ -92,8 +110,8 @@ public abstract class CollectionFileAggregatorService<
         var validationErrors = ValidateCreateCollectionModel(model);
         validationErrors.ThrowIfNotEmpty();
 
-        var createCollectionModel = mapper.Map<TCreateCollectionModel>(model);
-        var result = await collectionService.CreateItem(createCollectionModel);
+        var createCollectionModel = Mapper.Map<TCreateCollectionModel>(model);
+        var result = await CollectionService.CreateItem(createCollectionModel);
         return result;
     }
 
@@ -102,9 +120,9 @@ public abstract class CollectionFileAggregatorService<
         var validationErrors = ValidateUpdateCollectionModel(model);
         validationErrors.ThrowIfNotEmpty();
 
-        var updateGenericModel = mapper.Map<TUpdateCollectionModel>(model);
-        var dataModel = await collectionService.UpdateItem(updateGenericModel);
-        var collectionFileFields = collectionFileAggregatorSettings.CollectionsFileFields[model.CollectionName];
+        var updateGenericModel = Mapper.Map<TUpdateCollectionModel>(model);
+        var dataModel = await CollectionService.UpdateItem(updateGenericModel);
+        var collectionFileFields = CollectionFileAggregatorSettings.CollectionsFileFields[model.CollectionName];
         await DeleteItemFiles(model.Model.Model.Id, collectionFileFields);
         var fileFields = model.Model.Images.Where(f => collectionFileFields.Contains(f.FieldName));
         var result = await SaveAndComposeGenericFileAggregatorModel(dataModel, fileFields);
@@ -115,7 +133,7 @@ public abstract class CollectionFileAggregatorService<
     {
         ValidationHelper.ThrowExceptionIfNotValidatedEmptyStringField(nameof(userId), userId);
 
-        var deleted = await collectionService.DeleteItem(userId);
+        var deleted = await CollectionService.DeleteItem(userId);
         await DeleteItemFiles(deleted);
         return deleted.UserId;
     }
@@ -150,9 +168,9 @@ public abstract class CollectionFileAggregatorService<
         result.Collection = new Dictionary<string, List<ICollectionFileAggregatorItemModel<ICollectionItemModel>>>();
         foreach (var kvp in model.Collection)
         {
-            var collectionItems = mapper.Map<IEnumerable<TCollectionItemModel>>(kvp.Value);
+            var collectionItems = Mapper.Map<IEnumerable<TCollectionItemModel>>(kvp.Value);
             var collectionFileAggregatorItems = await LoadAndComposeCollectionFileAggregatorItemModel(kvp.Key, collectionItems);
-            var collection = mapper.Map<List<ICollectionFileAggregatorItemModel<ICollectionItemModel>>>(collectionFileAggregatorItems);
+            var collection = Mapper.Map<List<ICollectionFileAggregatorItemModel<ICollectionItemModel>>>(collectionFileAggregatorItems);
             result.Collection.Add(kvp.Key, collection);
         }
 
@@ -167,10 +185,10 @@ public abstract class CollectionFileAggregatorService<
             var collectionFileAggregatorItemModel = Activator.CreateInstance<TCollectionFileAggregatorItemModel>();
             collectionFileAggregatorItemModel.Model = collectionItemModel;
             collectionFileAggregatorItemModel.Images = new List<FileImageModel>();
-            var collectionFileFields = collectionFileAggregatorSettings.CollectionsFileFields[collectionName];
+            var collectionFileFields = CollectionFileAggregatorSettings.CollectionsFileFields[collectionName];
             foreach (var fileField in collectionFileFields)
             {
-                var fileContent = await filesService.DownloadFile(collectionFileAggregatorSettings.ContainerName, FilesService.CreateFileName(fileField, collectionItemModel.Id));
+                var fileContent = await FilesService.DownloadFile(CollectionFileAggregatorSettings.ContainerName, FilesService.CreateFileName(fileField, collectionItemModel.Id));
                 if (fileContent != null)
                 {
                     collectionFileAggregatorItemModel.Images.Add(new FileImageModel
@@ -198,8 +216,8 @@ public abstract class CollectionFileAggregatorService<
             if (fileField.Value != null)
             {
                 var fileContent = Encoding.Default.GetBytes(fileField.Value);
-                await filesService.UploadFile(
-                    collectionFileAggregatorSettings.ContainerName,
+                await FilesService.UploadFile(
+                    CollectionFileAggregatorSettings.ContainerName,
                     FilesService.CreateFileName(fileField.FieldName, result.Model.Id),
                     new MemoryStream(fileContent));
                 result.Images.Add(fileField);
@@ -213,7 +231,7 @@ public abstract class CollectionFileAggregatorService<
     {
         foreach (var kvp in model.Collection)
         {
-            var fileFields = collectionFileAggregatorSettings.CollectionsFileFields[kvp.Key];
+            var fileFields = CollectionFileAggregatorSettings.CollectionsFileFields[kvp.Key];
             foreach (var item in kvp.Value)
             {
                 await DeleteItemFiles(item.Id, fileFields);
@@ -225,7 +243,7 @@ public abstract class CollectionFileAggregatorService<
     {
         foreach (var fileField in fileFields)
         {
-            await filesService.DeleteFile(collectionFileAggregatorSettings.ContainerName, FilesService.CreateFileName(fileField, itemId));
+            await FilesService.DeleteFile(CollectionFileAggregatorSettings.ContainerName, FilesService.CreateFileName(fileField, itemId));
         }
     }
 }

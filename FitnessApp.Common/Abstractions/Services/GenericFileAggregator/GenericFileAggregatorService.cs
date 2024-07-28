@@ -23,16 +23,8 @@ public abstract class GenericFileAggregatorService<
     TCreateGenericFileAggregatorModel,
     TCreateGenericModel,
     TUpdateGenericFileAggregatorModel,
-    TUpdateGenericModel>(
-    IGenericService<
-        TGenericModel,
-        TCreateGenericModel,
-        TUpdateGenericModel> genericService,
-    IFilesService filesService,
-    IMapper mapper,
-    GenericFileAggregatorSettings genericFileAggregatorSettings
-    )
-    : IGenericFileAggregatorService<
+    TUpdateGenericModel> :
+    IGenericFileAggregatorService<
         TGenericFileAggregatorModel,
         TGenericModel,
         TCreateGenericFileAggregatorModel,
@@ -44,23 +36,46 @@ public abstract class GenericFileAggregatorService<
     where TUpdateGenericFileAggregatorModel : IUpdateGenericFileAggregatorModel
     where TUpdateGenericModel : IUpdateGenericModel
 {
+    protected IGenericService<
+        TGenericModel,
+        TCreateGenericModel,
+        TUpdateGenericModel> GenericService { get; }
+    protected IFilesService FilesService { get; }
+    protected IMapper Mapper { get; }
+    protected GenericFileAggregatorSettings GenericFileAggregatorSettings { get; }
+
+    protected GenericFileAggregatorService(
+        IGenericService<
+            TGenericModel,
+            TCreateGenericModel,
+            TUpdateGenericModel> genericService,
+        IFilesService filesService,
+        IMapper mapper,
+        GenericFileAggregatorSettings genericFileAggregatorSettings)
+    {
+        GenericService = genericService;
+        FilesService = filesService;
+        Mapper = mapper;
+        GenericFileAggregatorSettings = genericFileAggregatorSettings;
+    }
+
     public async Task<TGenericFileAggregatorModel> GetItemByUserId(string userId)
     {
-        var dataModel = await genericService.GetItemByUserId(userId);
+        var dataModel = await GenericService.GetItemByUserId(userId);
         var result = await LoadAndComposeGenericFileAggregatorModel(dataModel);
         return result;
     }
 
     public async Task<IEnumerable<TGenericFileAggregatorModel>> GetItemsByIds(string[] ids)
     {
-        var dataModels = await genericService.GetItemsByIds(ids);
+        var dataModels = await GenericService.GetItemsByIds(ids);
         var result = await LoadAndComposeGenericFileAggregatorModels(dataModels);
         return result;
     }
 
     public async Task<PagedDataModel<TGenericFileAggregatorModel>> GetItemsByIds(GetPagedByIdsDataModel model)
     {
-        var dataModels = await genericService.GetItemsByIds(model);
+        var dataModels = await GenericService.GetItemsByIds(model);
         var result = (await LoadAndComposeGenericFileAggregatorModels(dataModels.Items)).ToPaged(model);
         return result;
     }
@@ -69,8 +84,8 @@ public abstract class GenericFileAggregatorService<
     {
         ValidationHelper.ThrowExceptionIfNotValidFiles(model.Images);
 
-        var createGenericModel = mapper.Map<TCreateGenericModel>(model);
-        var dataModel = await genericService.CreateItem(createGenericModel);
+        var createGenericModel = Mapper.Map<TCreateGenericModel>(model);
+        var dataModel = await GenericService.CreateItem(createGenericModel);
         var result = await SaveAndComposeGenericFileAggregatorModel(dataModel, model.Images);
         return result;
     }
@@ -79,8 +94,8 @@ public abstract class GenericFileAggregatorService<
     {
         ValidationHelper.ThrowExceptionIfNotValidFiles(model.Images);
 
-        var updateGenericModel = mapper.Map<TUpdateGenericModel>(model);
-        var dataModel = await genericService.UpdateItem(updateGenericModel);
+        var updateGenericModel = Mapper.Map<TUpdateGenericModel>(model);
+        var dataModel = await GenericService.UpdateItem(updateGenericModel);
         await DeleteItemFiles(model.UserId);
         var result = await SaveAndComposeGenericFileAggregatorModel(dataModel, model.Images);
         return result;
@@ -88,7 +103,7 @@ public abstract class GenericFileAggregatorService<
 
     public async Task<string> DeleteItem(string userId)
     {
-        var deleted = await genericService.DeleteItem(userId);
+        var deleted = await GenericService.DeleteItem(userId);
         await DeleteItemFiles(userId);
         return deleted;
     }
@@ -99,9 +114,9 @@ public abstract class GenericFileAggregatorService<
         result.Model = dataModel;
         result.Images = new List<FileImageModel>();
 
-        foreach (var fileField in genericFileAggregatorSettings.FileFields)
+        foreach (var fileField in GenericFileAggregatorSettings.FileFields)
         {
-            var fileContent = await filesService.DownloadFile(genericFileAggregatorSettings.ContainerName, FilesService.CreateFileName(fileField, dataModel.UserId));
+            var fileContent = await FilesService.DownloadFile(GenericFileAggregatorSettings.ContainerName, FilesService.CreateFileName(fileField, dataModel.UserId));
             if (fileContent != null)
             {
                 result.Images.Add(new FileImageModel
@@ -139,8 +154,8 @@ public abstract class GenericFileAggregatorService<
             if (fileField.Value != null)
             {
                 var fileContent = Encoding.Default.GetBytes(fileField.Value);
-                await filesService.UploadFile(
-                    genericFileAggregatorSettings.ContainerName,
+                await FilesService.UploadFile(
+                    GenericFileAggregatorSettings.ContainerName,
                     FilesService.CreateFileName(fileField.FieldName, result.Model.UserId),
                     new MemoryStream(fileContent));
                 result.Images.Add(fileField);
@@ -152,9 +167,9 @@ public abstract class GenericFileAggregatorService<
 
     private async Task DeleteItemFiles(string userId)
     {
-        foreach (var fileField in genericFileAggregatorSettings.FileFields)
+        foreach (var fileField in GenericFileAggregatorSettings.FileFields)
         {
-            await filesService.DeleteFile(genericFileAggregatorSettings.ContainerName, FilesService.CreateFileName(fileField, userId));
+            await FilesService.DeleteFile(GenericFileAggregatorSettings.ContainerName, FilesService.CreateFileName(fileField, userId));
         }
     }
 }

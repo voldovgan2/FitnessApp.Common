@@ -13,13 +13,8 @@ namespace FitnessApp.Common.Abstractions.Services.Generic;
 public abstract class GenericService<
     TGenericModel,
     TCreateGenericModel,
-    TUpdateGenericModel>(
-        IGenericRepository<
-            TGenericModel,
-            TCreateGenericModel,
-            TUpdateGenericModel> repository
-    )
-    : IGenericService<
+    TUpdateGenericModel> :
+    IGenericService<
         TGenericModel,
         TCreateGenericModel,
         TUpdateGenericModel>
@@ -27,23 +22,33 @@ public abstract class GenericService<
     where TCreateGenericModel : ICreateGenericModel
     where TUpdateGenericModel : IUpdateGenericModel
 {
+    protected IGenericRepository<
+        TGenericModel,
+        TCreateGenericModel,
+        TUpdateGenericModel> Repository { get; }
+
+    protected GenericService(IGenericRepository<TGenericModel, TCreateGenericModel, TUpdateGenericModel> repository)
+    {
+        Repository = repository;
+    }
+
     public async Task<TGenericModel> GetItemByUserId(string userId)
     {
         ValidationHelper.ThrowExceptionIfNotValidatedEmptyStringField(nameof(userId), userId);
 
-        var result = await repository.GetItemByUserId(userId);
+        var result = await Repository.GetItemByUserId(userId);
         return result;
     }
 
     public async Task<IEnumerable<TGenericModel>> GetItemsByIds(IEnumerable<string> ids)
     {
-        var result = await repository.GetItemsByIds(ids);
+        var result = await Repository.GetItemsByIds(ids);
         return result;
     }
 
     public async Task<PagedDataModel<TGenericModel>> GetItemsByIds(GetPagedByIdsDataModel model)
     {
-        var result = await repository.GetItemsByIds(model);
+        var result = await Repository.GetItemsByIds(model);
         return result;
     }
 
@@ -52,7 +57,7 @@ public abstract class GenericService<
         var validationErrors = ValidateCreateGenericModel(model);
         validationErrors.ThrowIfNotEmpty();
 
-        var result = await repository.CreateItem(model);
+        var result = await Repository.CreateItem(model);
         return result;
     }
 
@@ -61,7 +66,7 @@ public abstract class GenericService<
         var validationErrors = ValidateUpdateGenericModel(model);
         validationErrors.ThrowIfNotEmpty();
 
-        var result = await repository.UpdateItem(model);
+        var result = await Repository.UpdateItem(model);
         return result;
     }
 
@@ -69,7 +74,7 @@ public abstract class GenericService<
     {
         ValidationHelper.ThrowExceptionIfNotValidatedEmptyStringField(nameof(userId), userId);
 
-        var result = await repository.DeleteItem(userId);
+        var result = await Repository.DeleteItem(userId);
         return result;
     }
 

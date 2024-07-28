@@ -7,7 +7,6 @@ using FitnessApp.Common.Files;
 using FitnessApp.Common.IntegrationTests.Abstraction.Services.Fixtures;
 using FitnessApp.Common.IntegrationTests.File.Fixtures;
 using FitnessApp.Comon.Tests.Shared;
-using FitnessApp.Comon.Tests.Shared.Abstraction.Db.Entities.Generic;
 using FitnessApp.Comon.Tests.Shared.Abstraction.Db.Repository.Generic;
 using FitnessApp.Comon.Tests.Shared.Abstraction.Models.Generic;
 using FitnessApp.Comon.Tests.Shared.Abstraction.Models.GenericFileAggregator;
@@ -43,7 +42,7 @@ public class GenericFileAggregatorServiceTest :
         };
         _service = new GenericFileAggregatorServiceMock(
             new GenericServiceMock(new GenericRepositoryMock(dbContextFixture.DbContext, dbContextFixture.Mapper)),
-            _fileFixture.FileService,
+            _fileFixture.FilesService,
             dbContextFixture.Mapper,
             genericFileAggregatorSettings
         );
@@ -88,8 +87,8 @@ public class GenericFileAggregatorServiceTest :
     [Fact]
     public async Task DeleteItem_ReturnsDeleted()
     {
-        var fileName = FilesService.CreateFileName(TestData.FileFieldName, TestData.EntityIdToDelete);
-        var fileBefore = await _fileFixture.FileService.DownloadFile(_fileFixture.Path, fileName);
+        var fileName = _fileFixture.FilesService.CreateFileName(TestData.FileFieldName, TestData.EntityIdToDelete);
+        var fileBefore = await _fileFixture.FilesService.DownloadFile(_fileFixture.Path, fileName);
         Assert.NotNull(fileBefore);
 
         // Act
@@ -97,7 +96,7 @@ public class GenericFileAggregatorServiceTest :
 
         // Assert
         Assert.Equal(TestData.EntityIdToDelete, item);
-        await Assert.ThrowsAsync<ObjectNotFoundException>(() => _fileFixture.FileService.DownloadFile(_fileFixture.Path, fileName));
+        await Assert.ThrowsAsync<ObjectNotFoundException>(() => _fileFixture.FilesService.DownloadFile(_fileFixture.Path, fileName));
     }
 
     private Dictionary<string, object> CreateTestGenericFileAggregatorModelParams(object id)

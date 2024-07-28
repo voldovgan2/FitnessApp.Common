@@ -57,7 +57,7 @@ public class FilesService(IMinioClient minioClient) : IFilesService
         await minioClient.RemoveObjectAsync(args);
     }
 
-    public static string CreateFileName(string propertyName, string userId)
+    public string CreateFileName(string propertyName, string userId)
     {
         return $"{propertyName}{userId}";
     }
