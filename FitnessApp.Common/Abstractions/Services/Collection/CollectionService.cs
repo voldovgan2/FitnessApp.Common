@@ -3,7 +3,6 @@ using System.Threading.Tasks;
 using FitnessApp.Common.Abstractions.Db.Repository.Collection;
 using FitnessApp.Common.Abstractions.Extensions;
 using FitnessApp.Common.Abstractions.Models.Collection;
-using FitnessApp.Common.Abstractions.Models.CollectionFileAggregator;
 using FitnessApp.Common.Abstractions.Models.Validation;
 using FitnessApp.Common.Abstractions.Services.Validation;
 using FitnessApp.Common.Paged.Extensions;
@@ -59,6 +58,7 @@ public abstract class CollectionService<
         errors.ThrowIfNotEmpty();
 
         var allItems = await repository.GetCollectionByUserId(model.UserId, model.CollectionName);
+        allItems = FilterItems(allItems, model.Search);
         var result = allItems.ToPaged(model);
         return result;
     }
@@ -87,6 +87,11 @@ public abstract class CollectionService<
 
         var result = await repository.DeleteItem(userId);
         return result;
+    }
+
+    protected virtual IEnumerable<TCollectionItemModel> FilterItems(IEnumerable<TCollectionItemModel> items, string search)
+    {
+        return items;
     }
 
     protected virtual IEnumerable<ValidationError> ValidateCreateCollectionModel(TCreateCollectionModel model)
