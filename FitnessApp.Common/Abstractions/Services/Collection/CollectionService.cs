@@ -19,8 +19,7 @@ public abstract class CollectionService<
             TCollectionModel,
             TCollectionItemModel,
             TCreateCollectionModel,
-            TUpdateCollectionModel> repository
-    ) : ICollectionService<
+            TUpdateCollectionModel> repository) : ICollectionService<
         TCollectionModel,
         TCollectionItemModel,
         TCreateCollectionModel,
