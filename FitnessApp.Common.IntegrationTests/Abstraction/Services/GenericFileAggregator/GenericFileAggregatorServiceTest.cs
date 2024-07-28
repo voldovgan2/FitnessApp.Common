@@ -42,10 +42,7 @@ public class GenericFileAggregatorServiceTest :
             }
         };
         _service = new GenericFileAggregatorServiceMock(
-            new GenericServiceMock(
-                new GenericRepositoryMock(dbContextFixture.DbContext, dbContextFixture.Mapper),
-                dbContextFixture.Mapper
-            ),
+            new GenericServiceMock(new GenericRepositoryMock(dbContextFixture.DbContext, dbContextFixture.Mapper)),
             _fileFixture.FileService,
             dbContextFixture.Mapper,
             genericFileAggregatorSettings

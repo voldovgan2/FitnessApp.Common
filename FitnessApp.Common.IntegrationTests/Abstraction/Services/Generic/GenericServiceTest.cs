@@ -20,7 +20,7 @@ public class GenericServiceTest : IClassFixture<GenericServiceFixture>
 
     public GenericServiceTest(GenericServiceFixture fixture)
     {
-        _service = new GenericServiceMock(new GenericRepositoryMock(fixture.DbContext, fixture.Mapper), fixture.Mapper);
+        _service = new GenericServiceMock(new GenericRepositoryMock(fixture.DbContext, fixture.Mapper));
     }
 
     [Fact]
