@@ -1,13 +1,12 @@
-using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Linq.Expressions;
 using System.Threading.Tasks;
 using FitnessApp.Common.Abstractions.Db.DbContext;
 using FitnessApp.Common.UnitTests.Abstraction;
 using FitnessApp.Comon.Tests.Shared;
 using FitnessApp.Comon.Tests.Shared.Abstraction.Db.Entities.Generic;
 using FitnessApp.Comon.Tests.Shared.Abstraction.Db.Repository.Generic;
+using FitnessApp.Comon.Tests.Shared.Abstraction.Models.Generic;
 using Moq;
 using Xunit;
 
@@ -24,7 +23,8 @@ public class GenericRepositoryTests : TestBase
         }
     };
 
-    public GenericRepositoryTests() : base()
+    public GenericRepositoryTests()
+        : base()
     {
         _dbContextMock = new Mock<IDbContext<TestGenericEntity>>();
         _repository = new GenericRepositoryMock(_dbContextMock.Object, _mapper);
@@ -41,6 +41,43 @@ public class GenericRepositoryTests : TestBase
 
         // Act
         var entity = await _repository.GetItemByUserId(TestData.Id);
+
+        // Assert
+        Assert.Equal(TestData.Id, entity.UserId);
+    }
+
+    [Fact]
+    public async Task GetItemByIds_ReturnsMathcedItems()
+    {
+        // Arrange
+        var genericEntitiesMock = GetGenericEntitiesMock();
+        _dbContextMock
+           .Setup(s => s.GetItemsByIds(It.IsAny<IEnumerable<string>>()))
+           .ReturnsAsync(genericEntitiesMock.Where(i => i.UserId == TestData.Id));
+
+        // Act
+        var entity = (await _repository.GetItemsByIds([TestData.Id])).Single();
+
+        // Assert
+        Assert.Equal(TestData.Id, entity.UserId);
+    }
+
+    [Fact]
+    public async Task GetItems_ReturnsMathcedItems()
+    {
+        // Arrange
+        var genericEntitiesMock = GetGenericEntitiesMock();
+        _dbContextMock
+           .Setup(s => s.GetItemsByIds(It.IsAny<IEnumerable<string>>()))
+           .ReturnsAsync(genericEntitiesMock.Where(i => i.UserId == TestData.Id));
+
+        // Act
+        var entity = (await _repository.GetItems(new GetTestPagedByIdsDataModel
+        {
+            Ids = new List<string> { TestData.Id },
+            Page = 0,
+            PageSize = 10,
+        })).Items.Single();
 
         // Assert
         Assert.Equal(TestData.Id, entity.UserId);

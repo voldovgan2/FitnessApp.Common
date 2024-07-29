@@ -42,13 +42,21 @@ public abstract class GenericService<
 
     public async Task<IEnumerable<TGenericModel>> GetItemsByIds(IEnumerable<string> ids)
     {
+        ValidationHelper.ThrowExceptionIfNotValidatedEmptyIdsField(nameof(ids), ids);
+
         var result = await Repository.GetItemsByIds(ids);
         return result;
     }
 
     public async Task<PagedDataModel<TGenericModel>> GetItemsByIds(GetPagedByIdsDataModel model)
     {
-        var result = await Repository.GetItemsByIds(model);
+        List<ValidationError> errors = new List<ValidationError>();
+        ValidationHelper.ThrowExceptionIfNotValidatedEmptyIdsField(nameof(model.Ids), model.Ids);
+        errors.AddIfNotNull(ValidationHelper.ValidateRange(0, int.MaxValue, model.Page, nameof(model.Page)));
+        errors.AddIfNotNull(ValidationHelper.ValidateRange(1, int.MaxValue, model.PageSize, nameof(model.PageSize)));
+        errors.ThrowIfNotEmpty();
+
+        var result = await Repository.GetItems(model);
         return result;
     }
 

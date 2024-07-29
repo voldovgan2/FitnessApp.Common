@@ -18,9 +18,25 @@ public static class ValidationHelper
         return result;
     }
 
+    public static ValidationError ValidateEmptyIdsField(string fieldName, IEnumerable<string> value)
+    {
+        ValidationError result = null;
+        if (!value.Any())
+            result = new ValidationError($"{fieldName} can't be empty", fieldName);
+
+        return result;
+    }
+
     public static void ThrowExceptionIfNotValidatedEmptyStringField(string fieldName, string value)
     {
         var error = ValidateEmptyStringField(fieldName, value);
+        if (error != null)
+            throw new ValidationException(error);
+    }
+
+    public static void ThrowExceptionIfNotValidatedEmptyIdsField(string fieldName, IEnumerable<string> value)
+    {
+        var error = ValidateEmptyIdsField(fieldName, value);
         if (error != null)
             throw new ValidationException(error);
     }

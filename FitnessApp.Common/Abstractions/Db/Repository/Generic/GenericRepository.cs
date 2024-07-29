@@ -47,7 +47,7 @@ public abstract class GenericRepository<
         return Mapper.Map<IEnumerable<TGenericModel>>(items);
     }
 
-    public async Task<PagedDataModel<TGenericModel>> GetItemsByIds(GetPagedByIdsDataModel model)
+    public async Task<PagedDataModel<TGenericModel>> GetItems(GetPagedByIdsDataModel model)
     {
         var items = await DbContext.GetItemsByIds(model.Ids);
         return Mapper.Map<IEnumerable<TGenericModel>>(items).ToPaged(model);

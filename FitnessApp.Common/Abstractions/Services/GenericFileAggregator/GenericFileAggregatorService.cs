@@ -141,9 +141,7 @@ public abstract class GenericFileAggregatorService<
         return result;
     }
 
-    private async Task<TGenericFileAggregatorModel> SaveAndComposeGenericFileAggregatorModel(
-        TGenericModel dataModel,
-        IEnumerable<FileImageModel> fileFields)
+    private async Task<TGenericFileAggregatorModel> SaveAndComposeGenericFileAggregatorModel(TGenericModel dataModel, IEnumerable<FileImageModel> fileFields)
     {
         var result = Activator.CreateInstance<TGenericFileAggregatorModel>();
         result.Model = dataModel;

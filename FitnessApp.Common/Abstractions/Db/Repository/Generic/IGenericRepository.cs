@@ -16,7 +16,7 @@ public interface IGenericRepository<
 {
     Task<TGenericModel> GetItemByUserId(string userId);
     Task<IEnumerable<TGenericModel>> GetItemsByIds(IEnumerable<string> ids);
-    Task<PagedDataModel<TGenericModel>> GetItemsByIds(GetPagedByIdsDataModel model);
+    Task<PagedDataModel<TGenericModel>> GetItems(GetPagedByIdsDataModel model);
     Task<TGenericModel> CreateItem(TCreateGenericModel model);
     Task<TGenericModel> UpdateItem(TUpdateGenericModel model);
     Task<string> DeleteItem(string userId);

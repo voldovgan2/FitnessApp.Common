@@ -63,7 +63,7 @@ public static class TestData
         var id = args["Id"];
         return new TestGenericEntity
         {
-            UserId = id.ToString(),
+            UserId = id?.ToString(),
             TestProperty1 = $"{_propertyPrefix}{id}"
         };
     }
@@ -73,7 +73,7 @@ public static class TestData
         var id = args["Id"];
         return new CreateTestGenericModel
         {
-            UserId = id.ToString(),
+            UserId = id?.ToString(),
             TestProperty1 = $"{_propertyPrefix}{id}"
         };
     }
@@ -83,7 +83,7 @@ public static class TestData
         var id = args["Id"];
         return new UpdateTestGenericModel
         {
-            UserId = id.ToString(),
+            UserId = id?.ToString(),
             TestProperty1 = $"{_propertyPrefix}{id}"
         };
     }
@@ -93,7 +93,7 @@ public static class TestData
         var id = args["Id"];
         return new TestGenericModel
         {
-            UserId = id.ToString(),
+            UserId = id?.ToString(),
             TestProperty1 = $"{_propertyPrefix}{id}"
         };
     }
