@@ -223,7 +223,7 @@ public static class TestData
         var id = args["Id"];
         return new CreateTestGenericFileAggregatorModel
         {
-            UserId = id.ToString(),
+            UserId = id?.ToString(),
             TestProperty = $"{_propertyPrefix}{id}",
             Images = (List<FileImageModel>)args["Images"]
         };
@@ -234,7 +234,7 @@ public static class TestData
         var id = args["Id"];
         return new UpdateTestGenericFileAggregatorModel
         {
-            UserId = id.ToString(),
+            UserId = id?.ToString(),
             TestProperty = $"{_propertyPrefix}{id}",
             Images = (List<FileImageModel>)args["Images"]
         };

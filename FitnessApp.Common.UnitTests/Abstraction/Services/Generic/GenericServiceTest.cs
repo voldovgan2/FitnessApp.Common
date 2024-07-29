@@ -19,17 +19,17 @@ public class GenericServiceTest : TestBase
     private readonly Mock<IGenericRepository<
         TestGenericModel,
         CreateTestGenericModel,
-        UpdateTestGenericModel>> _repositoryMock;
-    private readonly GenericServiceMock _serviceMock;
+        UpdateTestGenericModel>> _repository;
+    private readonly GenericServiceMock _service;
 
     public GenericServiceTest() : base()
     {
-        _repositoryMock = new Mock<
+        _repository = new Mock<
             IGenericRepository<
                 TestGenericModel,
                 CreateTestGenericModel,
                 UpdateTestGenericModel>>();
-        _serviceMock = new GenericServiceMock(_repositoryMock.Object);
+        _service = new GenericServiceMock(_repository.Object);
     }
 
     [Theory]
@@ -38,7 +38,7 @@ public class GenericServiceTest : TestBase
     public async Task GetItemByUserId_UserIdIsEmpty_ThrowsValidationError(string userId)
     {
         // Assert
-        var exception = await Assert.ThrowsAsync<ValidationException>(() => _serviceMock.GetItemByUserId(userId));
+        var exception = await Assert.ThrowsAsync<ValidationException>(() => _service.GetItemByUserId(userId));
         Assert.Equal("Field validation failed, field name: userId, message: userId can't be empty.", exception.Message);
     }
 
@@ -47,12 +47,12 @@ public class GenericServiceTest : TestBase
     {
         // Arrange
         var allDataMock = TestData.GetAll(TestData.CreateGenericModel, new Dictionary<string, object>());
-        _repositoryMock
+        _repository
            .Setup(s => s.GetItemByUserId(It.IsAny<string>()))
            .ReturnsAsync(allDataMock.Single(i => i.UserId == TestData.Id));
 
         // Act
-        var entity = await _serviceMock.GetItemByUserId(TestData.Id);
+        var entity = await _service.GetItemByUserId(TestData.Id);
 
         // Assert
         Assert.Equal(TestData.Id, entity.UserId);
@@ -62,7 +62,7 @@ public class GenericServiceTest : TestBase
     public async Task GetItemByIds_IdsIsEmpty_ThrowsValidationError()
     {
         // Assert
-        var exception = await Assert.ThrowsAsync<ValidationException>(() => _serviceMock.GetItemsByIds([]));
+        var exception = await Assert.ThrowsAsync<ValidationException>(() => _service.GetItemsByIds([]));
         Assert.Equal("Field validation failed, field name: ids, message: ids can't be empty.", exception.Message);
     }
 
@@ -71,12 +71,12 @@ public class GenericServiceTest : TestBase
     {
         // Arrange
         var genericEntitiesMock = CreateDefaultMockedData();
-        _repositoryMock
+        _repository
            .Setup(s => s.GetItemsByIds(It.IsAny<IEnumerable<string>>()))
            .ReturnsAsync(genericEntitiesMock.Where(e => TestData.Ids.Contains(e.UserId)));
 
         // Act
-        var models = await _serviceMock.GetItemsByIds(TestData.Ids);
+        var models = await _service.GetItemsByIds(TestData.Ids);
 
         // Assert
         Assert.All(models, m => Assert.Contains(m.UserId, TestData.Ids));
@@ -86,7 +86,7 @@ public class GenericServiceTest : TestBase
     public async Task GetItemByIds_PagedIdsIsEmpty_ThrowsValidationError()
     {
         // Assert
-        var exception = await Assert.ThrowsAsync<ValidationException>(() => _serviceMock.GetItemsByIds(new GetTestPagedByIdsDataModel
+        var exception = await Assert.ThrowsAsync<ValidationException>(() => _service.GetItemsByIds(new GetTestPagedByIdsDataModel
         {
             Ids = Enumerable.Empty<string>(),
             Page = 1,
@@ -99,7 +99,7 @@ public class GenericServiceTest : TestBase
     public async Task GetItemByIds_PagedPageLessThen0_ThrowsValidationError()
     {
         // Assert
-        var exception = await Assert.ThrowsAsync<AggregateException>(() => _serviceMock.GetItemsByIds(new GetTestPagedByIdsDataModel
+        var exception = await Assert.ThrowsAsync<AggregateException>(() => _service.GetItemsByIds(new GetTestPagedByIdsDataModel
         {
             Ids = TestData.Ids,
             Page = -1,
@@ -112,7 +112,7 @@ public class GenericServiceTest : TestBase
     public async Task GetItemByIds_PagedPageSizeLessThen1_ThrowsValidationError()
     {
         // Assert
-        var exception = await Assert.ThrowsAsync<AggregateException>(() => _serviceMock.GetItemsByIds(new GetTestPagedByIdsDataModel
+        var exception = await Assert.ThrowsAsync<AggregateException>(() => _service.GetItemsByIds(new GetTestPagedByIdsDataModel
         {
             Ids = TestData.Ids,
             Page = 0,
@@ -133,12 +133,12 @@ public class GenericServiceTest : TestBase
         };
 
         var genericEntitiesMock = CreateDefaultMockedData();
-        _repositoryMock
+        _repository
            .Setup(s => s.GetItems(It.IsAny<GetPagedByIdsDataModel>()))
            .ReturnsAsync(genericEntitiesMock.Where(e => TestData.Ids.Contains(e.UserId)).ToPaged(model));
 
         // Act
-        var models = await _serviceMock.GetItemsByIds(model);
+        var models = await _service.GetItemsByIds(model);
 
         // Assert
         Assert.All(models.Items, m => Assert.Contains(m.UserId, TestData.Ids));
@@ -150,7 +150,7 @@ public class GenericServiceTest : TestBase
     public async Task CreateItem_EmptyUserId_ThrowsValidationError(string userId)
     {
         // Assert
-        var exception = await Assert.ThrowsAsync<AggregateException>(() => _serviceMock.CreateItem(TestData.CreateCreateTestGenericModel(CreateGenericModelParameters(userId))));
+        var exception = await Assert.ThrowsAsync<AggregateException>(() => _service.CreateItem(TestData.CreateCreateTestGenericModel(CreateGenericModelParameters(userId))));
         Assert.Equal("Field validation failed, field name: UserId, message: UserId can't be empty.", exception.InnerExceptions.Single().Message);
     }
 
@@ -160,12 +160,12 @@ public class GenericServiceTest : TestBase
         // Arrange
         var genericModelParameters = CreateGenericModelParameters(TestData.Id);
         var model = TestData.CreateGenericModel(genericModelParameters);
-        _repositoryMock
+        _repository
             .Setup(s => s.CreateItem(It.IsAny<CreateTestGenericModel>()))
             .ReturnsAsync(model);
 
         // Act
-        var entity = await _serviceMock.CreateItem(TestData.CreateCreateTestGenericModel(genericModelParameters));
+        var entity = await _service.CreateItem(TestData.CreateCreateTestGenericModel(genericModelParameters));
 
         // Assert
         Assert.Equal(TestData.Id, entity.UserId);
@@ -177,7 +177,7 @@ public class GenericServiceTest : TestBase
     public async Task UpdateItem_EmptyUserId_ThrowsValidationError(string userId)
     {
         // Assert
-        var exception = await Assert.ThrowsAsync<AggregateException>(() => _serviceMock.UpdateItem(TestData.CreateUpdateTestGenericModel(CreateGenericModelParameters(userId))));
+        var exception = await Assert.ThrowsAsync<AggregateException>(() => _service.UpdateItem(TestData.CreateUpdateTestGenericModel(CreateGenericModelParameters(userId))));
         Assert.Equal("Field validation failed, field name: UserId, message: UserId can't be empty.", exception.InnerExceptions.Single().Message);
     }
 
@@ -191,12 +191,12 @@ public class GenericServiceTest : TestBase
         var model = TestData.CreateGenericModel(genericModelParameters);
         model.TestProperty1 = updateModel.TestProperty1;
 
-        _repositoryMock
+        _repository
             .Setup(s => s.UpdateItem(It.IsAny<UpdateTestGenericModel>()))
             .ReturnsAsync(model);
 
         // Act
-        var entity = await _serviceMock.UpdateItem(updateModel);
+        var entity = await _service.UpdateItem(updateModel);
 
         // Assert
         Assert.Equal(model.TestProperty1, entity.TestProperty1);
@@ -208,7 +208,7 @@ public class GenericServiceTest : TestBase
     public async Task DeleteItem_UserIdIsEmpty_ThrowsValidationError(string userId)
     {
         // Assert
-        var exception = await Assert.ThrowsAsync<ValidationException>(() => _serviceMock.DeleteItem(userId));
+        var exception = await Assert.ThrowsAsync<ValidationException>(() => _service.DeleteItem(userId));
         Assert.Equal("Field validation failed, field name: userId, message: userId can't be empty.", exception.Message);
     }
 
@@ -216,12 +216,12 @@ public class GenericServiceTest : TestBase
     public async Task DeleteItem_ReturnsDeletedItemId()
     {
         // Arrange
-        _repositoryMock
+        _repository
             .Setup(s => s.DeleteItem(It.IsAny<string>()))
             .ReturnsAsync(TestData.Id);
 
         // Act
-        var deletedId = await _serviceMock.DeleteItem(TestData.Id);
+        var deletedId = await _service.DeleteItem(TestData.Id);
 
         // Assert
         Assert.Equal(TestData.Id, deletedId);

@@ -1,10 +1,13 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using FitnessApp.Common.Abstractions.Db.Enums.Collection;
 using FitnessApp.Common.Abstractions.Db.Repository.Collection;
+using FitnessApp.Common.Exceptions;
 using FitnessApp.Comon.Tests.Shared;
 using FitnessApp.Comon.Tests.Shared.Abstraction.Models.Collection;
+using FitnessApp.Comon.Tests.Shared.Abstraction.Models.Generic;
 using FitnessApp.Comon.Tests.Shared.Abstraction.Services.Collection;
 using Moq;
 using Xunit;
@@ -19,7 +22,7 @@ public class CollectionServiceTest : TestBase
             TestCollectionItemModel,
             CreateTestCollectionModel,
             UpdateTestCollectionModel>
-        > _repositoryMock;
+        > _repository;
     private readonly CollectionServiceMock _service;
     private readonly Dictionary<string, object> _defaultTestCollectionEntityParameters = new()
     {
@@ -33,14 +36,24 @@ public class CollectionServiceTest : TestBase
 
     public CollectionServiceTest() : base()
     {
-        _repositoryMock = new Mock<
+        _repository = new Mock<
             ICollectionRepository<
                 TestCollectionModel,
                 TestCollectionItemModel,
                 CreateTestCollectionModel,
                 UpdateTestCollectionModel>
             >();
-        _service = new CollectionServiceMock(_repositoryMock.Object);
+        _service = new CollectionServiceMock(_repository.Object);
+    }
+
+    [Theory]
+    [InlineData(null)]
+    [InlineData("")]
+    public async Task GetItemByUserId_UserIdIsEmpty_ThrowsValidationError(string userId)
+    {
+        // Assert
+        var exception = await Assert.ThrowsAsync<ValidationException>(() => _service.GetItemByUserId(userId));
+        Assert.Equal("Field validation failed, field name: userId, message: userId can't be empty.", exception.Message);
     }
 
     [Fact]
@@ -53,7 +66,7 @@ public class CollectionServiceTest : TestBase
                 "ItemsCount", 2
             }
         });
-        _repositoryMock
+        _repository
            .Setup(s => s.GetItemByUserId(It.IsAny<string>()))
            .ReturnsAsync(genericModelsMock.Single(i => i.UserId == TestData.Id));
 
@@ -62,6 +75,26 @@ public class CollectionServiceTest : TestBase
 
         // Assert
         Assert.Equal(TestData.Id, entity.UserId);
+    }
+
+    [Theory]
+    [InlineData(null)]
+    [InlineData("")]
+    public async Task GetCollectionByUserId_UserIdIsEmpty_ThrowsValidationError(string userId)
+    {
+        // Assert
+        var exception = await Assert.ThrowsAsync<AggregateException>(() => _service.GetCollectionByUserId(userId, "collection"));
+        Assert.Equal("Field validation failed, field name: userId, message: userId can't be empty.", exception.InnerExceptions.Single().Message);
+    }
+
+    [Theory]
+    [InlineData(null)]
+    [InlineData("")]
+    public async Task GetCollectionByUserId_CollectionIsEmpty_ThrowsValidationError(string collection)
+    {
+        // Assert
+        var exception = await Assert.ThrowsAsync<AggregateException>(() => _service.GetCollectionByUserId("userId", collection));
+        Assert.Equal("Field validation failed, field name: collectionName, message: collectionName can't be empty.", exception.InnerExceptions.Single().Message);
     }
 
     [Fact]
@@ -73,7 +106,7 @@ public class CollectionServiceTest : TestBase
             TestData.CreateCollectionItemModel(1),
             TestData.CreateCollectionItemModel(2)
         };
-        _repositoryMock
+        _repository
            .Setup(s => s.GetCollectionByUserId(It.IsAny<string>(), It.IsAny<string>()))
            .ReturnsAsync(collectionItems);
 
@@ -83,6 +116,66 @@ public class CollectionServiceTest : TestBase
         // Assert
         Assert.All(collection, c => Assert.Contains(collectionItems, ci => ci.Id == c.Id));
         Assert.All(collection, c => Assert.Equal(c.TestProperty, collectionItems.Single(ci => ci.Id == c.Id).TestProperty));
+    }
+
+    [Theory]
+    [InlineData(null)]
+    [InlineData("")]
+    public async Task GetFilteredCollectionItems_UserIdIsEmpty_ThrowsValidationError(string userId)
+    {
+        // Assert
+        var exception = await Assert.ThrowsAsync<AggregateException>(() => _service.GetFilteredCollectionItems(new GetTestFilteredCollectionItemsModel
+        {
+            UserId = userId,
+            CollectionName = TestData.CollectionName,
+            Page = 0,
+            PageSize = 10
+        }));
+        Assert.Equal("Field validation failed, field name: UserId, message: UserId can't be empty.", exception.InnerExceptions.Single().Message);
+    }
+
+    [Theory]
+    [InlineData(null)]
+    [InlineData("")]
+    public async Task GetFilteredCollectionItems_CollectionIsEmpty_ThrowsValidationError(string collection)
+    {
+        // Assert
+        var exception = await Assert.ThrowsAsync<AggregateException>(() => _service.GetFilteredCollectionItems(new GetTestFilteredCollectionItemsModel
+        {
+            UserId = TestData.Id,
+            CollectionName = collection,
+            Page = 0,
+            PageSize = 10
+        }));
+        Assert.Equal("Field validation failed, field name: CollectionName, message: CollectionName can't be empty.", exception.InnerExceptions.Single().Message);
+    }
+
+    [Fact]
+    public async Task GetFilteredCollectionItems_PagedPageLessThen0_ThrowsValidationError()
+    {
+        // Assert
+        var exception = await Assert.ThrowsAsync<AggregateException>(() => _service.GetFilteredCollectionItems(new GetTestFilteredCollectionItemsModel
+        {
+            UserId = TestData.Id,
+            CollectionName = TestData.CollectionName,
+            Page = -1,
+            PageSize = 10
+        }));
+        Assert.Equal("Field validation failed, field name: Page, message: Page should be within the range [0, 2147483647].", exception.InnerExceptions.Single().Message);
+    }
+
+    [Fact]
+    public async Task GetFilteredCollectionItems_PagedPageSizeLessThen1_ThrowsValidationError()
+    {
+        // Assert
+        var exception = await Assert.ThrowsAsync<AggregateException>(() => _service.GetFilteredCollectionItems(new GetTestFilteredCollectionItemsModel
+        {
+            UserId = TestData.Id,
+            CollectionName = TestData.CollectionName,
+            Page = 0,
+            PageSize = 0
+        }));
+        Assert.Equal("Field validation failed, field name: PageSize, message: PageSize should be within the range [1, 2147483647].", exception.InnerExceptions.Single().Message);
     }
 
     [Fact]
@@ -106,7 +199,7 @@ public class CollectionServiceTest : TestBase
             PageSize = 10
         };
 
-        _repositoryMock
+        _repository
            .Setup(s => s.GetCollectionByUserId(It.IsAny<string>(), It.IsAny<string>()))
            .ReturnsAsync(collectionItems);
 
@@ -115,6 +208,16 @@ public class CollectionServiceTest : TestBase
 
         // Assert
         Assert.All(items.Items, m => filteredBySearchItems.Contains(m.Id));
+    }
+
+    [Theory]
+    [InlineData(null)]
+    [InlineData("")]
+    public async Task CreateItem_EmptyUserId_ThrowsValidationError(string userId)
+    {
+        // Assert
+        var exception = await Assert.ThrowsAsync<AggregateException>(() => _service.CreateItem(TestData.CreateCreateTestGenericModel(CreateGenericModelParameters(userId))));
+        Assert.Equal("Field validation failed, field name: UserId, message: UserId can't be empty.", exception.InnerExceptions.Single().Message);
     }
 
     [Fact]
@@ -128,7 +231,7 @@ public class CollectionServiceTest : TestBase
             }
         });
 
-        _repositoryMock
+        _repository
            .Setup(s => s.CreateItem(It.IsAny<CreateTestCollectionModel>()))
            .ReturnsAsync(createModel.UserId);
 
@@ -145,7 +248,7 @@ public class CollectionServiceTest : TestBase
         // Arrange
         var addItemModel = TestData.CreateCollectionItemModel(1);
 
-        _repositoryMock
+        _repository
            .Setup(s => s.UpdateItem(It.IsAny<UpdateTestCollectionModel>()))
            .ReturnsAsync(addItemModel);
 
@@ -163,7 +266,7 @@ public class CollectionServiceTest : TestBase
         // Arrange
         var updateItemModel = TestData.CreateCollectionItemModel(1, "Updated");
 
-        _repositoryMock
+        _repository
            .Setup(s => s.UpdateItem(It.IsAny<UpdateTestCollectionModel>()))
            .ReturnsAsync(updateItemModel);
 
@@ -181,7 +284,7 @@ public class CollectionServiceTest : TestBase
         // Arrange
         var updateItemModel = TestData.CreateCollectionItemModel(1);
 
-        _repositoryMock
+        _repository
            .Setup(s => s.UpdateItem(It.IsAny<UpdateTestCollectionModel>()))
            .ReturnsAsync(updateItemModel);
 
@@ -199,7 +302,7 @@ public class CollectionServiceTest : TestBase
         // Arrange
         var deletedModel = TestData.CreateCollectionModel(_defaultTestCollectionEntityParameters);
 
-        _repositoryMock
+        _repository
            .Setup(s => s.DeleteItem(It.IsAny<string>()))
            .ReturnsAsync(deletedModel);
 
