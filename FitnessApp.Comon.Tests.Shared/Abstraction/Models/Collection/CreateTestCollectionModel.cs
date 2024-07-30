@@ -5,6 +5,7 @@ using FitnessApp.Common.Abstractions.Models.Collection;
 
 namespace FitnessApp.Comon.Tests.Shared.Abstraction.Models.Collection;
 
+[ExcludeFromCodeCoverageAttribute]
 public class CreateTestCollectionModel : ICreateCollectionModel, IEquatable<CreateTestCollectionModel>
 {
     public string UserId { get; set; }

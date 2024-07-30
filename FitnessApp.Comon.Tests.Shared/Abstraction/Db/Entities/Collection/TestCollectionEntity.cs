@@ -6,6 +6,7 @@ using MongoDB.Bson.Serialization.Attributes;
 
 namespace FitnessApp.Comon.Tests.Shared.Abstraction.Db.Entities.Collection;
 
+[ExcludeFromCodeCoverageAttribute]
 public class TestCollectionEntity : ICollectionEntity, IEquatable<TestCollectionEntity>
 {
     [BsonId]

@@ -1,9 +1,11 @@
-﻿using FitnessApp.Common.Abstractions.Db.Enums.Collection;
+﻿using System.Diagnostics.CodeAnalysis;
+using FitnessApp.Common.Abstractions.Db.Enums.Collection;
 using FitnessApp.Common.Abstractions.Models.Collection;
 using FitnessApp.Common.Abstractions.Models.CollectionFileAggregator;
 
 namespace FitnessApp.Comon.Tests.Shared.Abstraction.Models.CollectionFileAggregator;
 
+[ExcludeFromCodeCoverageAttribute]
 public class UpdateTestCollectionFileAggregatorModel : IUpdateCollectionFileAggregatorModel
 {
     public string UserId { get; set; }

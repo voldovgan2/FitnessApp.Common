@@ -6,6 +6,7 @@ using MongoDB.Bson.Serialization.Attributes;
 
 namespace FitnessApp.Comon.Tests.Shared.Abstraction.Db.Entities.Generic;
 
+[ExcludeFromCodeCoverageAttribute]
 public class TestGenericEntity : IGenericEntity, IEquatable<TestGenericEntity>
 {
     [BsonId]

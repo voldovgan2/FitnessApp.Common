@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using System.IO;
 using System.Text;
 using FitnessApp.Common.Abstractions.Db.Entities.Collection;
@@ -17,6 +18,7 @@ using FitnessApp.Comon.Tests.Shared.Abstraction.Models.GenericFileAggregator;
 
 namespace FitnessApp.Comon.Tests.Shared;
 
+[ExcludeFromCodeCoverageAttribute]
 public static class TestData
 {
     public static string EntityIdToGet { get; } = "EntityIdToGet";

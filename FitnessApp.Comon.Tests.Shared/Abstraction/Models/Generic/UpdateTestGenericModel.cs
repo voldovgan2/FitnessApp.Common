@@ -4,6 +4,7 @@ using FitnessApp.Common.Abstractions.Models.Generic;
 
 namespace FitnessApp.Comon.Tests.Shared.Abstraction.Models.Generic;
 
+[ExcludeFromCodeCoverageAttribute]
 public class UpdateTestGenericModel : IUpdateGenericModel, IEquatable<UpdateTestGenericModel>
 {
     public string UserId { get; set; }

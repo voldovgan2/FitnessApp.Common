@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using AutoMapper;
 using FitnessApp.Common.Abstractions.Db.Entities.Collection;
 using FitnessApp.Comon.Tests.Shared.Abstraction.Db.Entities.Collection;
@@ -10,6 +11,7 @@ using FitnessApp.Comon.Tests.Shared.Abstraction.Models.GenericFileAggregator;
 
 namespace FitnessApp.Comon.Tests.Shared;
 
+[ExcludeFromCodeCoverageAttribute]
 public class MappingProfile : Profile
 {
     public MappingProfile()

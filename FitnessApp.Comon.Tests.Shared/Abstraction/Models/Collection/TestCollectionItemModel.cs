@@ -4,6 +4,7 @@ using FitnessApp.Common.Abstractions.Models.Collection;
 
 namespace FitnessApp.Comon.Tests.Shared.Abstraction.Models.Collection;
 
+[ExcludeFromCodeCoverageAttribute]
 public class TestCollectionItemModel : ICollectionItemModel, IEquatable<TestCollectionItemModel>
 {
     public string Id { get; set; }
