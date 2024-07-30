@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Diagnostics.CodeAnalysis;
 using System.Reflection;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.Extensions.Configuration;
@@ -8,6 +9,7 @@ using Serilog.Sinks.Elasticsearch;
 
 namespace FitnessApp.Common.Configuration;
 
+[ExcludeFromCodeCoverage]
 public static class SerilogExtensions
 {
     public static void ConfigureLogging(this WebApplicationBuilder builder)

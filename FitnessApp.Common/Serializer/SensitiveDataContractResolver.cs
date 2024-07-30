@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using System.Reflection;
 using FitnessApp.Common.Attributes;
@@ -8,6 +9,7 @@ using Newtonsoft.Json.Serialization;
 
 namespace FitnessApp.Common.Serializer;
 
+[ExcludeFromCodeCoverage]
 public class SensitiveDataContractResolver : DefaultContractResolver
 {
     public bool HasSensitiveProperties(Type type)

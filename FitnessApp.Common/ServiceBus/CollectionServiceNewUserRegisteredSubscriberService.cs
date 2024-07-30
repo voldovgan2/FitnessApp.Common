@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Diagnostics.CodeAnalysis;
 using System.Text.Json;
 using System.Threading.Tasks;
 using FitnessApp.Common.Abstractions.Models.Collection;
@@ -7,6 +8,7 @@ using FitnessApp.Common.ServiceBus.Nats.Services;
 
 namespace FitnessApp.Common.ServiceBus;
 
+[ExcludeFromCodeCoverage]
 public abstract class CollectionServiceNewUserRegisteredSubscriberService<TCreateModel>(
     IServiceBus serviceBus,
     Func<TCreateModel, Task<string>> createItemMethod) : MessageBusService(serviceBus)

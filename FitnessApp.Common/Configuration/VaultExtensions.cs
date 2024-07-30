@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Diagnostics.CodeAnalysis;
 using FitnessApp.Common.Vault;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -7,6 +8,7 @@ using VaultSharp.V1.AuthMethods.Token;
 
 namespace FitnessApp.Common.Configuration;
 
+[ExcludeFromCodeCoverage]
 public static class VaultExtensions
 {
     public static IServiceCollection ConfigureVault(this IServiceCollection services, IConfiguration configuration)

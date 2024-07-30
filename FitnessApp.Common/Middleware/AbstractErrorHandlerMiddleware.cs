@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Diagnostics.CodeAnalysis;
 using System.Net;
 using System.Text.Json;
 using System.Threading.Tasks;
@@ -7,6 +8,7 @@ using Serilog;
 
 namespace FitnessApp.Common.Middleware;
 
+[ExcludeFromCodeCoverage]
 public abstract class AbstractErrorHandlerMiddleware(RequestDelegate next)
 {
     public async Task Invoke(HttpContext context)

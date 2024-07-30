@@ -1,10 +1,12 @@
-﻿using System.IO;
+﻿using System.Diagnostics.CodeAnalysis;
+using System.IO;
 using System.Threading.Tasks;
 using Minio;
 using Minio.DataModel.Args;
 
 namespace FitnessApp.Common.Files;
 
+[ExcludeFromCodeCoverage]
 public class FilesService(IMinioClient minioClient) : IFilesService
 {
     public async Task UploadFile(string bucketName, string objectName, Stream stream)

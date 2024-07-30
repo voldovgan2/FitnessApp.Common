@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Diagnostics.CodeAnalysis;
 using FitnessApp.Common.ServiceBus.Nats.Services;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -6,6 +7,7 @@ using NATS.Client;
 
 namespace FitnessApp.Common.Configuration;
 
+[ExcludeFromCodeCoverage]
 public static class NatsExtensions
 {
     public static IServiceCollection ConfigureNats(this IServiceCollection services, IConfiguration configuration)

@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Diagnostics.CodeAnalysis;
 using System.Text.Json;
 using System.Threading.Tasks;
 using FitnessApp.Common.Abstractions.Models.CollectionFileAggregator;
@@ -7,6 +8,7 @@ using FitnessApp.Common.ServiceBus.Nats.Services;
 
 namespace FitnessApp.Common.ServiceBus;
 
+[ExcludeFromCodeCoverage]
 public class CollectionFileAggregatorServiceNewUserRegisteredSubscriberService<TCreateCollectionFileAggregatorModel>(
     IServiceBus serviceBus,
     Func<TCreateCollectionFileAggregatorModel, Task<string>> createItemMethod) : MessageBusService(serviceBus)

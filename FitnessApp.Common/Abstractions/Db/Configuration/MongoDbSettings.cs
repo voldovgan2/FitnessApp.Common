@@ -1,5 +1,8 @@
-﻿namespace FitnessApp.Common.Abstractions.Db.Configuration;
+﻿using System.Diagnostics.CodeAnalysis;
 
+namespace FitnessApp.Common.Abstractions.Db.Configuration;
+
+[ExcludeFromCodeCoverage]
 public class MongoDbSettings
 {
     public string ConnectionString { get; set; }

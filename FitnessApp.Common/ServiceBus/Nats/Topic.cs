@@ -1,5 +1,8 @@
-﻿namespace FitnessApp.Common.ServiceBus.Nats;
+﻿using System.Diagnostics.CodeAnalysis;
 
+namespace FitnessApp.Common.ServiceBus.Nats;
+
+[ExcludeFromCodeCoverage]
 public static class Topic
 {
     public const string NEW_USER_REGISTERED = "NEW_USER_REGISTERED";

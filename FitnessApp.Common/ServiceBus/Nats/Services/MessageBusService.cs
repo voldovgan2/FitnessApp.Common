@@ -1,10 +1,12 @@
-﻿using System.Threading;
+﻿using System.Diagnostics.CodeAnalysis;
+using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Hosting;
 using NATS.Client;
 
 namespace FitnessApp.Common.ServiceBus.Nats.Services;
 
+[ExcludeFromCodeCoverage]
 public abstract class MessageBusService(IServiceBus serviceBus) : IHostedService
 {
     private IAsyncSubscription _eventSubscription;

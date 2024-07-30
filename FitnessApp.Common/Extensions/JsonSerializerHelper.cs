@@ -1,8 +1,10 @@
-﻿using System.Text;
+﻿using System.Diagnostics.CodeAnalysis;
+using System.Text;
 using System.Text.Json;
 
 namespace FitnessApp.Common.Extensions;
 
+[ExcludeFromCodeCoverage]
 public static class JsonSerializerHelper
 {
     public static Encoding DefaultEncoding { get; set; } = Encoding.UTF32;

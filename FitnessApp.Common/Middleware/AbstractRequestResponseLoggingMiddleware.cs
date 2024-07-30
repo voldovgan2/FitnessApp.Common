@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Diagnostics.CodeAnalysis;
 using System.IO;
 using System.Text;
 using System.Threading.Tasks;
@@ -8,6 +9,7 @@ using Serilog;
 
 namespace FitnessApp.Common.Middleware;
 
+[ExcludeFromCodeCoverage]
 public abstract class AbstractRequestResponseLoggingMiddleware(RequestDelegate next, ILogger logger)
 {
     public async Task Invoke(HttpContext context)

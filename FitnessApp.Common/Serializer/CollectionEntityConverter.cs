@@ -1,11 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using FitnessApp.Common.Abstractions.Db.Entities.Collection;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 
 namespace FitnessApp.Common.Serializer;
 
+[ExcludeFromCodeCoverage]
 public class CollectionEntityConverter<TEntity, TCollectionItemEntity> : JsonConverter
     where TEntity : ICollectionEntity
     where TCollectionItemEntity : ICollectionItemEntity

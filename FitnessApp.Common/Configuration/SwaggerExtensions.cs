@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Diagnostics.CodeAnalysis;
 using System.IO;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.Extensions.DependencyInjection;
@@ -7,6 +8,7 @@ using Swashbuckle.AspNetCore.Filters;
 
 namespace FitnessApp.Common.Configuration;
 
+[ExcludeFromCodeCoverage]
 public static class SwaggerExtensions
 {
     public static IServiceCollection ConfigureSwagger(this IServiceCollection services, string apiName, string version = "1.0")

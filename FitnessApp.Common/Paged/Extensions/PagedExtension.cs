@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using System.Reflection;
 using FitnessApp.Common.Paged.Models.Input;
@@ -6,6 +7,7 @@ using FitnessApp.Common.Paged.Models.Output;
 
 namespace FitnessApp.Common.Paged.Extensions;
 
+[ExcludeFromCodeCoverage]
 public static class PagedExtension
 {
     public static PagedDataModel<T> ToPaged<T>(this IEnumerable<T> data, GetPagedDataModel model)

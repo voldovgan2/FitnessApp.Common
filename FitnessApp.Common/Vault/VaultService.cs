@@ -1,8 +1,10 @@
-﻿using System.Threading.Tasks;
+﻿using System.Diagnostics.CodeAnalysis;
+using System.Threading.Tasks;
 using VaultSharp;
 
 namespace FitnessApp.Common.Vault;
 
+[ExcludeFromCodeCoverage]
 public class VaultService(IVaultClient vaultClient) : IVaultService
 {
     public async Task<string> GetSecret(string secretKey)

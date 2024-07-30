@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Diagnostics.CodeAnalysis;
 using FitnessApp.Common.Files;
 using FitnessApp.Common.Vault;
 using Microsoft.Extensions.Configuration;
@@ -7,6 +8,7 @@ using Minio;
 
 namespace FitnessApp.Common.Configuration;
 
+[ExcludeFromCodeCoverage]
 public static class FilesExtensions
 {
     public static IServiceCollection ConfigureFilesService(this IServiceCollection services, IConfiguration configuration)

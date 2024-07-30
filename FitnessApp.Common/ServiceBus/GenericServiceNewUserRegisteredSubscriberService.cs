@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Diagnostics.CodeAnalysis;
 using System.Text.Json;
 using System.Threading.Tasks;
 using FitnessApp.Common.Abstractions.Models.Generic;
@@ -7,6 +8,7 @@ using FitnessApp.Common.ServiceBus.Nats.Services;
 
 namespace FitnessApp.Common.ServiceBus;
 
+[ExcludeFromCodeCoverage]
 public class GenericServiceNewUserRegisteredSubscriberService<TGenericModel, TCreateGenericModel>(
     IServiceBus serviceBus,
     Func<TCreateGenericModel, Task<TGenericModel>> createItemMethod) : MessageBusService(serviceBus)

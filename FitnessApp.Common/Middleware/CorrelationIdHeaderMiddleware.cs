@@ -1,9 +1,11 @@
 ﻿using System;
+using System.Diagnostics.CodeAnalysis;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
 
 namespace FitnessApp.Common.Middleware;
 
+[ExcludeFromCodeCoverage]
 public class CorrelationIdHeaderMiddleware(RequestDelegate next)
 {
     public async Task Invoke(HttpContext context)
