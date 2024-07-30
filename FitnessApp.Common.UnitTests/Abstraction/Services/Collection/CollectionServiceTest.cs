@@ -7,7 +7,6 @@ using FitnessApp.Common.Abstractions.Db.Repository.Collection;
 using FitnessApp.Common.Exceptions;
 using FitnessApp.Comon.Tests.Shared;
 using FitnessApp.Comon.Tests.Shared.Abstraction.Models.Collection;
-using FitnessApp.Comon.Tests.Shared.Abstraction.Models.Generic;
 using FitnessApp.Comon.Tests.Shared.Abstraction.Services.Collection;
 using Moq;
 using Xunit;
@@ -216,7 +215,7 @@ public class CollectionServiceTest : TestBase
     public async Task CreateItem_EmptyUserId_ThrowsValidationError(string userId)
     {
         // Assert
-        var exception = await Assert.ThrowsAsync<AggregateException>(() => _service.CreateItem(TestData.CreateCreateTestGenericModel(CreateGenericModelParameters(userId))));
+        var exception = await Assert.ThrowsAsync<AggregateException>(() => _service.CreateItem(TestData.CreateCreateTestCollectionModel(CreateCreateTestCollectionModelParameters(userId))));
         Assert.Equal("Field validation failed, field name: UserId, message: UserId can't be empty.", exception.InnerExceptions.Single().Message);
     }
 
@@ -224,12 +223,7 @@ public class CollectionServiceTest : TestBase
     public async Task CreateItem_ReturnsCreated()
     {
         // Arrange
-        var createModel = TestData.CreateCreateTestCollectionModel(new Dictionary<string, object>
-        {
-            {
-                "Id", TestData.Id
-            }
-        });
+        var createModel = TestData.CreateCreateTestCollectionModel(CreateCreateTestCollectionModelParameters(TestData.Id));
 
         _repository
            .Setup(s => s.CreateItem(It.IsAny<CreateTestCollectionModel>()))
@@ -240,6 +234,32 @@ public class CollectionServiceTest : TestBase
 
         // Assert
         Assert.Equal(TestData.Id, id);
+    }
+
+    [Theory]
+    [InlineData(null)]
+    [InlineData("")]
+    public async Task UpdateItem_UserIdIsEmpty_ThrowsValidationError(string userId)
+    {
+        // Arrange
+        var addItemModel = TestData.CreateCollectionItemModel(1);
+
+        // Assert
+        var exception = await Assert.ThrowsAsync<AggregateException>(() => _service.UpdateItem(CreateUpdateTestCollectionModel(userId, "collectionName", UpdateCollectionAction.Add, addItemModel)));
+        Assert.Equal("Field validation failed, field name: UserId, message: UserId can't be empty.", exception.InnerExceptions.Single().Message);
+    }
+
+    [Theory]
+    [InlineData(null)]
+    [InlineData("")]
+    public async Task UpdateItem_CollectionIsEmpty_ThrowsValidationError(string collectionName)
+    {
+        // Arrange
+        var addItemModel = TestData.CreateCollectionItemModel(1);
+
+        // Assert
+        var exception = await Assert.ThrowsAsync<AggregateException>(() => _service.UpdateItem(CreateUpdateTestCollectionModel("userId", collectionName, UpdateCollectionAction.Add, addItemModel)));
+        Assert.Equal("Field validation failed, field name: CollectionName, message: CollectionName can't be empty.", exception.InnerExceptions.Single().Message);
     }
 
     [Fact]
@@ -253,7 +273,7 @@ public class CollectionServiceTest : TestBase
            .ReturnsAsync(addItemModel);
 
         // Act
-        var createdItemModel = await _service.UpdateItem(CreateUpdateTestCollectionModel(UpdateCollectionAction.Add, addItemModel));
+        var createdItemModel = await _service.UpdateItem(CreateUpdateTestCollectionModel(TestData.Id, TestData.CollectionName, UpdateCollectionAction.Add, addItemModel));
 
         // Assert
         Assert.Equal(addItemModel.Id, createdItemModel.Id);
@@ -271,7 +291,7 @@ public class CollectionServiceTest : TestBase
            .ReturnsAsync(updateItemModel);
 
         // Act
-        var createdItemModel = await _service.UpdateItem(CreateUpdateTestCollectionModel(UpdateCollectionAction.Update, TestData.CreateCollectionItemModel(1)));
+        var createdItemModel = await _service.UpdateItem(CreateUpdateTestCollectionModel(TestData.Id, TestData.CollectionName, UpdateCollectionAction.Update, TestData.CreateCollectionItemModel(1)));
 
         // Assert
         Assert.Equal(updateItemModel.Id, createdItemModel.Id);
@@ -289,11 +309,21 @@ public class CollectionServiceTest : TestBase
            .ReturnsAsync(updateItemModel);
 
         // Act
-        var deletedItemModel = await _service.UpdateItem(CreateUpdateTestCollectionModel(UpdateCollectionAction.Remove, TestData.CreateCollectionItemModel(1)));
+        var deletedItemModel = await _service.UpdateItem(CreateUpdateTestCollectionModel(TestData.Id, TestData.CollectionName, UpdateCollectionAction.Remove, TestData.CreateCollectionItemModel(1)));
 
         // Assert
         Assert.Equal(updateItemModel.Id, deletedItemModel.Id);
         Assert.Equal(updateItemModel.TestProperty, deletedItemModel.TestProperty);
+    }
+
+    [Theory]
+    [InlineData(null)]
+    [InlineData("")]
+    public async Task DeleteItem_UserIdIsEmpty_ThrowsValidationError(string userId)
+    {
+        // Assert
+        var exception = await Assert.ThrowsAsync<ValidationException>(() => _service.DeleteItem(userId));
+        Assert.Equal("Field validation failed, field name: userId, message: userId can't be empty.", exception.Message);
     }
 
     [Fact]
@@ -313,18 +343,28 @@ public class CollectionServiceTest : TestBase
         Assert.Equal(deletedModel.UserId, deletedItemModel.UserId);
     }
 
-    private UpdateTestCollectionModel CreateUpdateTestCollectionModel(UpdateCollectionAction action, TestCollectionItemModel model)
+    private Dictionary<string, object> CreateCreateTestCollectionModelParameters(string id)
+    {
+        return new Dictionary<string, object>
+        {
+            {
+                "Id", id
+            }
+        };
+    }
+
+    private UpdateTestCollectionModel CreateUpdateTestCollectionModel(string id, string collectionName, UpdateCollectionAction action, TestCollectionItemModel model)
     {
         return TestData.CreateUpdateTestCollectionModel(new Dictionary<string, object>
         {
             {
-                "Id", TestData.Id
+                "Id", id
             },
             {
                 "Action", action
             },
             {
-                "CollectionName", TestData.CollectionName
+                "CollectionName", collectionName
             },
             {
                 "Model", model

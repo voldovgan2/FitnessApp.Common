@@ -1,10 +1,12 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 using FitnessApp.Common.Abstractions.Db.Enums.Collection;
 using FitnessApp.Common.Abstractions.Models.Collection;
 using FitnessApp.Common.Abstractions.Services.Collection;
+using FitnessApp.Common.Exceptions;
 using FitnessApp.Common.Files;
 using FitnessApp.Common.Paged.Extensions;
 using FitnessApp.Comon.Tests.Shared;
@@ -55,6 +57,16 @@ public class CollectionFileAggregatorServiceTest : TestBase
         );
     }
 
+    [Theory]
+    [InlineData(null)]
+    [InlineData("")]
+    public async Task GetItemByUserId_UserIdIsEmpty_ThrowsValidationError(string userId)
+    {
+        // Assert
+        var exception = await Assert.ThrowsAsync<ValidationException>(() => _collectionFilesAggregatorService.GetItemByUserId(userId));
+        Assert.Equal("Field validation failed, field name: userId, message: userId can't be empty.", exception.Message);
+    }
+
     [Fact]
     public async Task GetItemByUserId_ReturnsSingleItem()
     {
@@ -77,6 +89,113 @@ public class CollectionFileAggregatorServiceTest : TestBase
         Assert.All(testCollectionFileAggregatorModel.Collection[TestData.CollectionName], item => Assert.NotNull(collectionModel.Collection[TestData.CollectionName].Single(i => i.Id == item.Model.Id)));
         Assert.All(testCollectionFileAggregatorModel.Collection[TestData.CollectionName], item => Assert.Equal(TestData.FileFieldName, item.Images.Single().FieldName));
         Assert.All(testCollectionFileAggregatorModel.Collection[TestData.CollectionName], item => Assert.Equal(TestData.FileFieldContent, item.Images.Single().Value));
+    }
+
+    [Theory]
+    [InlineData(null)]
+    [InlineData("")]
+    public async Task GetCollectionByUserId_UserIdIsEmpty_ThrowsValidationError(string userId)
+    {
+        // Assert
+        var exception = await Assert.ThrowsAsync<AggregateException>(() => _collectionFilesAggregatorService.GetCollectionByUserId(userId, "collection"));
+        Assert.Equal("Field validation failed, field name: userId, message: userId can't be empty.", exception.InnerExceptions.Single().Message);
+    }
+
+    [Theory]
+    [InlineData(null)]
+    [InlineData("")]
+    public async Task GetCollectionByUserId_CollectionIsEmpty_ThrowsValidationError(string collection)
+    {
+        // Assert
+        var exception = await Assert.ThrowsAsync<AggregateException>(() => _collectionFilesAggregatorService.GetCollectionByUserId("userId", collection));
+        Assert.Equal("Field validation failed, field name: collectionName, message: collectionName can't be empty.", exception.InnerExceptions.Single().Message);
+    }
+
+    [Fact]
+    public async Task GetCollectionByUserId_ReturnsCollection()
+    {
+        // Arrange
+        var collectionItems = new List<TestCollectionItemModel>
+        {
+            TestData.CreateCollectionItemModel(1),
+            TestData.CreateCollectionItemModel(2)
+        };
+
+        _collectionService
+            .Setup(s => s.GetCollectionByUserId(It.IsAny<string>(), It.IsAny<string>()))
+            .ReturnsAsync(collectionItems);
+
+        _fileService
+            .Setup(s => s.DownloadFile(It.IsAny<string>(), It.IsAny<string>()))
+            .ReturnsAsync(TestData.CreateFileResult());
+
+        // Act
+        var testCollectionFileAggregatorItemModel = await _collectionFilesAggregatorService.GetCollectionByUserId(TestData.Id, TestData.CollectionName);
+
+        // Assert
+        Assert.All(testCollectionFileAggregatorItemModel, item => Assert.NotNull(collectionItems.Single(i => i.Id == item.Model.Id)));
+        Assert.All(testCollectionFileAggregatorItemModel, item => Assert.Equal(TestData.FileFieldName, item.Images.Single().FieldName));
+        Assert.All(testCollectionFileAggregatorItemModel, item => Assert.Equal(TestData.FileFieldContent, item.Images.Single().Value));
+    }
+
+    [Theory]
+    [InlineData(null)]
+    [InlineData("")]
+    public async Task GetFilteredCollectionItems_UserIdIsEmpty_ThrowsValidationError(string userId)
+    {
+        // Assert
+        var exception = await Assert.ThrowsAsync<AggregateException>(() => _collectionFilesAggregatorService.GetFilteredCollectionItems(new GetTestFilteredCollectionItemsModel
+        {
+            UserId = userId,
+            CollectionName = TestData.CollectionName,
+            Page = 0,
+            PageSize = 10
+        }));
+        Assert.Equal("Field validation failed, field name: UserId, message: UserId can't be empty.", exception.InnerExceptions.Single().Message);
+    }
+
+    [Theory]
+    [InlineData(null)]
+    [InlineData("")]
+    public async Task GetFilteredCollectionItems_CollectionIsEmpty_ThrowsValidationError(string collection)
+    {
+        // Assert
+        var exception = await Assert.ThrowsAsync<AggregateException>(() => _collectionFilesAggregatorService.GetFilteredCollectionItems(new GetTestFilteredCollectionItemsModel
+        {
+            UserId = TestData.Id,
+            CollectionName = collection,
+            Page = 0,
+            PageSize = 10
+        }));
+        Assert.Equal("Field validation failed, field name: CollectionName, message: CollectionName can't be empty.", exception.InnerExceptions.Single().Message);
+    }
+
+    [Fact]
+    public async Task GetFilteredCollectionItems_PagedPageLessThen0_ThrowsValidationError()
+    {
+        // Assert
+        var exception = await Assert.ThrowsAsync<AggregateException>(() => _collectionFilesAggregatorService.GetFilteredCollectionItems(new GetTestFilteredCollectionItemsModel
+        {
+            UserId = TestData.Id,
+            CollectionName = TestData.CollectionName,
+            Page = -1,
+            PageSize = 10
+        }));
+        Assert.Equal("Field validation failed, field name: Page, message: Page should be within the range [0, 2147483647].", exception.InnerExceptions.Single().Message);
+    }
+
+    [Fact]
+    public async Task GetFilteredCollectionItems_PagedPageSizeLessThen1_ThrowsValidationError()
+    {
+        // Assert
+        var exception = await Assert.ThrowsAsync<AggregateException>(() => _collectionFilesAggregatorService.GetFilteredCollectionItems(new GetTestFilteredCollectionItemsModel
+        {
+            UserId = TestData.Id,
+            CollectionName = TestData.CollectionName,
+            Page = 0,
+            PageSize = 0
+        }));
+        Assert.Equal("Field validation failed, field name: PageSize, message: PageSize should be within the range [1, 2147483647].", exception.InnerExceptions.Single().Message);
     }
 
     [Fact]
@@ -114,6 +233,16 @@ public class CollectionFileAggregatorServiceTest : TestBase
         Assert.All(testCollectionFileAggregatorItemModel.Items, item => Assert.Equal(TestData.FileFieldContent, item.Images.Single().Value));
     }
 
+    [Theory]
+    [InlineData(null)]
+    [InlineData("")]
+    public async Task CreateItem_EmptyUserId_ThrowsValidationError(string userId)
+    {
+        // Assert
+        var exception = await Assert.ThrowsAsync<AggregateException>(() => _collectionFilesAggregatorService.CreateItem(TestData.CreateCreateTestCollectionFileAggregatorModel(CreateCreateTestCollectionModelParameters(userId))));
+        Assert.Equal("Field validation failed, field name: UserId, message: UserId can't be empty.", exception.InnerExceptions.Single().Message);
+    }
+
     [Fact]
     public async Task CreateItem_ReturnsCreated()
     {
@@ -138,6 +267,26 @@ public class CollectionFileAggregatorServiceTest : TestBase
         Assert.Equal(TestData.Id, id);
     }
 
+    [Theory]
+    [InlineData(null)]
+    [InlineData("")]
+    public async Task UpdateItem_UserIdIsEmpty_ThrowsValidationError(string userId)
+    {
+        // Assert
+        var exception = await Assert.ThrowsAsync<AggregateException>(() => _collectionFilesAggregatorService.UpdateItem(CreateUpdateTestCollectionFileAggregatorModel(userId, "collectionName", UpdateCollectionAction.Add)));
+        Assert.Equal("Field validation failed, field name: UserId, message: UserId can't be empty.", exception.InnerExceptions.Single().Message);
+    }
+
+    [Theory]
+    [InlineData(null)]
+    [InlineData("")]
+    public async Task UpdateItem_CollectionIsEmpty_ThrowsValidationError(string collectionName)
+    {
+        // Assert
+        var exception = await Assert.ThrowsAsync<AggregateException>(() => _collectionFilesAggregatorService.UpdateItem(CreateUpdateTestCollectionFileAggregatorModel("userId", collectionName, UpdateCollectionAction.Add)));
+        Assert.Equal("Field validation failed, field name: CollectionName, message: CollectionName can't be empty.", exception.InnerExceptions.Single().Message);
+    }
+
     [Fact]
     public async Task UpdateItemAddCollectionItem_ReturnsAddedItem()
     {
@@ -156,7 +305,7 @@ public class CollectionFileAggregatorServiceTest : TestBase
             .Setup(s => s.UploadFile(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<Stream>()))
             .Returns(Task.CompletedTask);
 
-        var updateCollectionFileAggregatorModel = CreateUpdateTestCollectionFileAggregatorModel(UpdateCollectionAction.Add);
+        var updateCollectionFileAggregatorModel = CreateUpdateTestCollectionFileAggregatorModel(TestData.Id, TestData.CollectionName, UpdateCollectionAction.Add);
 
         // Act
         var collectionFileAggregatorModel = await _collectionFilesAggregatorService.UpdateItem(updateCollectionFileAggregatorModel);
@@ -189,7 +338,7 @@ public class CollectionFileAggregatorServiceTest : TestBase
            .Setup(s => s.DeleteFile(It.IsAny<string>(), It.IsAny<string>()))
            .Returns(Task.CompletedTask);
 
-        var updateCollectionFileAggregatorModel = CreateUpdateTestCollectionFileAggregatorModel(UpdateCollectionAction.Update);
+        var updateCollectionFileAggregatorModel = CreateUpdateTestCollectionFileAggregatorModel(TestData.Id, TestData.CollectionName, UpdateCollectionAction.Update);
 
         // Act
         var collectionFileAggregatorModel = await _collectionFilesAggregatorService.UpdateItem(updateCollectionFileAggregatorModel);
@@ -222,7 +371,7 @@ public class CollectionFileAggregatorServiceTest : TestBase
            .Setup(s => s.DeleteFile(It.IsAny<string>(), It.IsAny<string>()))
            .Returns(Task.CompletedTask);
 
-        var updateCollectionFileAggregatorModel = CreateUpdateTestCollectionFileAggregatorModel(UpdateCollectionAction.Remove);
+        var updateCollectionFileAggregatorModel = CreateUpdateTestCollectionFileAggregatorModel(TestData.Id, TestData.CollectionName, UpdateCollectionAction.Remove);
 
         // Act
         var collectionFileAggregatorModel = await _collectionFilesAggregatorService.UpdateItem(updateCollectionFileAggregatorModel);
@@ -231,6 +380,16 @@ public class CollectionFileAggregatorServiceTest : TestBase
         Assert.Equal(removeItemModel.Id, collectionFileAggregatorModel.Model.Id);
         Assert.Equal(TestData.FileFieldName, collectionFileAggregatorModel.Images.Single().FieldName);
         Assert.Equal(TestData.FileFieldContent, collectionFileAggregatorModel.Images.Single().Value);
+    }
+
+    [Theory]
+    [InlineData(null)]
+    [InlineData("")]
+    public async Task DeleteItem_UserIdIsEmpty_ThrowsValidationError(string userId)
+    {
+        // Assert
+        var exception = await Assert.ThrowsAsync<ValidationException>(() => _collectionFilesAggregatorService.DeleteItem(userId));
+        Assert.Equal("Field validation failed, field name: userId, message: userId can't be empty.", exception.Message);
     }
 
     [Fact]
@@ -253,18 +412,28 @@ public class CollectionFileAggregatorServiceTest : TestBase
         Assert.Equal(removedCollectionModel.UserId, deletedId);
     }
 
-    private UpdateTestCollectionFileAggregatorModel CreateUpdateTestCollectionFileAggregatorModel(UpdateCollectionAction action)
+    private Dictionary<string, object> CreateCreateTestCollectionModelParameters(string id)
+    {
+        return new Dictionary<string, object>
+        {
+            {
+                "Id", id
+            }
+        };
+    }
+
+    private UpdateTestCollectionFileAggregatorModel CreateUpdateTestCollectionFileAggregatorModel(string id, string collectionName, UpdateCollectionAction action)
     {
         return TestData.CreateUpdateTestCollectionFileAggregatorModel(new Dictionary<string, object>
         {
             {
-                "Id", TestData.Id
+                "Id", id
             },
             {
                 "Action", action
             },
             {
-                "CollectionName", TestData.CollectionName
+                "CollectionName", collectionName
             },
             {
                 "Model", TestData.CreateTestCollectionFileAggregatorItemModel(new Dictionary<string, object>())

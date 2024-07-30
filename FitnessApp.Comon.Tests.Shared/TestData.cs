@@ -143,7 +143,7 @@ public static class TestData
     {
         return new CreateTestCollectionModel
         {
-            UserId = args["Id"].ToString(),
+            UserId = args["Id"]?.ToString(),
             Collection = new Dictionary<string, IEnumerable<ICollectionItemModel>>()
         };
     }
@@ -152,8 +152,8 @@ public static class TestData
     {
         return new UpdateTestCollectionModel
         {
-            UserId = args["Id"].ToString(),
-            CollectionName = args["CollectionName"].ToString(),
+            UserId = args["Id"]?.ToString(),
+            CollectionName = args["CollectionName"]?.ToString(),
             Action = (UpdateCollectionAction)args["Action"],
             Model = (ICollectionItemModel)args["Model"],
         };
@@ -260,7 +260,7 @@ public static class TestData
     {
         return new CreateTestCollectionFileAggregatorModel
         {
-            UserId = args["Id"].ToString(),
+            UserId = args["Id"]?.ToString(),
             Collection = new Dictionary<string, IEnumerable<ICollectionItemModel>>()
         };
     }
@@ -281,8 +281,8 @@ public static class TestData
     {
         return new UpdateTestCollectionFileAggregatorModel
         {
-            UserId = args["Id"].ToString(),
-            CollectionName = args["CollectionName"].ToString(),
+            UserId = args["Id"]?.ToString(),
+            CollectionName = args["CollectionName"]?.ToString(),
             Action = (UpdateCollectionAction)args["Action"],
             Model = (ICollectionFileAggregatorItemModel<ICollectionItemModel>)args["Model"],
         };

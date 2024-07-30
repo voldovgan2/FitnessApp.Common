@@ -44,8 +44,7 @@ public abstract class CollectionFileAggregatorService<
             TCollectionModel,
             TCollectionItemModel,
             TCreateCollectionModel,
-            TUpdateCollectionModel> CollectionService
-    { get; }
+            TUpdateCollectionModel> CollectionService { get; }
     protected IFilesService FilesService { get; }
     protected IMapper Mapper { get; }
     protected CollectionFileAggregatorSettings CollectionFileAggregatorSettings { get; }
