@@ -15,18 +15,21 @@ public static class FilesExtensions
     {
         ArgumentNullException.ThrowIfNull(services);
 
-        var vaultService = services.BuildServiceProvider().GetRequiredService<IVaultService>();
-        var endpoint = configuration.GetValue<string>("Minio:Endpoint");
-        var accessKey = configuration.GetValue<string>("Minio:AccessKey");
-        var secretKey = vaultService.GetSecret("Minio:SecretKey").GetAwaiter().GetResult();
-        var secure = configuration.GetValue<bool>("Minio:Secure");
-        services.AddMinio(options =>
-        {
-            options.WithEndpoint(endpoint);
-            options.WithCredentials(accessKey, secretKey);
-            options.WithSSL(secure);
-            options.Build();
-        });
+        services.AddTransient(
+            sp =>
+            {
+                var vaultService = services.BuildServiceProvider().GetRequiredService<IVaultService>();
+                var endpoint = configuration.GetValue<string>("Minio:Endpoint");
+                var accessKey = configuration.GetValue<string>("Minio:AccessKey");
+                var secretKey = vaultService.GetSecret("Minio:SecretKey").GetAwaiter().GetResult();
+                var secure = configuration.GetValue<bool>("Minio:Secure");
+                return new MinioClient()
+                    .WithEndpoint(endpoint)
+                    .WithCredentials(accessKey, secretKey)
+                    .WithSSL(secure)
+                    .Build();
+            }
+        );
 
         services.AddTransient<IFilesService, FilesService>();
 
