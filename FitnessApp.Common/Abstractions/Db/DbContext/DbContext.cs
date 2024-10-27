@@ -65,7 +65,7 @@ public class DbContext<TGenericEntity> : IDbContext<TGenericEntity>
         var replaceResult = await _collection.ReplaceOneAsync(s => s.UserId == entity.UserId, entity);
         return replaceResult.IsAcknowledged && replaceResult.MatchedCount == 1
             ? await GetItemById(entity.UserId)
-            : throw;
+            : default;
     }
 
     public async Task UpdateItems(IEnumerable<TGenericEntity> entities)
