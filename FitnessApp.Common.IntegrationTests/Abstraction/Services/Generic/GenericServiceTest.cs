@@ -11,14 +11,14 @@ using Xunit;
 namespace FitnessApp.Common.IntegrationTests.Abstraction.Services.Generic;
 
 [Collection("GenericService collection")]
-public class GenericServiceTest : IClassFixture<GenericServiceFixture>
+public abstract class GenericServiceTest : IClassFixture<GenericServiceFixture>
 {
     private readonly IGenericService<
         TestGenericModel,
         CreateTestGenericModel,
         UpdateTestGenericModel> _service;
 
-    public GenericServiceTest(GenericServiceFixture fixture)
+    protected GenericServiceTest(GenericServiceFixture fixture)
     {
         _service = new GenericServiceMock(new GenericRepositoryMock(fixture.DbContext, fixture.Mapper));
     }

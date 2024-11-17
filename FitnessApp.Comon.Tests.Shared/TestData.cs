@@ -3,16 +3,10 @@ using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.IO;
 using System.Text;
-using FitnessApp.Common.Abstractions.Db.Entities.Collection;
 using FitnessApp.Common.Abstractions.Db.Enums.Collection;
-using FitnessApp.Common.Abstractions.Models.Collection;
-using FitnessApp.Common.Abstractions.Models.CollectionFileAggregator;
 using FitnessApp.Common.Abstractions.Models.FileImage;
 using FitnessApp.Common.Abstractions.Services.Configuration;
-using FitnessApp.Comon.Tests.Shared.Abstraction.Db.Entities.Collection;
 using FitnessApp.Comon.Tests.Shared.Abstraction.Db.Entities.Generic;
-using FitnessApp.Comon.Tests.Shared.Abstraction.Models.Collection;
-using FitnessApp.Comon.Tests.Shared.Abstraction.Models.CollectionFileAggregator;
 using FitnessApp.Comon.Tests.Shared.Abstraction.Models.Generic;
 using FitnessApp.Comon.Tests.Shared.Abstraction.Models.GenericFileAggregator;
 
@@ -102,91 +96,6 @@ public static class TestData
 
     #endregion
 
-    #region Collection initialization
-
-    public static TestCollectionItemModel CreateCollectionItemModel(object index, string suffix = "")
-    {
-        return new TestCollectionItemModel
-        {
-            Id = index.ToString(),
-            TestProperty = $"{_propertyPrefix}{index}{suffix}"
-        };
-    }
-
-    public static TestCollectionEntity CreateCollectionEntity(Dictionary<string, object> args)
-    {
-        var collectionItems = new List<ICollectionItemEntity>();
-        var itemsCount = (int)args["ItemsCount"];
-        for (int k = 0; k < itemsCount; k++)
-        {
-            collectionItems.Add(
-                new TestCollectionItemEntity
-                {
-                    Id = k.ToString(),
-                    TestProperty = $"{_propertyPrefix}{k}"
-                }
-            );
-        }
-
-        return new TestCollectionEntity
-        {
-            UserId = args["Id"].ToString(),
-            Collection = new Dictionary<string, List<ICollectionItemEntity>>
-            {
-                {
-                    CollectionName,
-                    collectionItems
-                }
-            }
-        };
-    }
-
-    public static CreateTestCollectionModel CreateCreateTestCollectionModel(Dictionary<string, object> args)
-    {
-        return new CreateTestCollectionModel
-        {
-            UserId = args["Id"]?.ToString(),
-            Collection = new Dictionary<string, IEnumerable<ICollectionItemModel>>()
-        };
-    }
-
-    public static UpdateTestCollectionModel CreateUpdateTestCollectionModel(Dictionary<string, object> args)
-    {
-        return new UpdateTestCollectionModel
-        {
-            UserId = args["Id"]?.ToString(),
-            CollectionName = args["CollectionName"]?.ToString(),
-            Action = (UpdateCollectionAction)args["Action"],
-            Model = (ICollectionItemModel)args["Model"],
-        };
-    }
-
-    public static TestCollectionModel CreateCollectionModel(Dictionary<string, object> args)
-    {
-        var collectionItems = new List<ICollectionItemModel>();
-        var itemsCount = (int)args["ItemsCount"];
-        for (int k = 0; k < itemsCount; k++)
-        {
-            collectionItems.Add(
-                CreateCollectionItemModel(k)
-            );
-        }
-
-        return new TestCollectionModel
-        {
-            UserId = args["Id"].ToString(),
-            Collection = new Dictionary<string, List<ICollectionItemModel>>
-            {
-                {
-                    CollectionName,
-                    collectionItems
-                }
-            }
-        };
-    }
-
-    #endregion
-
     #region File
 
     public static Stream GetStream(string content)
@@ -250,60 +159,6 @@ public static class TestData
             FileFields = new string[]
             {
                 FileFieldName
-            }
-        };
-    }
-
-    #endregion
-
-    #region Collection File aggregator initialization
-
-    public static CreateTestCollectionFileAggregatorModel CreateCreateTestCollectionFileAggregatorModel(Dictionary<string, object> args)
-    {
-        return new CreateTestCollectionFileAggregatorModel
-        {
-            UserId = args["Id"]?.ToString(),
-            Collection = new Dictionary<string, IEnumerable<ICollectionItemModel>>()
-        };
-    }
-
-    public static TestCollectionFileAggregatorItemModel CreateTestCollectionFileAggregatorItemModel(Dictionary<string, object> args)
-    {
-        args.TryGetValue("Id", out var index);
-        index ??= 1;
-
-        return new TestCollectionFileAggregatorItemModel
-        {
-            Model = CreateCollectionItemModel(index),
-            Images = CreateFileAggregatorImages()
-        };
-    }
-
-    public static UpdateTestCollectionFileAggregatorModel CreateUpdateTestCollectionFileAggregatorModel(Dictionary<string, object> args)
-    {
-        return new UpdateTestCollectionFileAggregatorModel
-        {
-            UserId = args["Id"]?.ToString(),
-            CollectionName = args["CollectionName"]?.ToString(),
-            Action = (UpdateCollectionAction)args["Action"],
-            Model = (ICollectionFileAggregatorItemModel<ICollectionItemModel>)args["Model"],
-        };
-    }
-
-    public static CollectionFileAggregatorSettings CreateCollectionFileAggregatorSettings()
-    {
-        return new CollectionFileAggregatorSettings
-        {
-            ContainerName = ContainerName,
-            CollectionsFileFields = new Dictionary<string, string[]>
-            {
-                {
-                    CollectionName,
-                    new string[]
-                    {
-                        FileFieldName
-                    }
-                }
             }
         };
     }

@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Diagnostics.CodeAnalysis;
 using FitnessApp.Common.Abstractions.Db.Configuration;
-using FitnessApp.Common.Vault;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using MongoDB.Driver;
@@ -19,8 +18,7 @@ public static class MongoClientExtensions
         services.AddTransient<IMongoClient, MongoClient>(
             sp =>
             {
-                var vaultService = sp.GetRequiredService<IVaultService>();
-                var connectionString = vaultService.GetSecret("MongoConnection:ConnectionString").GetAwaiter().GetResult();
+                var connectionString = configuration.GetValue<string>("MongoConnection:ConnectionString");
                 return new MongoClient(connectionString);
             }
         );

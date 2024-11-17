@@ -12,7 +12,7 @@ using Xunit;
 
 namespace FitnessApp.Common.UnitTests.Abstractions.Db.Repository.Generic;
 
-public class GenericRepositoryTests : TestBase
+public abstract class GenericRepositoryTests : TestBase
 {
     private readonly Mock<IDbContext<TestGenericEntity>> _dbContextMock;
     private readonly GenericRepositoryMock _repository;
@@ -23,8 +23,7 @@ public class GenericRepositoryTests : TestBase
         }
     };
 
-    public GenericRepositoryTests()
-        : base()
+    protected GenericRepositoryTests()
     {
         _dbContextMock = new Mock<IDbContext<TestGenericEntity>>();
         _repository = new GenericRepositoryMock(_dbContextMock.Object, _mapper);

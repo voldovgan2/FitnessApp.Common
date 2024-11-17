@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Diagnostics.CodeAnalysis;
 using FitnessApp.Common.Files;
-using FitnessApp.Common.Vault;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Minio;
@@ -18,10 +17,9 @@ public static class FilesExtensions
         services.AddTransient(
             sp =>
             {
-                var vaultService = services.BuildServiceProvider().GetRequiredService<IVaultService>();
                 var endpoint = configuration.GetValue<string>("Minio:Endpoint");
                 var accessKey = configuration.GetValue<string>("Minio:AccessKey");
-                var secretKey = vaultService.GetSecret("Minio:SecretKey").GetAwaiter().GetResult();
+                var secretKey = configuration.GetValue<string>("Minio:SecretKey");
                 var secure = configuration.GetValue<bool>("Minio:Secure");
                 return new MinioClient()
                     .WithEndpoint(endpoint)

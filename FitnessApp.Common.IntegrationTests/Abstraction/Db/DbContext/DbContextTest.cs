@@ -7,7 +7,7 @@ using Xunit;
 namespace FitnessApp.Common.IntegrationTests.Abstraction.Db.DbContext;
 
 [Collection("DbContext collection")]
-public class DbContextTest(GenericDbContextFixture fixture) : IClassFixture<GenericDbContextFixture>
+public abstract class DbContextTest(GenericDbContextFixture fixture) : IClassFixture<GenericDbContextFixture>
 {
     [Fact]
     public async Task GetItemById_ReturnsSingleItem()

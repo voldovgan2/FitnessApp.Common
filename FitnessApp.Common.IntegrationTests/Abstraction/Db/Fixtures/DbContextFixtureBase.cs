@@ -14,14 +14,14 @@ using MongoDB.Driver;
 
 namespace FitnessApp.Common.IntegrationTests.Abstraction.Db.Fixtures;
 
-public class DbContextFixtureBase<TEntity> : TestBase, IDisposable
+public abstract class DbContextFixtureBase<TEntity> : TestBase, IDisposable
     where TEntity : IGenericEntity
 {
     public DbContext<TEntity> DbContext { get; }
     private readonly MongoClient _mongoClient;
     private readonly MongoDbSettings _mongoDbSettings;
 
-    public DbContextFixtureBase(Func<string, TEntity> createEntityFacotryMethod)
+    protected DbContextFixtureBase(Func<string, TEntity> createEntityFacotryMethod)
     {
         var objectSerializer = new ObjectSerializer(type => true);
         BsonSerializer.RegisterSerializer(objectSerializer);

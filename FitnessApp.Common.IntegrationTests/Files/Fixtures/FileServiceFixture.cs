@@ -1,3 +1,3 @@
 ﻿namespace FitnessApp.Common.IntegrationTests.File.Fixtures;
 
-public class FileServiceFixture : FileFixtureBase<FileServiceFixture>;
+public abstract class FileServiceFixture : FileFixtureBase<FileServiceFixture>;

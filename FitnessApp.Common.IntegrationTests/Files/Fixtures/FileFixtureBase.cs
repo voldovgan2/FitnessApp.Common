@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text;
@@ -36,21 +35,7 @@ public class FileFixtureBase<T> : TestBase, IDisposable
             TestData.FileToDelete,
             FilesService.CreateFileName(TestData.FileFieldName, TestData.EntityIdToGet),
             FilesService.CreateFileName(TestData.FileFieldName, TestData.EntityIdToDelete)
-        }
-            .Concat(
-                TestData
-                    .CreateCollectionEntity(new Dictionary<string, object>
-                    {
-                        {
-                            "Id", TestData.EntityIdToGet
-                        },
-                        {
-                            "ItemsCount", 2
-                        }
-                    })
-                    .Collection[TestData.CollectionName]
-                    .Select(item => FilesService.CreateFileName(TestData.FileFieldName, item.Id))
-            );
+        };
         var createdItemsTasks = itemIds
             .Select(itemId => FilesService.UploadFile(
                 Path.ToLower(),

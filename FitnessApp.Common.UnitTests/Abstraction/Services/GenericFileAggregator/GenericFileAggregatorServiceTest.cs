@@ -15,7 +15,7 @@ using Xunit;
 
 namespace FitnessApp.Common.UnitTests.Abstraction.Services.GenericFileAggregator;
 
-public class GenericFileAggregatorServiceTest : TestBase
+public abstract class GenericFileAggregatorServiceTest : TestBase
 {
     private readonly Mock<
         IGenericService<
@@ -26,7 +26,7 @@ public class GenericFileAggregatorServiceTest : TestBase
     private readonly Mock<IFilesService> _fileService;
     private readonly GenericFileAggregatorServiceMock _genericFileAggregatorService;
 
-    public GenericFileAggregatorServiceTest()
+    protected GenericFileAggregatorServiceTest()
     {
         _genericService = new Mock<
             IGenericService<

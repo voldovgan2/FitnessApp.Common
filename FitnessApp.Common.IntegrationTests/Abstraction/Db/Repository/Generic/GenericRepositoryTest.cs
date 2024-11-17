@@ -9,11 +9,11 @@ using Xunit;
 namespace FitnessApp.Common.IntegrationTests.Abstraction.Db.Repository.Generic;
 
 [Collection("GenericRepository collection")]
-public class GenericRepositoryTest : IClassFixture<GenericRepositoryDbContextFixture>
+public abstract class GenericRepositoryTest : IClassFixture<GenericRepositoryDbContextFixture>
 {
     private readonly GenericRepositoryMock _repository;
 
-    public GenericRepositoryTest(GenericRepositoryDbContextFixture fixture)
+    protected GenericRepositoryTest(GenericRepositoryDbContextFixture fixture)
     {
         _repository = new GenericRepositoryMock(fixture.DbContext, fixture.Mapper);
     }

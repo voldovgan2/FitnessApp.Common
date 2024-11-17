@@ -14,7 +14,7 @@ using Xunit;
 
 namespace FitnessApp.Common.UnitTests.Abstraction.Services.Generic;
 
-public class GenericServiceTest : TestBase
+public abstract class GenericServiceTest : TestBase
 {
     private readonly Mock<IGenericRepository<
         TestGenericModel,
@@ -22,7 +22,7 @@ public class GenericServiceTest : TestBase
         UpdateTestGenericModel>> _repository;
     private readonly GenericServiceMock _service;
 
-    public GenericServiceTest() : base()
+    protected GenericServiceTest() : base()
     {
         _repository = new Mock<
             IGenericRepository<

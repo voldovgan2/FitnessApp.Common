@@ -4,9 +4,9 @@ using FitnessApp.Comon.Tests.Shared.Abstraction.Db.Entities.Generic;
 
 namespace FitnessApp.Common.IntegrationTests.Abstraction.Db.Fixtures;
 
-public class GenericRepositoryDbContextFixture : DbContextFixtureBase<TestGenericEntity>
+public abstract class GenericRepositoryDbContextFixture : DbContextFixtureBase<TestGenericEntity>
 {
-    public GenericRepositoryDbContextFixture()
+    protected GenericRepositoryDbContextFixture()
         : base((itemId) => TestData.CreateGenericEntity(new Dictionary<string, object>
             {
                 {
