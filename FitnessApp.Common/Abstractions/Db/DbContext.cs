@@ -20,7 +20,7 @@ public abstract class DbContextBase<TEntity>
     where TEntity : IGenericEntity
 {
     protected IMongoCollection<TEntity> Collection { get; }
-    private protected MongoDbSettings Settings { get; }
+    protected MongoDbSettings Settings { get; }
     protected DbContextBase(IMongoClient mongoClient, MongoDbSettings settings)
     {
         Settings = settings;
