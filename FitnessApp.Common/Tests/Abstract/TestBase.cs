@@ -2,7 +2,7 @@
 using FitnessApp.Common.Abstractions.Models;
 using FitnessApp.Common.Paged.Models.Input;
 
-namespace FitnessApp.Common.UnitTests;
+namespace FitnessApp.Common.Tests.Abstract;
 
 public abstract class TestBase<
     TModel,

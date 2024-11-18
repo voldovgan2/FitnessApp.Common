@@ -7,7 +7,7 @@ using FitnessApp.Common.Abstractions.Services;
 using FitnessApp.Common.Exceptions;
 using Xunit;
 
-namespace FitnessApp.Common.UnitTests;
+namespace FitnessApp.Common.Tests.Abstract;
 
 public abstract class GenericFileAggregatorServiceTest<
     TGenericFileAggregatorModel,

@@ -5,8 +5,6 @@ VisualStudioVersion = 17.6.33829.357
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "FitnessApp.Common", "FitnessApp.Common\FitnessApp.Common.csproj", "{6A7B468E-56B6-41ED-B92F-38F34405106C}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "FitnessApp.Common.Tests", "FitnessApp.Common.UnitTests\FitnessApp.Common.Tests.csproj", "{BCF1959C-1D91-4906-8767-44AE8BE0ACFB}"
-EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{0210EB4A-6A17-42A0-8693-04DD6657B253}"
 	ProjectSection(SolutionItems) = preProject
 		.editorconfig = .editorconfig
@@ -24,10 +22,6 @@ Global
 		{6A7B468E-56B6-41ED-B92F-38F34405106C}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{6A7B468E-56B6-41ED-B92F-38F34405106C}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{6A7B468E-56B6-41ED-B92F-38F34405106C}.Release|Any CPU.Build.0 = Release|Any CPU
-		{BCF1959C-1D91-4906-8767-44AE8BE0ACFB}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{BCF1959C-1D91-4906-8767-44AE8BE0ACFB}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{BCF1959C-1D91-4906-8767-44AE8BE0ACFB}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{BCF1959C-1D91-4906-8767-44AE8BE0ACFB}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

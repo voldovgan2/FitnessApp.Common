@@ -3,7 +3,7 @@ using FitnessApp.Common.Abstractions.Db;
 using FitnessApp.Common.Abstractions.Models;
 using Xunit;
 
-namespace FitnessApp.Common.UnitTests;
+namespace FitnessApp.Common.Tests.Abstract;
 
 public abstract class GenericRepositoryTests<
     TGenericEntity,
