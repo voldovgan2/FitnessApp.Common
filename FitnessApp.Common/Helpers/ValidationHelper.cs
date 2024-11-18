@@ -1,8 +1,7 @@
 ﻿using System;
 using System.Diagnostics.CodeAnalysis;
 using System.Linq;
-using FitnessApp.Common.Abstractions.Models.FileImage;
-using FitnessApp.Common.Abstractions.Models.Validation;
+using FitnessApp.Common.Abstractions.Models;
 using FitnessApp.Common.Exceptions;
 
 namespace FitnessApp.Common.Helpers;

@@ -1,6 +1,6 @@
 ﻿using System.Diagnostics.CodeAnalysis;
 
-namespace FitnessApp.Common.Abstractions.Models.Validation;
+namespace FitnessApp.Common.Abstractions.Models;
 
 [ExcludeFromCodeCoverage]
 public class ValidationError(string message, string field)

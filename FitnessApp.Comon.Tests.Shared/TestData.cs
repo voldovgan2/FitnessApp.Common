@@ -1,13 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
-using System.IO;
-using System.Text;
-using FitnessApp.Common.Abstractions.Models.FileImage;
-using FitnessApp.Common.Abstractions.Services;
-using FitnessApp.Comon.Tests.Shared.Abstraction.Db;
-using FitnessApp.Comon.Tests.Shared.Abstraction.Models.Generic;
-using FitnessApp.Comon.Tests.Shared.Abstraction.Models.GenericFileAggregator;
+using FitnessApp.Common.Abstractions.Models;
 
 namespace FitnessApp.Comon.Tests.Shared;
 
@@ -25,91 +18,17 @@ public static class TestData
 
     public static string Id { get; } = "1";
     public static string[] Ids { get; } = [Id];
-    public static string CollectionName { get; } = "Collection";
-    public static string ContainerName { get; } = "ContainerName";
     public static string FileFieldName { get; } = "FileField";
     public static string FileFieldContent { get; } = "FileFieldContent";
 
-    private static string _propertyPrefix = "TestProperty";
-
-    #region Abstract
-
-    public static T[] GetAll<T>(Func<Dictionary<string, object>, T> createElementFactory, Dictionary<string, object> args)
-        where T : class
+    public static Dictionary<string, object> CreateGenericModelParameters(string id)
     {
-        var result = new T[4];
-        args.Add("Id", 0);
-
-        for (int k = 0; k < 4; k++)
+        return new()
         {
-            args["Id"] = k + 1;
-            result[k] = createElementFactory(args);
-        }
-
-        return result;
-    }
-
-    #endregion
-
-    #region Generic initialization
-
-    public static TestGenericEntity CreateGenericEntity(Dictionary<string, object> args)
-    {
-        var id = args["Id"];
-        return new TestGenericEntity
-        {
-            UserId = id?.ToString(),
-            TestProperty1 = $"{_propertyPrefix}{id}"
+            {
+                "Id", id
+            }
         };
-    }
-
-    public static CreateTestGenericModel CreateCreateTestGenericModel(Dictionary<string, object> args)
-    {
-        var id = args["Id"];
-        return new CreateTestGenericModel
-        {
-            UserId = id?.ToString(),
-            TestProperty1 = $"{_propertyPrefix}{id}"
-        };
-    }
-
-    public static UpdateTestGenericModel CreateUpdateTestGenericModel(Dictionary<string, object> args)
-    {
-        var id = args["Id"];
-        return new UpdateTestGenericModel
-        {
-            UserId = id?.ToString(),
-            TestProperty1 = $"{_propertyPrefix}{id}"
-        };
-    }
-
-    public static TestGenericModel CreateGenericModel(Dictionary<string, object> args)
-    {
-        var id = args["Id"];
-        return new TestGenericModel
-        {
-            UserId = id?.ToString(),
-            TestProperty1 = $"{_propertyPrefix}{id}"
-        };
-    }
-
-    #endregion
-
-    #region File
-
-    public static Stream GetStream(string content)
-    {
-        return new MemoryStream(Encoding.Default.GetBytes(content));
-    }
-
-    #endregion
-
-    #region File aggregator initialization
-
-    public static byte[] CreateFileResult()
-    {
-        var bytes = Encoding.Default.GetBytes(FileFieldContent);
-        return bytes;
     }
 
     public static FileImageModel[] CreateFileAggregatorImages()
@@ -122,44 +41,4 @@ public static class TestData
             },
         ];
     }
-
-    #endregion
-
-    #region Generic File aggregator initialization
-
-    public static CreateTestGenericFileAggregatorModel CreateCreateTestGenericFileAggregatorModel(Dictionary<string, object> args)
-    {
-        var id = args["Id"];
-        return new CreateTestGenericFileAggregatorModel
-        {
-            UserId = id?.ToString(),
-            TestProperty = $"{_propertyPrefix}{id}",
-            Images = (FileImageModel[])args["Images"]
-        };
-    }
-
-    public static UpdateTestGenericFileAggregatorModel CreateUpdateTestGenericFileAggregatorModel(Dictionary<string, object> args)
-    {
-        var id = args["Id"];
-        return new UpdateTestGenericFileAggregatorModel
-        {
-            UserId = id?.ToString(),
-            TestProperty = $"{_propertyPrefix}{id}",
-            Images = (FileImageModel[])args["Images"]
-        };
-    }
-
-    public static GenericFileAggregatorSettings CreateGenericFileAggregatorSettings()
-    {
-        return new GenericFileAggregatorSettings
-        {
-            ContainerName = ContainerName,
-            FileFields =
-            [
-                FileFieldName
-            ]
-        };
-    }
-
-    #endregion
 }

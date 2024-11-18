@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
-using FitnessApp.Common.Abstractions.Models.Validation;
+using FitnessApp.Common.Abstractions.Models;
 
 namespace FitnessApp.Common.Exceptions;
 

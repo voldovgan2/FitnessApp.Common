@@ -2,8 +2,7 @@
 using System.Threading.Tasks;
 using FitnessApp.Common.Abstractions.Db;
 using FitnessApp.Common.Abstractions.Extensions;
-using FitnessApp.Common.Abstractions.Models.Generic;
-using FitnessApp.Common.Abstractions.Models.Validation;
+using FitnessApp.Common.Abstractions.Models;
 using FitnessApp.Common.Helpers;
 using FitnessApp.Common.Paged.Models.Input;
 using FitnessApp.Common.Paged.Models.Output;

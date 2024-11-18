@@ -1,143 +1,108 @@
-using System.Collections.Generic;
-using System.Linq;
 using System.Threading.Tasks;
 using FitnessApp.Common.Abstractions.Db;
-using FitnessApp.Comon.Tests.Shared;
-using FitnessApp.Comon.Tests.Shared.Abstraction.Db;
-using FitnessApp.Comon.Tests.Shared.Abstraction.Models.Generic;
-using Moq;
+using FitnessApp.Common.Abstractions.Models;
 using Xunit;
 
 namespace FitnessApp.Common.UnitTests;
 
-public abstract class GenericRepositoryTests : TestBase
+public abstract class GenericRepositoryTests<
+    TGenericEntity,
+    TGenericModel,
+    TCreateGenericModel,
+    TUpdateGenericModel> :
+    TestBase<
+        TGenericModel,
+        TCreateGenericModel,
+        TUpdateGenericModel>
+    where TGenericEntity : IWithUserIdEntity
+    where TGenericModel : IGenericModel
+    where TCreateGenericModel : ICreateGenericModel
+    where TUpdateGenericModel : IUpdateGenericModel
 {
-    private readonly Mock<IDbContext<TestGenericEntity>> _dbContextMock;
-    private readonly GenericRepositoryMock _repository;
-    private readonly Dictionary<string, object> _defaultGenericModelParameters = new()
-    {
-        {
-            "Id", TestData.Id
-        }
-    };
+    protected readonly GenericRepository<
+        TGenericEntity,
+        TGenericModel,
+        TCreateGenericModel,
+        TUpdateGenericModel> Repository;
 
-    protected GenericRepositoryTests()
+    protected GenericRepositoryTests(
+        GenericRepository<
+            TGenericEntity,
+            TGenericModel,
+            TCreateGenericModel,
+            TUpdateGenericModel> repository)
     {
-        _dbContextMock = new Mock<IDbContext<TestGenericEntity>>();
-        _repository = new GenericRepositoryMock(_dbContextMock.Object, _mapper);
+        Repository = repository;
     }
 
     [Fact]
     public async Task GetItemByUserId_ReturnsSingleItem()
     {
-        // Arrange
-        var genericEntitiesMock = GetGenericEntitiesMock();
-        _dbContextMock
-           .Setup(s => s.GetByUserId(It.IsAny<string>()))
-           .ReturnsAsync(genericEntitiesMock.Single(i => i.UserId == TestData.Id));
-
         // Act
-        var entity = await _repository.GetItemByUserId(TestData.Id);
+        var entity = await Repository.GetItemByUserId(Id);
 
         // Assert
-        Assert.Equal(TestData.Id, entity.UserId);
+        AssertExtractedItem(entity);
     }
 
     [Fact]
     public async Task GetItemByIds_ReturnsMathcedItems()
     {
-        // Arrange
-        var genericEntitiesMock = GetGenericEntitiesMock();
-        _dbContextMock
-           .Setup(s => s.GetByUserIds(It.IsAny<string[]>()))
-           .ReturnsAsync([.. genericEntitiesMock.Where(i => i.UserId == TestData.Id)]);
-
         // Act
-        var entity = (await _repository.GetItemByUserIds([TestData.Id])).Single();
+        var models = await Repository.GetItemByUserIds([Id]);
 
         // Assert
-        Assert.Equal(TestData.Id, entity.UserId);
+        AssertCollection(models);
     }
 
     [Fact]
     public async Task GetItems_ReturnsMathcedItems()
     {
-        // Arrange
-        var genericEntitiesMock = GetGenericEntitiesMock();
-        _dbContextMock
-           .Setup(s => s.GetByUserIds(It.IsAny<string[]>()))
-           .ReturnsAsync([.. genericEntitiesMock.Where(i => i.UserId == TestData.Id)]);
-
         // Act
-        var entity = (await _repository.GetItems(new GetTestPagedByIdsDataModel
-        {
-            UserIds = [TestData.Id],
-            Page = 0,
-            PageSize = 10,
-        })).Items.Single();
+        var model = await Repository.GetItems(CreateGetPagedByIdsDataModel([Id], 0, 10));
 
         // Assert
-        Assert.Equal(TestData.Id, entity.UserId);
+        AssertCollection(model.Items);
     }
 
     [Fact]
     public async Task CreateItem_ReturnsCreatedItem()
     {
-        // Arrange
-        var createdEntity = TestData.CreateGenericEntity(_defaultGenericModelParameters);
-        _dbContextMock
-            .Setup(s => s.CreateItem(It.IsAny<TestGenericEntity>()))
-            .ReturnsAsync(createdEntity);
-
-        var createModel = TestData.CreateCreateTestGenericModel(_defaultGenericModelParameters);
-
         // Act
-        var entity = await _repository.CreateItem(createModel);
+        var entity = await Repository.CreateItem(CreateCreateModel(CreateGenericModelParameters(Id)));
 
         // Assert
-        Assert.Equal(createModel.UserId, entity.UserId);
-        Assert.Equal(createModel.TestProperty1, entity.TestProperty1);
+        AssertCreatedItem(entity);
     }
 
     [Fact]
     public async Task UpdateItem_ReturnsUpdatedItem()
     {
-        // Arrange
-        var genericEntitiesMock = GetGenericEntitiesMock();
-        _dbContextMock
-           .Setup(s => s.GetByUserId(It.IsAny<string>()))
-           .ReturnsAsync(genericEntitiesMock.Single(i => i.UserId == TestData.Id));
-
-        var entityUpdate = TestData.CreateGenericEntity(_defaultGenericModelParameters);
-        entityUpdate.TestProperty1 = "Updated";
-
-        _dbContextMock
-            .Setup(s => s.UpdateItem(It.IsAny<TestGenericEntity>()))
-            .ReturnsAsync(entityUpdate);
-
-        var updateModel = TestData.CreateUpdateTestGenericModel(_defaultGenericModelParameters);
-        updateModel.TestProperty1 = "Updated";
-
         // Act
-        var entity = await _repository.UpdateItem(updateModel);
+        var entity = await Repository.UpdateItem(CreateUpdateModel(CreateGenericModelParameters(Id)));
 
         // Assert
-        Assert.Equal(updateModel.TestProperty1, entity.TestProperty1);
+        AssertUpdatedItem(entity);
     }
 
     [Fact]
     public async Task DeleteItem_ReturnsDeletedItemId()
     {
-        // Arrange
-        var entity = TestData.CreateGenericEntity(_defaultGenericModelParameters);
-        _dbContextMock
-            .Setup(s => s.DeleteItem(It.IsAny<string>()))
-            .ReturnsAsync(entity);
-
         // Act
-        var deletedId = await _repository.DeleteItem(TestData.Id);
+        var deletedId = await Repository.DeleteItem(Id);
 
         // Assert
-        Assert.Equal(TestData.Id, deletedId);
+        Assert.Equal(Id, deletedId);
+    }
+
+    protected override void AssertExtractedItem(TGenericModel model)
+    {
+        Assert.Equal(Id, model.UserId);
+    }
+
+    protected override void AssertCollection(TGenericModel[] models)
+    {
+        Assert.All(models, m => Assert.Contains(m.UserId, Ids));
+        base.AssertCollection(models);
     }
 }

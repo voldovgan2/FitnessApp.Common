@@ -5,17 +5,13 @@ VisualStudioVersion = 17.6.33829.357
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "FitnessApp.Common", "FitnessApp.Common\FitnessApp.Common.csproj", "{6A7B468E-56B6-41ED-B92F-38F34405106C}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "FitnessApp.Common.UnitTests", "FitnessApp.Common.UnitTests\FitnessApp.Common.UnitTests.csproj", "{BCF1959C-1D91-4906-8767-44AE8BE0ACFB}"
-EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "FitnessApp.Common.IntegrationTests", "FitnessApp.Common.IntegrationTests\FitnessApp.Common.IntegrationTests.csproj", "{AB8099C2-E06A-430E-BF56-016693870411}"
-EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "FitnessApp.Comon.Tests.Shared", "FitnessApp.Comon.Tests.Shared\FitnessApp.Comon.Tests.Shared.csproj", "{245106C9-034B-4AD1-9528-949E53B2B513}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "FitnessApp.Common.Tests", "FitnessApp.Common.UnitTests\FitnessApp.Common.Tests.csproj", "{BCF1959C-1D91-4906-8767-44AE8BE0ACFB}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{0210EB4A-6A17-42A0-8693-04DD6657B253}"
 	ProjectSection(SolutionItems) = preProject
 		.editorconfig = .editorconfig
-		Directory.Build.props = Directory.Build.props
 		CodeCoverage.runsettings = CodeCoverage.runsettings
+		Directory.Build.props = Directory.Build.props
 	EndProjectSection
 EndProject
 Global
@@ -32,14 +28,6 @@ Global
 		{BCF1959C-1D91-4906-8767-44AE8BE0ACFB}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{BCF1959C-1D91-4906-8767-44AE8BE0ACFB}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{BCF1959C-1D91-4906-8767-44AE8BE0ACFB}.Release|Any CPU.Build.0 = Release|Any CPU
-		{AB8099C2-E06A-430E-BF56-016693870411}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{AB8099C2-E06A-430E-BF56-016693870411}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{AB8099C2-E06A-430E-BF56-016693870411}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{AB8099C2-E06A-430E-BF56-016693870411}.Release|Any CPU.Build.0 = Release|Any CPU
-		{245106C9-034B-4AD1-9528-949E53B2B513}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{245106C9-034B-4AD1-9528-949E53B2B513}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{245106C9-034B-4AD1-9528-949E53B2B513}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{245106C9-034B-4AD1-9528-949E53B2B513}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

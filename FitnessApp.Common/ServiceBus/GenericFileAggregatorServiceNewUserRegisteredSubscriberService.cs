@@ -2,8 +2,7 @@
 using System.Diagnostics.CodeAnalysis;
 using System.Text.Json;
 using System.Threading.Tasks;
-using FitnessApp.Common.Abstractions.Models.Generic;
-using FitnessApp.Common.Abstractions.Models.GenericFileAggregator;
+using FitnessApp.Common.Abstractions.Models;
 using FitnessApp.Common.ServiceBus.Nats.Events;
 using FitnessApp.Common.ServiceBus.Nats.Services;
 

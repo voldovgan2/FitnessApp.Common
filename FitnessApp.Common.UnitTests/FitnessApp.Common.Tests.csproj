@@ -22,7 +22,6 @@
 
   <ItemGroup>
     <ProjectReference Include="..\FitnessApp.Common\FitnessApp.Common.csproj" />
-    <ProjectReference Include="..\FitnessApp.Comon.Tests.Shared\FitnessApp.Comon.Tests.Shared.csproj" />
   </ItemGroup>
 
 </Project>
