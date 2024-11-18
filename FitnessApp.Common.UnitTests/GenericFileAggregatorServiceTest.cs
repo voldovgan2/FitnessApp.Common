@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
-using FitnessApp.Common.Abstractions.Services.Generic;
+using FitnessApp.Common.Abstractions.Services;
 using FitnessApp.Common.Exceptions;
 using FitnessApp.Common.Files;
 using FitnessApp.Common.Paged.Extensions;
@@ -13,7 +13,7 @@ using FitnessApp.Comon.Tests.Shared.Abstraction.Services.GenericFileAggregator;
 using Moq;
 using Xunit;
 
-namespace FitnessApp.Common.UnitTests.Abstraction.Services.GenericFileAggregator;
+namespace FitnessApp.Common.UnitTests;
 
 public abstract class GenericFileAggregatorServiceTest : TestBase
 {
@@ -81,7 +81,7 @@ public abstract class GenericFileAggregatorServiceTest : TestBase
     public async Task GetItemByIds_IdsIsEmpty_ThrowsValidationError()
     {
         // Assert
-        var exception = await Assert.ThrowsAsync<ValidationException>(() => _genericFileAggregatorService.GetItemsByIds([]));
+        var exception = await Assert.ThrowsAsync<ValidationException>(() => _genericFileAggregatorService.GetItemsByUserIds([]));
         Assert.Equal("Field validation failed, field name: ids, message: ids can't be empty.", exception.Message);
     }
 
@@ -92,8 +92,8 @@ public abstract class GenericFileAggregatorServiceTest : TestBase
         var genericModel = TestData.CreateGenericModel(CreateDefaultGenericModelParameters(TestData.Id));
 
         _genericService
-            .Setup(s => s.GetItemsByIds(It.IsAny<IEnumerable<string>>()))
-           .ReturnsAsync(new List<TestGenericModel> { genericModel });
+            .Setup(s => s.GetItemByUserIds(It.IsAny<string[]>()))
+           .ReturnsAsync([genericModel]);
 
         var fileContent = TestData.CreateFileResult();
         _fileService
@@ -101,7 +101,7 @@ public abstract class GenericFileAggregatorServiceTest : TestBase
             .ReturnsAsync(fileContent);
 
         // Act
-        var testGenericFileAggregatorModels = await _genericFileAggregatorService.GetItemsByIds(TestData.Ids);
+        var testGenericFileAggregatorModels = await _genericFileAggregatorService.GetItemsByUserIds(TestData.Ids);
 
         // Assert
         Assert.All(testGenericFileAggregatorModels, testGenericFileAggregatorModel => Assert.Equal(genericModel.UserId, testGenericFileAggregatorModel.Model.UserId));
@@ -114,9 +114,9 @@ public abstract class GenericFileAggregatorServiceTest : TestBase
     public async Task GetItemByIds_PagedIdsIsEmpty_ThrowsValidationError()
     {
         // Assert
-        var exception = await Assert.ThrowsAsync<ValidationException>(() => _genericFileAggregatorService.GetItemsByIds(new GetTestPagedByIdsDataModel
+        var exception = await Assert.ThrowsAsync<ValidationException>(() => _genericFileAggregatorService.GetItems(new GetTestPagedByIdsDataModel
         {
-            Ids = Enumerable.Empty<string>(),
+            UserIds = [],
             Page = 1,
             PageSize = 1,
         }));
@@ -127,9 +127,9 @@ public abstract class GenericFileAggregatorServiceTest : TestBase
     public async Task GetItemByIds_PagedPageLessThen0_ThrowsValidationError()
     {
         // Assert
-        var exception = await Assert.ThrowsAsync<AggregateException>(() => _genericFileAggregatorService.GetItemsByIds(new GetTestPagedByIdsDataModel
+        var exception = await Assert.ThrowsAsync<AggregateException>(() => _genericFileAggregatorService.GetItems(new GetTestPagedByIdsDataModel
         {
-            Ids = TestData.Ids,
+            UserIds = TestData.Ids,
             Page = -1,
             PageSize = 1,
         }));
@@ -140,9 +140,9 @@ public abstract class GenericFileAggregatorServiceTest : TestBase
     public async Task GetItemByIds_PagedPageSizeLessThen1_ThrowsValidationError()
     {
         // Assert
-        var exception = await Assert.ThrowsAsync<AggregateException>(() => _genericFileAggregatorService.GetItemsByIds(new GetTestPagedByIdsDataModel
+        var exception = await Assert.ThrowsAsync<AggregateException>(() => _genericFileAggregatorService.GetItems(new GetTestPagedByIdsDataModel
         {
-            Ids = TestData.Ids,
+            UserIds = TestData.Ids,
             Page = 0,
             PageSize = 0,
         }));
@@ -156,14 +156,15 @@ public abstract class GenericFileAggregatorServiceTest : TestBase
         var genericModel = TestData.CreateGenericModel(CreateDefaultGenericModelParameters(TestData.Id));
         var model = new GetTestPagedByIdsDataModel
         {
-            Ids = TestData.Ids,
+            UserIds = TestData.Ids,
             Page = 1,
             PageSize = 1,
         };
 
+        TestGenericModel[] items = [genericModel];
         _genericService
-            .Setup(s => s.GetItemsByIds(It.IsAny<GetTestPagedByIdsDataModel>()))
-            .ReturnsAsync(new List<TestGenericModel> { genericModel }.ToPaged(model));
+            .Setup(s => s.GetItems(It.IsAny<GetTestPagedByIdsDataModel>()))
+            .ReturnsAsync(items.ToPaged(model));
 
         var fileContent = TestData.CreateFileResult();
         _fileService
@@ -171,7 +172,7 @@ public abstract class GenericFileAggregatorServiceTest : TestBase
             .ReturnsAsync(fileContent);
 
         // Act
-        var testGenericFileAggregatorModels = (await _genericFileAggregatorService.GetItemsByIds(model)).Items;
+        var testGenericFileAggregatorModels = (await _genericFileAggregatorService.GetItems(model)).Items;
 
         // Assert
         Assert.All(testGenericFileAggregatorModels, testGenericFileAggregatorModel => Assert.Equal(genericModel.UserId, testGenericFileAggregatorModel.Model.UserId));

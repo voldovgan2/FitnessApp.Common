@@ -1,16 +1,29 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using AutoMapper;
-using FitnessApp.Common.Abstractions.Db.DbContext;
-using FitnessApp.Common.Abstractions.Db.Entities.Generic;
 using FitnessApp.Common.Abstractions.Models.Generic;
 using FitnessApp.Common.Paged.Extensions;
 using FitnessApp.Common.Paged.Models.Input;
 using FitnessApp.Common.Paged.Models.Output;
 
-namespace FitnessApp.Common.Abstractions.Db.Repository.Generic;
+namespace FitnessApp.Common.Abstractions.Db;
+
+public interface IGenericRepository<
+    TGenericModel,
+    TCreateGenericModel,
+    TUpdateGenericModel>
+    where TGenericModel : IGenericModel
+    where TCreateGenericModel : ICreateGenericModel
+    where TUpdateGenericModel : IUpdateGenericModel
+{
+    Task<TGenericModel> GetItemByUserId(string userId);
+    Task<TGenericModel[]> GetItemByUserIds(string[] userIds);
+    Task<PagedDataModel<TGenericModel>> GetItems(GetPagedByIdsDataModel model);
+    Task<TGenericModel> CreateItem(TCreateGenericModel model);
+    Task<TGenericModel> UpdateItem(TUpdateGenericModel model);
+    Task<string> DeleteItem(string userId);
+}
 
 public abstract class GenericRepository<
     TGenericEntity,
@@ -21,7 +34,7 @@ public abstract class GenericRepository<
         TGenericModel,
         TCreateGenericModel,
         TUpdateGenericModel>
-    where TGenericEntity : IGenericEntity
+    where TGenericEntity : IWithUserIdEntity
     where TGenericModel : IGenericModel
     where TCreateGenericModel : ICreateGenericModel
     where TUpdateGenericModel : IUpdateGenericModel
@@ -37,20 +50,20 @@ public abstract class GenericRepository<
 
     public async Task<TGenericModel> GetItemByUserId(string userId)
     {
-        var entity = await DbContext.GetItemById(userId);
+        var entity = await DbContext.GetByUserId(userId);
         return Mapper.Map<TGenericModel>(entity);
     }
 
-    public async Task<IEnumerable<TGenericModel>> GetItemsByIds(IEnumerable<string> ids)
+    public async Task<TGenericModel[]> GetItemByUserIds(string[] userIds)
     {
-        var items = await DbContext.GetItemsByIds(ids);
-        return Mapper.Map<IEnumerable<TGenericModel>>(items);
+        var items = await DbContext.GetByUserIds(userIds);
+        return Mapper.Map<TGenericModel[]>(items);
     }
 
     public async Task<PagedDataModel<TGenericModel>> GetItems(GetPagedByIdsDataModel model)
     {
-        var items = await DbContext.GetItemsByIds(model.Ids);
-        return Mapper.Map<IEnumerable<TGenericModel>>(items).ToPaged(model);
+        var items = await DbContext.GetByUserIds(model.UserIds);
+        return Mapper.Map<TGenericModel[]>(items).ToPaged(model);
     }
 
     public async Task<TGenericModel> CreateItem(TCreateGenericModel model)
@@ -63,7 +76,7 @@ public abstract class GenericRepository<
 
     public async Task<TGenericModel> UpdateItem(TUpdateGenericModel model)
     {
-        var entity = await DbContext.GetItemById(model.UserId);
+        var entity = await DbContext.GetByUserId(model.UserId);
         var propertiesToUpdate = model
             .GetType()
             .GetProperties()
@@ -84,7 +97,7 @@ public abstract class GenericRepository<
     public async Task<string> DeleteItem(string userId)
     {
         var deleted = await DbContext.DeleteItem(userId);
-        string result = deleted.UserId;
+        var result = deleted.UserId;
         return result;
     }
 }

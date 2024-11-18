@@ -1,14 +1,30 @@
 ﻿using System.Collections.Generic;
 using System.Threading.Tasks;
-using FitnessApp.Common.Abstractions.Db.Repository.Generic;
+using FitnessApp.Common.Abstractions.Db;
 using FitnessApp.Common.Abstractions.Extensions;
 using FitnessApp.Common.Abstractions.Models.Generic;
 using FitnessApp.Common.Abstractions.Models.Validation;
-using FitnessApp.Common.Abstractions.Services.Validation;
+using FitnessApp.Common.Helpers;
 using FitnessApp.Common.Paged.Models.Input;
 using FitnessApp.Common.Paged.Models.Output;
 
-namespace FitnessApp.Common.Abstractions.Services.Generic;
+namespace FitnessApp.Common.Abstractions.Services;
+
+public interface IGenericService<
+    TGenericModel,
+    TCreateGenericModel,
+    TUpdateGenericModel>
+    where TGenericModel : IGenericModel
+    where TCreateGenericModel : ICreateGenericModel
+    where TUpdateGenericModel : IUpdateGenericModel
+{
+    Task<TGenericModel> GetItemByUserId(string userId);
+    Task<TGenericModel[]> GetItemByUserIds(string[] userIds);
+    Task<PagedDataModel<TGenericModel>> GetItems(GetPagedByIdsDataModel model);
+    Task<TGenericModel> CreateItem(TCreateGenericModel model);
+    Task<TGenericModel> UpdateItem(TUpdateGenericModel model);
+    Task<string> DeleteItem(string userId);
+}
 
 public abstract class GenericService<
     TGenericModel,
@@ -25,7 +41,8 @@ public abstract class GenericService<
     protected IGenericRepository<
         TGenericModel,
         TCreateGenericModel,
-        TUpdateGenericModel> Repository { get; }
+        TUpdateGenericModel> Repository
+    { get; }
 
     protected GenericService(IGenericRepository<TGenericModel, TCreateGenericModel, TUpdateGenericModel> repository)
     {
@@ -40,18 +57,18 @@ public abstract class GenericService<
         return result;
     }
 
-    public async Task<IEnumerable<TGenericModel>> GetItemsByIds(IEnumerable<string> ids)
+    public async Task<TGenericModel[]> GetItemByUserIds(string[] userIds)
     {
-        ValidationHelper.ThrowExceptionIfNotValidatedEmptyIdsField(nameof(ids), ids);
+        ValidationHelper.ThrowExceptionIfNotValidatedEmptyIdsField(nameof(userIds), userIds);
 
-        var result = await Repository.GetItemsByIds(ids);
+        var result = await Repository.GetItemByUserIds(userIds);
         return result;
     }
 
-    public async Task<PagedDataModel<TGenericModel>> GetItemsByIds(GetPagedByIdsDataModel model)
+    public async Task<PagedDataModel<TGenericModel>> GetItems(GetPagedByIdsDataModel model)
     {
-        List<ValidationError> errors = new List<ValidationError>();
-        ValidationHelper.ThrowExceptionIfNotValidatedEmptyIdsField(nameof(model.Ids), model.Ids);
+        var errors = new List<ValidationError>();
+        ValidationHelper.ThrowExceptionIfNotValidatedEmptyIdsField(nameof(model.UserIds), model.UserIds);
         errors.AddIfNotNull(ValidationHelper.ValidateRange(0, int.MaxValue, model.Page, nameof(model.Page)));
         errors.AddIfNotNull(ValidationHelper.ValidateRange(1, int.MaxValue, model.PageSize, nameof(model.PageSize)));
         errors.ThrowIfNotEmpty();
@@ -86,14 +103,14 @@ public abstract class GenericService<
         return result;
     }
 
-    protected virtual IEnumerable<ValidationError> ValidateCreateGenericModel(TCreateGenericModel model)
+    protected virtual List<ValidationError> ValidateCreateGenericModel(TCreateGenericModel model)
     {
         var errors = new List<ValidationError>();
         errors.AddIfNotNull(ValidationHelper.ValidateEmptyStringField(nameof(model.UserId), model.UserId));
         return errors;
     }
 
-    protected virtual IEnumerable<ValidationError> ValidateUpdateGenericModel(TUpdateGenericModel model)
+    protected virtual List<ValidationError> ValidateUpdateGenericModel(TUpdateGenericModel model)
     {
         var errors = new List<ValidationError>();
         errors.AddIfNotNull(ValidationHelper.ValidateEmptyStringField(nameof(model.UserId), model.UserId));

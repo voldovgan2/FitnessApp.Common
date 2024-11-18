@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using AutoMapper;
@@ -9,15 +10,31 @@ using FitnessApp.Common.Abstractions.Models.FileImage;
 using FitnessApp.Common.Abstractions.Models.Generic;
 using FitnessApp.Common.Abstractions.Models.GenericFileAggregator;
 using FitnessApp.Common.Abstractions.Models.Validation;
-using FitnessApp.Common.Abstractions.Services.Configuration;
-using FitnessApp.Common.Abstractions.Services.Generic;
-using FitnessApp.Common.Abstractions.Services.Validation;
 using FitnessApp.Common.Files;
+using FitnessApp.Common.Helpers;
 using FitnessApp.Common.Paged.Extensions;
 using FitnessApp.Common.Paged.Models.Input;
 using FitnessApp.Common.Paged.Models.Output;
 
-namespace FitnessApp.Common.Abstractions.Services.GenericFileAggregator;
+namespace FitnessApp.Common.Abstractions.Services;
+
+public interface IGenericFileAggregatorService<
+    TGenericFileAggregatorModel,
+    TGenericModel,
+    TCreateGenericFileAggregatorModel,
+    TUpdateGenericFileAggregatorModel>
+    where TGenericFileAggregatorModel : IGenericFileAggregatorModel<TGenericModel>
+    where TGenericModel : IGenericModel
+    where TCreateGenericFileAggregatorModel : ICreateGenericFileAggregatorModel
+    where TUpdateGenericFileAggregatorModel : IUpdateGenericFileAggregatorModel
+{
+    Task<TGenericFileAggregatorModel> GetItemByUserId(string userId);
+    Task<TGenericFileAggregatorModel[]> GetItemsByUserIds(string[] userIds);
+    Task<PagedDataModel<TGenericFileAggregatorModel>> GetItems(GetPagedByIdsDataModel model);
+    Task<TGenericFileAggregatorModel> CreateItem(TCreateGenericFileAggregatorModel model);
+    Task<TGenericFileAggregatorModel> UpdateItem(TUpdateGenericFileAggregatorModel model);
+    Task<string> DeleteItem(string userId);
+}
 
 public abstract class GenericFileAggregatorService<
     TGenericFileAggregatorModel,
@@ -41,7 +58,8 @@ public abstract class GenericFileAggregatorService<
     protected IGenericService<
         TGenericModel,
         TCreateGenericModel,
-        TUpdateGenericModel> GenericService { get; }
+        TUpdateGenericModel> GenericService
+    { get; }
     protected IFilesService FilesService { get; }
     protected IMapper Mapper { get; }
     protected GenericFileAggregatorSettings GenericFileAggregatorSettings { get; }
@@ -70,24 +88,24 @@ public abstract class GenericFileAggregatorService<
         return result;
     }
 
-    public async Task<IEnumerable<TGenericFileAggregatorModel>> GetItemsByIds(string[] ids)
+    public async Task<TGenericFileAggregatorModel[]> GetItemsByUserIds(string[] userIds)
     {
-        ValidationHelper.ThrowExceptionIfNotValidatedEmptyIdsField(nameof(ids), ids);
+        ValidationHelper.ThrowExceptionIfNotValidatedEmptyIdsField(nameof(userIds), userIds);
 
-        var dataModels = await GenericService.GetItemsByIds(ids);
+        var dataModels = await GenericService.GetItemByUserIds(userIds);
         var result = await LoadAndComposeGenericFileAggregatorModels(dataModels);
         return result;
     }
 
-    public async Task<PagedDataModel<TGenericFileAggregatorModel>> GetItemsByIds(GetPagedByIdsDataModel model)
+    public async Task<PagedDataModel<TGenericFileAggregatorModel>> GetItems(GetPagedByIdsDataModel model)
     {
-        List<ValidationError> errors = new List<ValidationError>();
-        ValidationHelper.ThrowExceptionIfNotValidatedEmptyIdsField(nameof(model.Ids), model.Ids);
+        var errors = new List<ValidationError>();
+        ValidationHelper.ThrowExceptionIfNotValidatedEmptyIdsField(nameof(model.UserIds), model.UserIds);
         errors.AddIfNotNull(ValidationHelper.ValidateRange(0, int.MaxValue, model.Page, nameof(model.Page)));
         errors.AddIfNotNull(ValidationHelper.ValidateRange(1, int.MaxValue, model.PageSize, nameof(model.PageSize)));
         errors.ThrowIfNotEmpty();
 
-        var dataModels = await GenericService.GetItemsByIds(model);
+        var dataModels = await GenericService.GetItems(model);
         var result = (await LoadAndComposeGenericFileAggregatorModels(dataModels.Items)).ToPaged(model);
         return result;
     }
@@ -108,7 +126,6 @@ public abstract class GenericFileAggregatorService<
         var validationErrors = ValidateUpdateGenericModel(model);
         validationErrors.ThrowIfNotEmpty();
         ValidationHelper.ThrowExceptionIfNotValidFiles(model.Images);
-
         var updateGenericModel = Mapper.Map<TUpdateGenericModel>(model);
         var dataModel = await GenericService.UpdateItem(updateGenericModel);
         await DeleteItemFiles(model.UserId);
@@ -129,8 +146,7 @@ public abstract class GenericFileAggregatorService<
     {
         var result = Activator.CreateInstance<TGenericFileAggregatorModel>();
         result.Model = dataModel;
-        result.Images = new List<FileImageModel>();
-
+        result.Images = [];
         foreach (var fileField in GenericFileAggregatorSettings.FileFields)
         {
             var fileContent = await FilesService.DownloadFile(GenericFileAggregatorSettings.ContainerName, FilesService.CreateFileName(fileField, dataModel.UserId));
@@ -147,18 +163,13 @@ public abstract class GenericFileAggregatorService<
         return result;
     }
 
-    protected async Task<IEnumerable<TGenericFileAggregatorModel>> LoadAndComposeGenericFileAggregatorModels(IEnumerable<TGenericModel> dataModels)
+    protected async Task<TGenericFileAggregatorModel[]> LoadAndComposeGenericFileAggregatorModels(TGenericModel[] dataModels)
     {
-        var result = new List<TGenericFileAggregatorModel>();
-        foreach (var dataModel in dataModels)
-        {
-            result.Add(await LoadAndComposeGenericFileAggregatorModel(dataModel));
-        }
-
-        return result;
+        var loadAndComposeGenericFileAggregatorModelTasks = dataModels.Select(LoadAndComposeGenericFileAggregatorModel);
+        return [.. await Task.WhenAll(loadAndComposeGenericFileAggregatorModelTasks)];
     }
 
-    protected virtual IEnumerable<ValidationError> ValidateCreateGenericModel(TCreateGenericFileAggregatorModel model)
+    protected virtual List<ValidationError> ValidateCreateGenericModel(TCreateGenericFileAggregatorModel model)
     {
         var errors = new List<ValidationError>();
         errors.AddIfNotNull(ValidationHelper.ValidateEmptyStringField(nameof(model.UserId), model.UserId));
@@ -166,19 +177,18 @@ public abstract class GenericFileAggregatorService<
         return errors;
     }
 
-    protected virtual IEnumerable<ValidationError> ValidateUpdateGenericModel(TUpdateGenericFileAggregatorModel model)
+    protected virtual List<ValidationError> ValidateUpdateGenericModel(TUpdateGenericFileAggregatorModel model)
     {
         var errors = new List<ValidationError>();
         errors.AddIfNotNull(ValidationHelper.ValidateEmptyStringField(nameof(model.UserId), model.UserId));
         return errors;
     }
 
-    private async Task<TGenericFileAggregatorModel> SaveAndComposeGenericFileAggregatorModel(TGenericModel dataModel, IEnumerable<FileImageModel> fileFields)
+    private async Task<TGenericFileAggregatorModel> SaveAndComposeGenericFileAggregatorModel(TGenericModel dataModel, FileImageModel[] fileFields)
     {
         var result = Activator.CreateInstance<TGenericFileAggregatorModel>();
         result.Model = dataModel;
-        result.Images = new List<FileImageModel>();
-
+        result.Images = [];
         foreach (var fileField in fileFields)
         {
             if (fileField.Value != null)

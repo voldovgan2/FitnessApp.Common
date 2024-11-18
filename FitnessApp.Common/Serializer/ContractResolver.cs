@@ -8,7 +8,7 @@ using Newtonsoft.Json.Serialization;
 namespace FitnessApp.Common.Serializer;
 
 [ExcludeFromCodeCoverage]
-public class ContractResolver(IEnumerable<string> propertiesToIgnore) : DefaultContractResolver
+public class ContractResolver(string[] propertiesToIgnore) : DefaultContractResolver
 {
     protected override IList<JsonProperty> CreateProperties(Type type, MemberSerialization memberSerialization)
     {

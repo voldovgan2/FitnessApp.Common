@@ -1,4 +1,4 @@
-﻿namespace FitnessApp.Common.Abstractions.Services.Configuration;
+﻿namespace FitnessApp.Common.Abstractions.Services;
 
 public class GenericFileAggregatorSettings
 {

@@ -6,6 +6,14 @@ using Minio.DataModel.Args;
 
 namespace FitnessApp.Common.Files;
 
+public interface IFilesService
+{
+    Task UploadFile(string bucketName, string objectName, Stream stream);
+    Task<byte[]> DownloadFile(string bucketName, string objectName);
+    Task DeleteFile(string bucketName, string objectName);
+    string CreateFileName(string propertyName, string userId);
+}
+
 [ExcludeFromCodeCoverage]
 public class FilesService(IMinioClient minioClient) : IFilesService
 {

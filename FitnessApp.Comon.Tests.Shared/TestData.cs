@@ -3,10 +3,9 @@ using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.IO;
 using System.Text;
-using FitnessApp.Common.Abstractions.Db.Enums.Collection;
 using FitnessApp.Common.Abstractions.Models.FileImage;
-using FitnessApp.Common.Abstractions.Services.Configuration;
-using FitnessApp.Comon.Tests.Shared.Abstraction.Db.Entities.Generic;
+using FitnessApp.Common.Abstractions.Services;
+using FitnessApp.Comon.Tests.Shared.Abstraction.Db;
 using FitnessApp.Comon.Tests.Shared.Abstraction.Models.Generic;
 using FitnessApp.Comon.Tests.Shared.Abstraction.Models.GenericFileAggregator;
 
@@ -25,7 +24,7 @@ public static class TestData
     public static string FileToDelete { get; } = "FileToDelete";
 
     public static string Id { get; } = "1";
-    public static string[] Ids { get; } = new string[] { Id };
+    public static string[] Ids { get; } = [Id];
     public static string CollectionName { get; } = "Collection";
     public static string ContainerName { get; } = "ContainerName";
     public static string FileFieldName { get; } = "FileField";
@@ -35,16 +34,16 @@ public static class TestData
 
     #region Abstract
 
-    public static List<T> GetAll<T>(Func<Dictionary<string, object>, T> createElementFactory, Dictionary<string, object> args)
+    public static T[] GetAll<T>(Func<Dictionary<string, object>, T> createElementFactory, Dictionary<string, object> args)
         where T : class
     {
-        var result = new List<T>();
+        var result = new T[4];
         args.Add("Id", 0);
 
         for (int k = 0; k < 4; k++)
         {
             args["Id"] = k + 1;
-            result.Add(createElementFactory(args));
+            result[k] = createElementFactory(args);
         }
 
         return result;
@@ -113,16 +112,15 @@ public static class TestData
         return bytes;
     }
 
-    public static List<FileImageModel> CreateFileAggregatorImages()
+    public static FileImageModel[] CreateFileAggregatorImages()
     {
-        return new List<FileImageModel>
-        {
+        return [
             new FileImageModel
             {
                 FieldName = FileFieldName,
                 Value = FileFieldContent
-            }
-        };
+            },
+        ];
     }
 
     #endregion
@@ -136,7 +134,7 @@ public static class TestData
         {
             UserId = id?.ToString(),
             TestProperty = $"{_propertyPrefix}{id}",
-            Images = (List<FileImageModel>)args["Images"]
+            Images = (FileImageModel[])args["Images"]
         };
     }
 
@@ -147,7 +145,7 @@ public static class TestData
         {
             UserId = id?.ToString(),
             TestProperty = $"{_propertyPrefix}{id}",
-            Images = (List<FileImageModel>)args["Images"]
+            Images = (FileImageModel[])args["Images"]
         };
     }
 
@@ -156,10 +154,10 @@ public static class TestData
         return new GenericFileAggregatorSettings
         {
             ContainerName = ContainerName,
-            FileFields = new string[]
-            {
+            FileFields =
+            [
                 FileFieldName
-            }
+            ]
         };
     }
 

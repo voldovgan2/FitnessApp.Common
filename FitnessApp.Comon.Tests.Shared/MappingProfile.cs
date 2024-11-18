@@ -1,7 +1,6 @@
-﻿using System.Collections.Generic;
-using System.Diagnostics.CodeAnalysis;
+﻿using System.Diagnostics.CodeAnalysis;
 using AutoMapper;
-using FitnessApp.Comon.Tests.Shared.Abstraction.Db.Entities.Generic;
+using FitnessApp.Comon.Tests.Shared.Abstraction.Db;
 using FitnessApp.Comon.Tests.Shared.Abstraction.Models.Generic;
 using FitnessApp.Comon.Tests.Shared.Abstraction.Models.GenericFileAggregator;
 

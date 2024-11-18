@@ -1,16 +1,14 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using FitnessApp.Common.Abstractions.Db.DbContext;
-using FitnessApp.Common.UnitTests.Abstraction;
+using FitnessApp.Common.Abstractions.Db;
 using FitnessApp.Comon.Tests.Shared;
-using FitnessApp.Comon.Tests.Shared.Abstraction.Db.Entities.Generic;
-using FitnessApp.Comon.Tests.Shared.Abstraction.Db.Repository.Generic;
+using FitnessApp.Comon.Tests.Shared.Abstraction.Db;
 using FitnessApp.Comon.Tests.Shared.Abstraction.Models.Generic;
 using Moq;
 using Xunit;
 
-namespace FitnessApp.Common.UnitTests.Abstractions.Db.Repository.Generic;
+namespace FitnessApp.Common.UnitTests;
 
 public abstract class GenericRepositoryTests : TestBase
 {
@@ -35,7 +33,7 @@ public abstract class GenericRepositoryTests : TestBase
         // Arrange
         var genericEntitiesMock = GetGenericEntitiesMock();
         _dbContextMock
-           .Setup(s => s.GetItemById(It.IsAny<string>()))
+           .Setup(s => s.GetByUserId(It.IsAny<string>()))
            .ReturnsAsync(genericEntitiesMock.Single(i => i.UserId == TestData.Id));
 
         // Act
@@ -51,11 +49,11 @@ public abstract class GenericRepositoryTests : TestBase
         // Arrange
         var genericEntitiesMock = GetGenericEntitiesMock();
         _dbContextMock
-           .Setup(s => s.GetItemsByIds(It.IsAny<IEnumerable<string>>()))
-           .ReturnsAsync(genericEntitiesMock.Where(i => i.UserId == TestData.Id));
+           .Setup(s => s.GetByUserIds(It.IsAny<string[]>()))
+           .ReturnsAsync([.. genericEntitiesMock.Where(i => i.UserId == TestData.Id)]);
 
         // Act
-        var entity = (await _repository.GetItemsByIds([TestData.Id])).Single();
+        var entity = (await _repository.GetItemByUserIds([TestData.Id])).Single();
 
         // Assert
         Assert.Equal(TestData.Id, entity.UserId);
@@ -67,13 +65,13 @@ public abstract class GenericRepositoryTests : TestBase
         // Arrange
         var genericEntitiesMock = GetGenericEntitiesMock();
         _dbContextMock
-           .Setup(s => s.GetItemsByIds(It.IsAny<IEnumerable<string>>()))
-           .ReturnsAsync(genericEntitiesMock.Where(i => i.UserId == TestData.Id));
+           .Setup(s => s.GetByUserIds(It.IsAny<string[]>()))
+           .ReturnsAsync([.. genericEntitiesMock.Where(i => i.UserId == TestData.Id)]);
 
         // Act
         var entity = (await _repository.GetItems(new GetTestPagedByIdsDataModel
         {
-            Ids = new List<string> { TestData.Id },
+            UserIds = [TestData.Id],
             Page = 0,
             PageSize = 10,
         })).Items.Single();
@@ -107,7 +105,7 @@ public abstract class GenericRepositoryTests : TestBase
         // Arrange
         var genericEntitiesMock = GetGenericEntitiesMock();
         _dbContextMock
-           .Setup(s => s.GetItemById(It.IsAny<string>()))
+           .Setup(s => s.GetByUserId(It.IsAny<string>()))
            .ReturnsAsync(genericEntitiesMock.Single(i => i.UserId == TestData.Id));
 
         var entityUpdate = TestData.CreateGenericEntity(_defaultGenericModelParameters);

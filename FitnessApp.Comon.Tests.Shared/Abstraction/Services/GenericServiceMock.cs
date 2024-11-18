@@ -1,6 +1,6 @@
 ﻿using System.Diagnostics.CodeAnalysis;
-using FitnessApp.Common.Abstractions.Db.Repository.Generic;
-using FitnessApp.Common.Abstractions.Services.Generic;
+using FitnessApp.Common.Abstractions.Db;
+using FitnessApp.Common.Abstractions.Services;
 using FitnessApp.Comon.Tests.Shared.Abstraction.Models.Generic;
 
 namespace FitnessApp.Comon.Tests.Shared.Abstraction.Services.Generic;

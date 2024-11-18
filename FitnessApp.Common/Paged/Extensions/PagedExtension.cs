@@ -1,5 +1,4 @@
-﻿using System.Collections.Generic;
-using System.Diagnostics.CodeAnalysis;
+﻿using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using System.Reflection;
 using FitnessApp.Common.Paged.Models.Input;
@@ -10,17 +9,19 @@ namespace FitnessApp.Common.Paged.Extensions;
 [ExcludeFromCodeCoverage]
 public static class PagedExtension
 {
-    public static PagedDataModel<T> ToPaged<T>(this IEnumerable<T> data, GetPagedDataModel model)
+    public static PagedDataModel<T> ToPaged<T>(this T[] data, GetPagedDataModel model)
     {
-        var totalCount = data.Count();
+        var totalCount = data.Length;
         if (!string.IsNullOrWhiteSpace(model.SortBy))
         {
             var propertyInfo = typeof(T).GetProperty(model.SortBy);
             if (propertyInfo != null)
             {
-                data = model.Asc ?
-                    data.OrderBy(x => GetProperty(x, propertyInfo))
-                    : data.OrderByDescending(x => GetProperty(x, propertyInfo));
+                data = [
+                    ..model.Asc ?
+                        data.OrderBy(x => GetProperty(x, propertyInfo))
+                        : data.OrderByDescending(x => GetProperty(x, propertyInfo))
+                ];
             }
         }
 
@@ -29,7 +30,7 @@ public static class PagedExtension
         {
             Page = model.Page,
             TotalCount = totalCount,
-            Items = items
+            Items = [..items]
         };
     }
 

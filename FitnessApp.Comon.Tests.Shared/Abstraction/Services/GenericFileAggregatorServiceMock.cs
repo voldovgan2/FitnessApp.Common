@@ -1,8 +1,6 @@
 ﻿using System.Diagnostics.CodeAnalysis;
 using AutoMapper;
-using FitnessApp.Common.Abstractions.Services.Configuration;
-using FitnessApp.Common.Abstractions.Services.Generic;
-using FitnessApp.Common.Abstractions.Services.GenericFileAggregator;
+using FitnessApp.Common.Abstractions.Services;
 using FitnessApp.Common.Files;
 using FitnessApp.Comon.Tests.Shared.Abstraction.Models.Generic;
 using FitnessApp.Comon.Tests.Shared.Abstraction.Models.GenericFileAggregator;

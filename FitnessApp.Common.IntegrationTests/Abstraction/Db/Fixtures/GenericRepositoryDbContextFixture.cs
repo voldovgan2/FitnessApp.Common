@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
 using FitnessApp.Comon.Tests.Shared;
-using FitnessApp.Comon.Tests.Shared.Abstraction.Db.Entities.Generic;
+using FitnessApp.Comon.Tests.Shared.Abstraction.Db;
 
 namespace FitnessApp.Common.IntegrationTests.Abstraction.Db.Fixtures;
 

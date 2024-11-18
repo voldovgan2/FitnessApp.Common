@@ -1,15 +1,16 @@
 ﻿using System;
 using System.Diagnostics.CodeAnalysis;
-using FitnessApp.Common.Abstractions.Db.Entities.Generic;
+using FitnessApp.Common.Abstractions.Db;
 using FitnessApp.Common.Attributes;
 using MongoDB.Bson.Serialization.Attributes;
 
-namespace FitnessApp.Comon.Tests.Shared.Abstraction.Db.Entities.Generic;
+namespace FitnessApp.Comon.Tests.Shared.Abstraction.Db;
 
 [ExcludeFromCodeCoverageAttribute]
-public class TestGenericEntity : IGenericEntity, IEquatable<TestGenericEntity>
+public class TestGenericEntity : IWithUserIdEntity, IEquatable<TestGenericEntity>
 {
     [BsonId]
+    public string Id { get; set; }
     public string UserId { get; set; }
     [SingleWordSearchable]
     public string TestProperty1 { get; set; }

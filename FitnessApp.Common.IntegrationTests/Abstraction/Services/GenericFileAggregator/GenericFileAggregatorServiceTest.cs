@@ -1,13 +1,12 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using FitnessApp.Common.Abstractions.Services.Configuration;
-using FitnessApp.Common.Abstractions.Services.GenericFileAggregator;
+using FitnessApp.Common.Abstractions.Services;
 using FitnessApp.Common.Files;
 using FitnessApp.Common.IntegrationTests.Abstraction.Services.Fixtures;
 using FitnessApp.Common.IntegrationTests.File.Fixtures;
 using FitnessApp.Comon.Tests.Shared;
-using FitnessApp.Comon.Tests.Shared.Abstraction.Db.Repository.Generic;
+using FitnessApp.Comon.Tests.Shared.Abstraction.Db;
 using FitnessApp.Comon.Tests.Shared.Abstraction.Models.Generic;
 using FitnessApp.Comon.Tests.Shared.Abstraction.Models.GenericFileAggregator;
 using FitnessApp.Comon.Tests.Shared.Abstraction.Services.Generic;

@@ -1,10 +1,9 @@
-﻿using System.Collections.Generic;
-using System.Diagnostics.CodeAnalysis;
+﻿using System.Diagnostics.CodeAnalysis;
 
 namespace FitnessApp.Common.Paged.Contracts.Input;
 
 [ExcludeFromCodeCoverage]
 public abstract class GetPagedByIdsDataContract : GetPagedDataContract
 {
-    public IEnumerable<string> Ids { get; set; }
+    public string[] UserIds { get; set; }
 }

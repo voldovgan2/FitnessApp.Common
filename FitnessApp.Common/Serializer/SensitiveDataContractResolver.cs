@@ -14,23 +14,26 @@ public class SensitiveDataContractResolver : DefaultContractResolver
 {
     public bool HasSensitiveProperties(Type type)
     {
-        return GetSensitiveProperties(type).Any();
+        return GetSensitiveProperties(type).Length != 0;
     }
 
     protected override IList<JsonProperty> CreateProperties(Type type, MemberSerialization memberSerialization)
     {
         var sensitiveProperties = GetSensitiveProperties(type)
             .Select(p => p.Name);
-        return base
-            .CreateProperties(type, memberSerialization)
-            .Where(p => !sensitiveProperties.Contains(p.PropertyName))
-            .ToList();
+        return [
+            ..base
+                .CreateProperties(type, memberSerialization)
+                .Where(p => !sensitiveProperties.Contains(p.PropertyName))
+        ];
     }
 
-    private IEnumerable<PropertyInfo> GetSensitiveProperties(Type type)
+    private PropertyInfo[] GetSensitiveProperties(Type type)
     {
-        return type
-            .GetProperties(BindingFlags.Public | BindingFlags.Instance)
-            .Where(p => p.GetCustomAttributes(typeof(SensitiveAttribute), false).Any());
+        return [
+            ..type
+                .GetProperties(BindingFlags.Public | BindingFlags.Instance)
+                .Where(p => p.GetCustomAttributes(typeof(SensitiveAttribute), false).Length != 0)
+        ];
     }
 }

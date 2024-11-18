@@ -1,5 +1,4 @@
-﻿using System.Collections.Generic;
-using System.Diagnostics.CodeAnalysis;
+﻿using System.Diagnostics.CodeAnalysis;
 using System.Text;
 using Newtonsoft.Json;
 
@@ -15,7 +14,7 @@ public static class JsonConvertHelper
         return DefaultEncoding.GetBytes(JsonConvert.SerializeObject(data));
     }
 
-    public static byte[] SerializeToBytes(object data, IEnumerable<string> propertiesToIgnore)
+    public static byte[] SerializeToBytes(object data, string[] propertiesToIgnore)
     {
         return DefaultEncoding.GetBytes(JsonConvert.SerializeObject(data, new JsonSerializerSettings
         {
@@ -28,7 +27,7 @@ public static class JsonConvertHelper
         return JsonConvert.DeserializeObject<T>(DefaultEncoding.GetString(data));
     }
 
-    public static string SerializeToString(object data, IEnumerable<string> propertiesToIgnore)
+    public static string SerializeToString(object data, string[] propertiesToIgnore)
     {
         return JsonConvert.SerializeObject(data, new JsonSerializerSettings
         {

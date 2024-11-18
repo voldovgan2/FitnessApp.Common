@@ -2,7 +2,7 @@
 using System.Threading.Tasks;
 using FitnessApp.Common.IntegrationTests.Abstraction.Db.Fixtures;
 using FitnessApp.Comon.Tests.Shared;
-using FitnessApp.Comon.Tests.Shared.Abstraction.Db.Repository.Generic;
+using FitnessApp.Comon.Tests.Shared.Abstraction.Db;
 using FitnessApp.Comon.Tests.Shared.Abstraction.Models.Generic;
 using Xunit;
 

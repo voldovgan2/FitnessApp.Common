@@ -1,9 +1,9 @@
 ﻿using System.Collections.Generic;
 using AutoMapper;
 using FitnessApp.Comon.Tests.Shared;
-using FitnessApp.Comon.Tests.Shared.Abstraction.Db.Entities.Generic;
+using FitnessApp.Comon.Tests.Shared.Abstraction.Db;
 
-namespace FitnessApp.Common.UnitTests.Abstraction;
+namespace FitnessApp.Common.UnitTests;
 
 public abstract class TestBase
 {
@@ -18,7 +18,7 @@ public abstract class TestBase
             .CreateMapper();
     }
 
-    protected IEnumerable<TestGenericEntity> GetGenericEntitiesMock()
+    protected static TestGenericEntity[] GetGenericEntitiesMock()
     {
         return TestData.GetAll(TestData.CreateGenericEntity, new Dictionary<string, object>());
     }

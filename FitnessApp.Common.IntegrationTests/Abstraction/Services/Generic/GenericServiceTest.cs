@@ -1,9 +1,9 @@
 ﻿using System.Collections.Generic;
 using System.Threading.Tasks;
-using FitnessApp.Common.Abstractions.Services.Generic;
+using FitnessApp.Common.Abstractions.Services;
 using FitnessApp.Common.IntegrationTests.Abstraction.Services.Fixtures;
 using FitnessApp.Comon.Tests.Shared;
-using FitnessApp.Comon.Tests.Shared.Abstraction.Db.Repository.Generic;
+using FitnessApp.Comon.Tests.Shared.Abstraction.Db;
 using FitnessApp.Comon.Tests.Shared.Abstraction.Models.Generic;
 using FitnessApp.Comon.Tests.Shared.Abstraction.Services.Generic;
 using Xunit;

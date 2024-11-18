@@ -85,6 +85,9 @@ dotnet_diagnostic.SA1009.severity = None
 # Closing parenthesis should be on line of last parameter
 dotnet_diagnostic.SA1111.severity = None
 
+# An opening square bracket should never be preceded by whitespace
+dotnet_diagnostic.SA1010.severity = None
+
 # Braces should not be ommitted
 dotnet_diagnostic.SA1503.severity = None
 csharp_using_directive_placement = outside_namespace:silent

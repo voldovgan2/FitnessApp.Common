@@ -18,13 +18,7 @@ public static class ValidationErrorsListExtension
 
     public static void ThrowIfNotEmpty(this List<ValidationError> source)
     {
-        if (source.Any())
-            throw new AggregateException(source.Select(e => new ValidationException(e)));
-    }
-
-    public static void ThrowIfNotEmpty(this IEnumerable<ValidationError> source)
-    {
-        if (source.Any())
+        if (source.Count != 0)
             throw new AggregateException(source.Select(e => new ValidationException(e)));
     }
 }

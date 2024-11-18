@@ -1,13 +1,9 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using FitnessApp.Common.Abstractions.Db.Configuration;
-using FitnessApp.Common.Abstractions.Db.DbContext;
-using FitnessApp.Common.Abstractions.Db.Entities.Generic;
+using FitnessApp.Common.Abstractions.Db;
 using FitnessApp.Comon.Tests.Shared;
 using Microsoft.Extensions.Configuration;
-using Microsoft.Extensions.Options;
 using MongoDB.Bson.Serialization;
 using MongoDB.Bson.Serialization.Serializers;
 using MongoDB.Driver;
@@ -15,7 +11,7 @@ using MongoDB.Driver;
 namespace FitnessApp.Common.IntegrationTests.Abstraction.Db.Fixtures;
 
 public abstract class DbContextFixtureBase<TEntity> : TestBase, IDisposable
-    where TEntity : IGenericEntity
+    where TEntity : IWithUserIdEntity
 {
     public DbContext<TEntity> DbContext { get; }
     private readonly MongoClient _mongoClient;
@@ -32,8 +28,8 @@ public abstract class DbContextFixtureBase<TEntity> : TestBase, IDisposable
             CollecttionName = "Items",
         };
         _mongoClient = new MongoClient(_mongoDbSettings.ConnectionString);
-        DbContext = new DbContext<TEntity>(_mongoClient, Options.Create(_mongoDbSettings));
-        IEnumerable<string> itemIds =
+        DbContext = new DbContext<TEntity>(_mongoClient, _mongoDbSettings);
+        string[] itemIds =
         [
             TestData.EntityIdToGet,
             TestData.EntityIdToDelete,

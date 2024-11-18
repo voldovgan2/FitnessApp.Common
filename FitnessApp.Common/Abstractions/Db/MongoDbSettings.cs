@@ -1,6 +1,6 @@
 ﻿using System.Diagnostics.CodeAnalysis;
 
-namespace FitnessApp.Common.Abstractions.Db.Configuration;
+namespace FitnessApp.Common.Abstractions.Db;
 
 [ExcludeFromCodeCoverage]
 public class MongoDbSettings

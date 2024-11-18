@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using FitnessApp.Common.Abstractions.Db.Repository.Generic;
+using FitnessApp.Common.Abstractions.Db;
 using FitnessApp.Common.Exceptions;
 using FitnessApp.Common.Paged.Extensions;
 using FitnessApp.Common.Paged.Models.Input;
@@ -12,7 +12,7 @@ using FitnessApp.Comon.Tests.Shared.Abstraction.Services.Generic;
 using Moq;
 using Xunit;
 
-namespace FitnessApp.Common.UnitTests.Abstraction.Services.Generic;
+namespace FitnessApp.Common.UnitTests;
 
 public abstract class GenericServiceTest : TestBase
 {
@@ -22,7 +22,7 @@ public abstract class GenericServiceTest : TestBase
         UpdateTestGenericModel>> _repository;
     private readonly GenericServiceMock _service;
 
-    protected GenericServiceTest() : base()
+    protected GenericServiceTest()
     {
         _repository = new Mock<
             IGenericRepository<
@@ -62,7 +62,7 @@ public abstract class GenericServiceTest : TestBase
     public async Task GetItemByIds_IdsIsEmpty_ThrowsValidationError()
     {
         // Assert
-        var exception = await Assert.ThrowsAsync<ValidationException>(() => _service.GetItemsByIds([]));
+        var exception = await Assert.ThrowsAsync<ValidationException>(() => _service.GetItemByUserIds([]));
         Assert.Equal("Field validation failed, field name: ids, message: ids can't be empty.", exception.Message);
     }
 
@@ -72,11 +72,11 @@ public abstract class GenericServiceTest : TestBase
         // Arrange
         var genericEntitiesMock = CreateDefaultMockedData();
         _repository
-           .Setup(s => s.GetItemsByIds(It.IsAny<IEnumerable<string>>()))
-           .ReturnsAsync(genericEntitiesMock.Where(e => TestData.Ids.Contains(e.UserId)));
+           .Setup(s => s.GetItemByUserIds(It.IsAny<string[]>()))
+           .ReturnsAsync([..genericEntitiesMock.Where(e => TestData.Ids.Contains(e.UserId))]);
 
         // Act
-        var models = await _service.GetItemsByIds(TestData.Ids);
+        var models = await _service.GetItemByUserIds(TestData.Ids);
 
         // Assert
         Assert.All(models, m => Assert.Contains(m.UserId, TestData.Ids));
@@ -86,9 +86,9 @@ public abstract class GenericServiceTest : TestBase
     public async Task GetItemByIds_PagedIdsIsEmpty_ThrowsValidationError()
     {
         // Assert
-        var exception = await Assert.ThrowsAsync<ValidationException>(() => _service.GetItemsByIds(new GetTestPagedByIdsDataModel
+        var exception = await Assert.ThrowsAsync<ValidationException>(() => _service.GetItems(new GetTestPagedByIdsDataModel
         {
-            Ids = Enumerable.Empty<string>(),
+            UserIds = [],
             Page = 1,
             PageSize = 1,
         }));
@@ -99,9 +99,9 @@ public abstract class GenericServiceTest : TestBase
     public async Task GetItemByIds_PagedPageLessThen0_ThrowsValidationError()
     {
         // Assert
-        var exception = await Assert.ThrowsAsync<AggregateException>(() => _service.GetItemsByIds(new GetTestPagedByIdsDataModel
+        var exception = await Assert.ThrowsAsync<AggregateException>(() => _service.GetItems(new GetTestPagedByIdsDataModel
         {
-            Ids = TestData.Ids,
+            UserIds = TestData.Ids,
             Page = -1,
             PageSize = 1,
         }));
@@ -112,9 +112,9 @@ public abstract class GenericServiceTest : TestBase
     public async Task GetItemByIds_PagedPageSizeLessThen1_ThrowsValidationError()
     {
         // Assert
-        var exception = await Assert.ThrowsAsync<AggregateException>(() => _service.GetItemsByIds(new GetTestPagedByIdsDataModel
+        var exception = await Assert.ThrowsAsync<AggregateException>(() => _service.GetItems(new GetTestPagedByIdsDataModel
         {
-            Ids = TestData.Ids,
+            UserIds = TestData.Ids,
             Page = 0,
             PageSize = 0,
         }));
@@ -127,7 +127,7 @@ public abstract class GenericServiceTest : TestBase
         // Arrange
         var model = new GetTestPagedByIdsDataModel
         {
-            Ids = TestData.Ids,
+            UserIds = TestData.Ids,
             Page = 1,
             PageSize = 1,
         };
@@ -135,10 +135,10 @@ public abstract class GenericServiceTest : TestBase
         var genericEntitiesMock = CreateDefaultMockedData();
         _repository
            .Setup(s => s.GetItems(It.IsAny<GetPagedByIdsDataModel>()))
-           .ReturnsAsync(genericEntitiesMock.Where(e => TestData.Ids.Contains(e.UserId)).ToPaged(model));
+           .ReturnsAsync(genericEntitiesMock.Where(e => TestData.Ids.Contains(e.UserId)).ToArray().ToPaged(model));
 
         // Act
-        var models = await _service.GetItemsByIds(model);
+        var models = await _service.GetItems(model);
 
         // Assert
         Assert.All(models.Items, m => Assert.Contains(m.UserId, TestData.Ids));
@@ -227,7 +227,7 @@ public abstract class GenericServiceTest : TestBase
         Assert.Equal(TestData.Id, deletedId);
     }
 
-    private Dictionary<string, object> CreateGenericModelParameters(string id)
+    private static Dictionary<string, object> CreateGenericModelParameters(string id)
     {
         return new()
         {
@@ -237,8 +237,8 @@ public abstract class GenericServiceTest : TestBase
         };
     }
 
-    private IEnumerable<TestGenericModel> CreateDefaultMockedData()
+    private static TestGenericModel[] CreateDefaultMockedData()
     {
-        return TestData.GetAll(TestData.CreateGenericModel, new Dictionary<string, object>());
+        return TestData.GetAll(TestData.CreateGenericModel, []);
     }
 }

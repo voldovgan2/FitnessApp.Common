@@ -13,7 +13,7 @@ public abstract class DbContextTest(GenericDbContextFixture fixture) : IClassFix
     public async Task GetItemById_ReturnsSingleItem()
     {
         // Act
-        var item = await fixture.DbContext.GetItemById(TestData.EntityIdToGet);
+        var item = await fixture.DbContext.GetByUserId(TestData.EntityIdToGet);
 
         // Assert
         Assert.NotNull(item);
@@ -40,7 +40,7 @@ public abstract class DbContextTest(GenericDbContextFixture fixture) : IClassFix
     public async Task UpdateItem_ReturnsUpdated()
     {
         // Arrange
-        var existingItem = await fixture.DbContext.GetItemById(TestData.EntityIdToUpdate);
+        var existingItem = await fixture.DbContext.GetByUserId(TestData.EntityIdToUpdate);
         existingItem.TestProperty1 = "Updated";
 
         // Act
