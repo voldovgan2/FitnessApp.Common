@@ -17,7 +17,7 @@ public static class DbContextHelper
     public static async Task<PagedDataModel<TEntity>> GetPagedCollection<TEntity>(
         IMongoCollection<TEntity> collection,
         FilterDefinition<TEntity> filter,
-        GetPagedSearchDataModel model)
+        GetPagedDataModel model)
         where TEntity : IGenericEntity
     {
         var data = collection.Find(filter);
