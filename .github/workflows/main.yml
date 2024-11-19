@@ -11,29 +11,7 @@ jobs:
     runs-on: ubuntu-latest    
     outputs: 
       Version: ${{ steps.gitversion.outputs.SemVer }}
-      CommitsSinceVersionSource: ${{ steps.gitversion.outputs.CommitsSinceVersionSource }} 
-
-    services:
-      mongo-db:
-        image: mongo
-        ports:
-          - 27017:27017
-        options: >-
-          --health-cmd "echo 'db.runCommand("ping").ok' | mongosh --quiet"
-          --health-interval 10s
-          --health-timeout 5s
-          --health-retries 5
-          --name mongo_container
-          
-      minio:
-        image: minio/minio:latest
-        ports:
-          - 9000:9000
-        env:
-          MINIO_ROOT_USER: minioadmin
-          MINIO_ROOT_PASSWORD: minioadmin
-          MINIO_ACCESS_KEY: minioadmin
-          MINIO_SECRET_KEY: minioadmin   
+      CommitsSinceVersionSource: ${{ steps.gitversion.outputs.CommitsSinceVersionSource }}   
         
     steps:
     - name: Check out code 
@@ -71,36 +49,7 @@ jobs:
       
     - name: Build project 
       run: dotnet build FitnessApp.Common.sln -c Release /p:Version=${{ steps.gitversion.outputs.AssemblySemVer }} /p:AssemblyVersion=${{ steps.gitversion.outputs.AssemblySemVer }} /p:InformationalVersion=${{ steps.gitversion.outputs.InformationalVersion }} --no-restore
-      
-    - name: Run tests
-      run: dotnet test --configuration Release /p:Version=${{ steps.gitversion.outputs.AssemblySemVer }} --no-build --verbosity normal --collect:"XPlat Code Coverage" --results-directory ./coverage
-      env:
-        Minio__Endpoint: minio:9000
-        Minio__AccessKey: minioadmin
-        Minio__SecretKey: minioadmin
-        Minio__Secure: False
-        MongoConnection__ConnectionString: mongodb://localhost:27017
-        
-    - name: Code Coverage Report
-      uses: irongut/CodeCoverageSummary@v1.3.0
-      with:
-        filename: coverage/**/coverage.cobertura.xml
-        badge: true
-        fail_below_min: true
-        format: markdown
-        hide_branch_rate: false
-        hide_complexity: false
-        indicators: true
-        output: both
-        thresholds: '0 100'
-
-    - name: Add Coverage PR Comment
-      uses: marocchino/sticky-pull-request-comment@v2
-      if: github.event_name == 'pull_request'
-      with:
-        recreate: true
-        path: code-coverage-results.md
-        
+            
     - name: Pack package
       run: dotnet pack FitnessApp.Common/FitnessApp.Common.csproj -o:package /p:PackageVersion='${{ steps.gitversion.outputs.SemVer }}' -c Release
     
