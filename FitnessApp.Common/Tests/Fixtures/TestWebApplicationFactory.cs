@@ -1,4 +1,5 @@
-﻿using System.Net.Http;
+﻿using System;
+using System.Net.Http;
 using System.Net.Http.Headers;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Hosting;
@@ -11,7 +12,7 @@ namespace FitnessApp.Common.Tests.Fixtures;
 public class TestWebApplicationFactory<
     TProgram,
     TAuthenticationHandler,
-    TEntity>(MongoDbFixture<TEntity> fixture, TEntity[] items) :
+    TEntity>(MongoDbFixture<TEntity> fixture) :
     WebApplicationFactory<TProgram>
     where TProgram : class
     where TAuthenticationHandler : MockAuthenticationHandlerBase
@@ -19,6 +20,7 @@ public class TestWebApplicationFactory<
 {
     protected override void ConfigureWebHost(IWebHostBuilder builder)
     {
+        ArgumentNullException.ThrowIfNull(fixture);
         builder
             .ConfigureTestServices(services =>
             {
@@ -27,7 +29,6 @@ public class TestWebApplicationFactory<
                     .AddScheme<AuthenticationSchemeOptions, TAuthenticationHandler>(MockConstants.Scheme, options => { });
             })
             .UseEnvironment("Development");
-        fixture.SeedData(items).GetAwaiter().GetResult();
     }
 
     public HttpClient CreateHttpClient()

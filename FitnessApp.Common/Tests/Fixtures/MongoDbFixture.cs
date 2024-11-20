@@ -12,15 +12,17 @@ public abstract class MongoDbFixture<TEntity> : IDisposable
     protected MongoDbFixture(
         string connectionString,
         string databaseName,
-        string collecttionName)
+        string collecttionName,
+        TEntity[] items)
     {
         var database = new MongoClient(connectionString).GetDatabase(databaseName);
         if (!database.ListCollectionNames().ToList().Exists(c => c == collecttionName))
             database.CreateCollection(collecttionName);
         Collection = database.GetCollection<TEntity>(collecttionName);
+        SeedData(items).GetAwaiter().GetResult();
     }
 
-    public async Task SeedData(TEntity[] items)
+    private async Task SeedData(TEntity[] items)
     {
         var createdItemsTasks = items.Select(item => Collection.InsertOneAsync(item));
         await Task.WhenAll(createdItemsTasks);
