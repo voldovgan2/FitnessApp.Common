@@ -12,10 +12,12 @@ public interface IWithUserIdEntity : IGenericEntity
     string UserId { get; set; }
 }
 
-public interface IPartitionKey : IWithUserIdEntity
+public interface IPartitionKey
 {
     string PartitionKey { get; set; }
 }
+
+public interface IArrayFilterParams;
 
 public abstract class GenericEntity : IGenericEntity
 {
