@@ -17,8 +17,6 @@ public interface IPartitionKey
     string PartitionKey { get; set; }
 }
 
-public interface IArrayFilterParams;
-
 public abstract class GenericEntity : IGenericEntity
 {
     [BsonId]
