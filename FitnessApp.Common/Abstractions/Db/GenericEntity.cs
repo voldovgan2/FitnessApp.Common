@@ -7,10 +7,12 @@ public interface IGenericEntity
     string Id { get; set; }
 }
 
-public interface IWithUserIdEntity : IGenericEntity
+public interface IUserId
 {
     string UserId { get; set; }
 }
+
+public interface IWithUserIdEntity : IUserId, IGenericEntity;
 
 public interface IPartitionKey
 {
