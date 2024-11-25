@@ -1,4 +1,5 @@
-﻿using System.Reflection;
+﻿using System;
+using System.Reflection;
 using System.Threading.Tasks;
 using FitnessApp.Common.Abstractions.Db;
 using FitnessApp.Common.Paged.Models.Input;
@@ -65,5 +66,22 @@ public static class DbContextHelper
         where TPartitionKey : IPartitionKey
     {
         return Builders<TPartitionKey>.Filter.Eq(s => s.PartitionKey, partitionKey);
+    }
+
+    public static FilterDefinition<TEntity> CreateGetByArrayParamsFiter<TParams, TEntity>(
+        TParams[] @params,
+        Func<TParams, FilterDefinition<TEntity>> createGetByArrayParamFiter)
+        where TParams : IMultipleParamFilter
+        where TEntity : IGenericEntity
+    {
+        if (@params.Length == 0)
+            return Builders<TEntity>.Filter.Where(o => false);
+        var filter = createGetByArrayParamFiter(@params[0]);
+        for (int k = 1; k < @params.Length; k++)
+        {
+            filter = Builders<TEntity>.Filter.Or(filter, createGetByArrayParamFiter(@params[k]));
+        }
+
+        return filter;
     }
 }

@@ -29,3 +29,5 @@ public abstract class GenericWithUserIdEntity : GenericEntity, IWithUserIdEntity
 {
     public string UserId { get; set; }
 }
+
+public interface IMultipleParamFilter;
