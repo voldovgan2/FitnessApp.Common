@@ -4,30 +4,30 @@ namespace FitnessApp.Common.Abstractions.Db;
 public interface IGenericEntity
 {
     [BsonId]
-    string Id { get; set; }
+    string Id { get; init; }
 }
 
 public interface IUserId
 {
-    string UserId { get; set; }
+    string UserId { get; init; }
 }
 
 public interface IWithUserIdEntity : IUserId, IGenericEntity;
 
 public interface IPartitionKey
 {
-    string PartitionKey { get; set; }
+    string PartitionKey { get; init; }
 }
 
 public abstract class GenericEntity : IGenericEntity
 {
     [BsonId]
-    public string Id { get; set; }
+    public string Id { get; init; }
 }
 
 public abstract class GenericWithUserIdEntity : GenericEntity, IWithUserIdEntity
 {
-    public string UserId { get; set; }
+    public string UserId { get; init; }
 }
 
 public interface IMultipleParamFilter;
