@@ -30,7 +30,7 @@ public static class MongoClientExtensions
             });
         }
 
-        services.AddTransient<IMongoClient, MongoClient>((IServiceProvider sp) => new MongoClient(connectionString));
+        services.AddSingleton<IMongoClient, MongoClient>((IServiceProvider sp) => new MongoClient(connectionString));
         return services;
     }
 }
