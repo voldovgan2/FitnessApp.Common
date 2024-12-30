@@ -12,7 +12,7 @@ namespace FitnessApp.Common.Serializer;
 [ExcludeFromCodeCoverage]
 public class SensitiveDataContractResolver : DefaultContractResolver
 {
-    public bool HasSensitiveProperties(Type type)
+    public static bool HasSensitiveProperties(Type type)
     {
         return GetSensitiveProperties(type).Length != 0;
     }
@@ -28,7 +28,7 @@ public class SensitiveDataContractResolver : DefaultContractResolver
         ];
     }
 
-    private PropertyInfo[] GetSensitiveProperties(Type type)
+    private static PropertyInfo[] GetSensitiveProperties(Type type)
     {
         return [
             ..type

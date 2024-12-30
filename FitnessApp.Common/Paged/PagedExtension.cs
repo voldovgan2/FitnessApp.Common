@@ -1,10 +1,8 @@
 ﻿using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using System.Reflection;
-using FitnessApp.Common.Paged.Models.Input;
-using FitnessApp.Common.Paged.Models.Output;
 
-namespace FitnessApp.Common.Paged.Extensions;
+namespace FitnessApp.Common.Paged;
 
 [ExcludeFromCodeCoverage]
 public static class PagedExtension
@@ -30,7 +28,7 @@ public static class PagedExtension
         {
             Page = model.Page,
             TotalCount = totalCount,
-            Items = [..items]
+            Items = [.. items]
         };
     }
 

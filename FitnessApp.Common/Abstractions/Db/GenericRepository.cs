@@ -3,7 +3,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using AutoMapper;
 using FitnessApp.Common.Abstractions.Models;
-using FitnessApp.Common.Paged.Extensions;
+using FitnessApp.Common.Paged;
 using FitnessApp.Common.Paged.Models.Input;
 using FitnessApp.Common.Paged.Models.Output;
 

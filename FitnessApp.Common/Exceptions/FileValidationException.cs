@@ -11,7 +11,7 @@ public class FileValidationException(ValidationError fileFieldNameError, Validat
 {
     private static string GetErrorMessage(ValidationError fileFieldNameError, ValidationError fileFieldValueError)
     {
-        List<string> errors = new List<string>();
+        List<string> errors = [];
         if (fileFieldNameError != null)
             errors.Add(fileFieldNameError.ToString());
 
