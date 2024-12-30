@@ -11,6 +11,7 @@ namespace FitnessApp.Common.Middleware;
 [ExcludeFromCodeCoverage]
 public abstract class AbstractErrorHandlerMiddleware(RequestDelegate next)
 {
+    public const string CorrelationIdHeaderName = "X-Correlation-Id";
     public async Task Invoke(HttpContext context)
     {
         try
@@ -29,9 +30,9 @@ public abstract class AbstractErrorHandlerMiddleware(RequestDelegate next)
         }
     }
 
-    protected string GetCorrelationId(HttpContext context)
+    protected static string GetCorrelationId(HttpContext context)
     {
-        context.Request.Headers.TryGetValue(MiddlewareConstants.CorrelationIdHeaderName, out var correlationId);
+        context.Request.Headers.TryGetValue(CorrelationIdHeaderName, out var correlationId);
         return correlationId;
     }
 

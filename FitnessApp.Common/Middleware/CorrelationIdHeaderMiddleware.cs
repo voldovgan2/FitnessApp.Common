@@ -10,12 +10,12 @@ public class CorrelationIdHeaderMiddleware(RequestDelegate next)
 {
     public async Task Invoke(HttpContext context)
     {
-        if (!context.Request.Headers.TryGetValue(MiddlewareConstants.CorrelationIdHeaderName, out var correlationId))
+        if (!context.Request.Headers.TryGetValue(AbstractErrorHandlerMiddleware.CorrelationIdHeaderName, out var correlationId))
             correlationId = Guid.NewGuid().ToString();
 
         context.Response.OnStarting(() =>
         {
-            context.Response.Headers.Append(MiddlewareConstants.CorrelationIdHeaderName, new[] { correlationId.ToString() });
+            context.Response.Headers.Append(AbstractErrorHandlerMiddleware.CorrelationIdHeaderName, new[] { correlationId.ToString() });
             return Task.CompletedTask;
         });
 

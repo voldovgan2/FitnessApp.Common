@@ -4,8 +4,6 @@ using System.Threading.Tasks;
 using AutoMapper;
 using FitnessApp.Common.Abstractions.Models;
 using FitnessApp.Common.Paged;
-using FitnessApp.Common.Paged.Models.Input;
-using FitnessApp.Common.Paged.Models.Output;
 
 namespace FitnessApp.Common.Abstractions.Db;
 

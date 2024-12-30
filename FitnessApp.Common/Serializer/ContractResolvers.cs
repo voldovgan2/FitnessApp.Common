@@ -10,6 +10,17 @@ using Newtonsoft.Json.Serialization;
 namespace FitnessApp.Common.Serializer;
 
 [ExcludeFromCodeCoverage]
+public class ContractResolver(string[] propertiesToIgnore) : DefaultContractResolver
+{
+    protected override IList<JsonProperty> CreateProperties(Type type, MemberSerialization memberSerialization)
+    {
+        var properties = base.CreateProperties(type, memberSerialization);
+        properties = properties.Where(p => !propertiesToIgnore.Contains(p.PropertyName)).ToList();
+        return properties;
+    }
+}
+
+[ExcludeFromCodeCoverage]
 public class SensitiveDataContractResolver : DefaultContractResolver
 {
     public static bool HasSensitiveProperties(Type type)

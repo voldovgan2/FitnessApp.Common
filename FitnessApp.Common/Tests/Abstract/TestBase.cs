@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
 using FitnessApp.Common.Abstractions.Models;
-using FitnessApp.Common.Paged.Models.Input;
+using FitnessApp.Common.Paged;
 
 namespace FitnessApp.Common.Tests.Abstract;
 

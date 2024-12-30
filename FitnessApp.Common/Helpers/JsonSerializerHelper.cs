@@ -1,11 +1,12 @@
 ﻿using System.Diagnostics.CodeAnalysis;
 using System.Text;
+using FitnessApp.Common.Serializer;
 using Newtonsoft.Json;
 
-namespace FitnessApp.Common.Serializer;
+namespace FitnessApp.Common.Helpers;
 
 [ExcludeFromCodeCoverage]
-public static class JsonConvertHelper
+public static class JsonSerializerHelper
 {
     private static Encoding DefaultEncoding { get; set; } = Encoding.UTF32;
 

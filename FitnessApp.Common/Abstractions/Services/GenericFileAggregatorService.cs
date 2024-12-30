@@ -9,9 +9,7 @@ using FitnessApp.Common.Abstractions.Extensions;
 using FitnessApp.Common.Abstractions.Models;
 using FitnessApp.Common.Files;
 using FitnessApp.Common.Helpers;
-using FitnessApp.Common.Paged.Extensions;
-using FitnessApp.Common.Paged.Models.Input;
-using FitnessApp.Common.Paged.Models.Output;
+using FitnessApp.Common.Paged;
 
 namespace FitnessApp.Common.Abstractions.Services;
 

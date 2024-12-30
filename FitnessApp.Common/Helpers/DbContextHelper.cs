@@ -2,8 +2,7 @@
 using System.Reflection;
 using System.Threading.Tasks;
 using FitnessApp.Common.Abstractions.Db;
-using FitnessApp.Common.Paged.Models.Input;
-using FitnessApp.Common.Paged.Models.Output;
+using FitnessApp.Common.Paged;
 using MongoDB.Driver;
 
 namespace FitnessApp.Common.Helpers;

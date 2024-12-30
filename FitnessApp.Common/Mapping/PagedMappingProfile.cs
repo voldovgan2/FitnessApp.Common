@@ -1,7 +1,6 @@
 ﻿using System.Diagnostics.CodeAnalysis;
 using AutoMapper;
-using FitnessApp.Common.Paged.Contracts.Output;
-using FitnessApp.Common.Paged.Models.Output;
+using FitnessApp.Common.Paged;
 
 namespace FitnessApp.Common.Mapping;
 

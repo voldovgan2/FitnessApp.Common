@@ -12,6 +12,12 @@ namespace FitnessApp.Common.Middleware;
 [ExcludeFromCodeCoverage]
 public abstract class AbstractRequestResponseLoggingMiddleware(RequestDelegate next, ILogger logger)
 {
+    protected enum RequestDirection
+    {
+        In,
+        Out
+    }
+
     public async Task Invoke(HttpContext context)
     {
         context.Features.Get<IHttpMaxRequestBodySizeFeature>().MaxRequestBodySize = 110100480;
