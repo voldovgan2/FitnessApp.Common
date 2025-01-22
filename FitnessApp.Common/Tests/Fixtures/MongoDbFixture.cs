@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Linq;
 using System.Threading.Tasks;
+using Microsoft.Extensions.Configuration;
 using MongoDB.Driver;
 
 namespace FitnessApp.Common.Tests.Fixtures;
@@ -9,16 +10,16 @@ public abstract class MongoDbFixture<TEntity> : IDisposable
 {
     protected IMongoCollection<TEntity> Collection { get; }
 
-    protected MongoDbFixture(
-        string connectionString,
-        string databaseName,
-        string collecttionName,
-        TEntity[] items)
+    protected MongoDbFixture(TEntity[] items)
     {
-        var database = new MongoClient(connectionString).GetDatabase(databaseName);
-        if (!database.ListCollectionNames().ToList().Exists(c => c == collecttionName))
-            database.CreateCollection(collecttionName);
-        Collection = database.GetCollection<TEntity>(collecttionName);
+        var configuration = new ConfigurationBuilder()
+            .AddJsonFile("appsettings.json", optional: true, reloadOnChange: true)
+            .AddEnvironmentVariables()
+            .Build();
+        var database = new MongoClient(configuration["ConnectionString"]).GetDatabase(configuration["DatabaseName"]);
+        if (!database.ListCollectionNames().ToList().Exists(c => c == configuration["CollecttionName"]))
+            database.CreateCollection(configuration["CollecttionName"]);
+        Collection = database.GetCollection<TEntity>(configuration["CollecttionName"]);
         SeedData(items).GetAwaiter().GetResult();
     }
 
